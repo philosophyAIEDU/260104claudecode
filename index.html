@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philosophy AI Education - AI로 미래를 교육합니다</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #e67e22;
+            --primary-dark: #d35400;
+            --secondary-color: #f39c12;
+            --accent-color: #3498db;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --background-light: #f8f9fa;
+            --white: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-hover: rgba(0, 0, 0, 0.15);
+            --gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background-color: var(--white);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: var(--white);
+            box-shadow: 0 2px 10px var(--shadow);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            padding: 0.5rem;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary-color);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-dark);
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--gradient);
+            color: var(--white);
+            padding: 150px 0 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="30" r="1.5" fill="rgba(255,255,255,0.05)"/><circle cx="80" cy="60" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards 0.5s;
+        }
+
+        .hero .slogan {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards 0.8s;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--white);
+            color: var(--primary-color);
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards 1.1s;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: var(--background-light);
+        }
+
+        /* Sections */
+        section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .section-title.animate {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        /* About Section */
+        .about {
+            background: var(--background-light);
+        }
+
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--text-light);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .about-content.animate {
+            animation: fadeInUp 0.8s ease forwards 0.3s;
+        }
+
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .service-card {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px var(--shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .service-card.animate {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .service-card:nth-child(2).animate {
+            animation-delay: 0.2s;
+        }
+
+        .service-card:nth-child(3).animate {
+            animation-delay: 0.4s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px var(--shadow-hover);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .service-card p {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Why Us Section */
+        .why-us {
+            background: var(--background-light);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .feature-item {
+            text-align: center;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .feature-item.animate {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .feature-item:nth-child(2).animate {
+            animation-delay: 0.2s;
+        }
+
+        .feature-item:nth-child(3).animate {
+            animation-delay: 0.4s;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--white);
+        }
+
+        .feature-item h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .feature-item p {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Contact Section */
+        .contact-form {
+            max-width: 600px;
+            margin: 2rem auto 0;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .contact-form.animate {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--white);
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .form-group.error input,
+        .form-group.error textarea {
+            border-color: #e74c3c;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .form-group.success input,
+        .form-group.success textarea {
+            border-color: #27ae60;
+        }
+
+        @keyframes shake {
+            0%, 20%, 40%, 60%, 80%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--gradient);
+            color: var(--white);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn .loading {
+            display: none;
+        }
+
+        .submit-btn.loading .loading {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+
+        .submit-btn.loading .text {
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success Message */
+        .success-message {
+            background: #27ae60;
+            color: var(--white);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .success-message.show {
+            display: flex;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Submission Counter */
+        .submission-counter {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Admin Panel */
+        .admin-trigger {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .admin-trigger:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(230, 126, 34, 0.4);
+        }
+
+        .admin-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .admin-content {
+            background: var(--white);
+            max-width: 900px;
+            margin: 50px auto;
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--background-light);
+        }
+
+        .admin-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .admin-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-search {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .admin-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .admin-btn.export {
+            background: var(--accent-color);
+            color: var(--white);
+        }
+
+        .admin-btn.clear {
+            background: #e74c3c;
+            color: var(--white);
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .inquiries-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .inquiry-item {
+            background: var(--background-light);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .inquiry-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .inquiry-name {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .inquiry-date {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .inquiry-email {
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .inquiry-message {
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text-dark);
+            color: var(--white);
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .services-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1.5rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-menu {
+                position: fixed;
+                left: -100%;
+                top: 70px;
+                flex-direction: column;
+                background-color: var(--white);
+                width: 100%;
+                text-align: center;
+                transition: 0.3s;
+                box-shadow: 0 10px 27px var(--shadow);
+                padding: 2rem 0;
+                gap: 0;
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .nav-menu li {
+                margin: 1rem 0;
+            }
+
+            .nav-menu a {
+                padding: 1rem;
+                display: block;
+                font-size: 1.1rem;
+            }
+
+            .hero {
+                padding: 120px 0 80px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .slogan {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            section {
+                padding: 60px 0;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .admin-content {
+                margin: 20px;
+                padding: 1.5rem;
+            }
+
+            .admin-controls {
+                flex-direction: column;
+            }
+
+            .admin-search {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero .slogan {
+                font-size: 1rem;
+            }
+
+            .cta-button {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+            }
+
+            .service-card,
+            .contact-form {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: hover) {
+            .service-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 10px 30px var(--shadow-hover);
+            }
+
+            .cta-button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            }
+
+            .submit-btn:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);
+            }
+        }
+
+        @media (max-width: 360px) {
+            .container {
+                padding: 0 10px;
+            }
+            
+            .hero {
+                padding: 100px 0 60px;
+            }
+            
+            .service-card,
+            .contact-form {
+                padding: 1rem;
+            }
+        }
+
+        /* Performance optimizations */
+        .service-card,
+        .feature-icon,
+        .cta-button,
+        .submit-btn {
+            will-change: transform;
+        }
+
+        /* Ensure smooth animations on mobile */
+        * {
+            transform: translate3d(0, 0, 0);
+        }
+
+        /* iOS fixes */
+        input, textarea, button {
+            -webkit-appearance: none;
+            border-radius: 0;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            border-radius: 8px !important;
+        }
+
+        .submit-btn,
+        .cta-button {
+            border-radius: 8px !important;
+        }
+
+        .cta-button {
+            border-radius: 50px !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">Philosophy AI Education</a>
+            <ul class="nav-menu">
+                <li><a href="#home">홈</a></li>
+                <li><a href="#about">회사소개</a></li>
+                <li><a href="#services">서비스</a></li>
+                <li><a href="#why-us">강점</a></li>
+                <li><a href="#contact">문의</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Philosophy AI Education</h1>
+                <p class="slogan">AI로 미래를 교육합니다</p>
+                <a href="#contact" class="cta-button">
+                    <i class="fas fa-rocket"></i> 강의 문의하기
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">회사 소개</h2>
+            <div class="about-content">
+                <p>Philosophy AI Education은 AI 기술의 철학적 이해와 실용적 활용을 통해 미래 인재를 양성합니다. Claude, GPT 등 최신 AI 도구를 교육에 접목하여 개인과 기업의 성장을 돕고 있습니다. 체계적인 커리큘럼과 전문 강사진을 통해 AI 시대에 필요한 핵심 역량을 기를 수 있도록 지원합니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">서비스</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Claude 활용 교육</h3>
+                    <p>Claude AI의 고급 기능을 활용한 실무 중심 교육으로 생산성을 극대화하고 창의적 사고를 기릅니다.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>맞춤형 AI 워크샵</h3>
+                    <p>개인 및 팀의 니즈에 맞춘 맞춤형 AI 도구 활용 워크샵을 통해 즉시 적용 가능한 스킬을 습득합니다.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3>기업 교육 프로그램</h3>
+                    <p>기업의 디지털 전환을 지원하는 체계적인 AI 교육 프로그램으로 조직 역량을 강화합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Us Section -->
+    <section id="why-us" class="why-us">
+        <div class="container">
+            <h2 class="section-title">왜 Philosophy AI Education인가?</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h3>전문 강사진</h3>
+                    <p>AI 기술과 교육 분야의 풍부한 경험을 가진 전문 강사들이 최고 수준의 교육을 제공합니다.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>체계적 커리큘럼</h3>
+                    <p>기초부터 고급 활용까지 단계별로 구성된 체계적인 커리큘럼으로 확실한 학습 효과를 보장합니다.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>지속적 지원</h3>
+                    <p>교육 완료 후에도 지속적인 멘토링과 업데이트 정보를 제공하여 장기적인 성장을 지원합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">문의하기</h2>
+            <form class="contact-form" id="contactForm">
+                <div class="form-group">
+                    <label for="name">이름</label>
+                    <input type="text" id="name" name="name" required>
+                    <div class="error-message" id="nameError">이름을 2글자 이상 입력해주세요.</div>
+                </div>
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <input type="email" id="email" name="email" required>
+                    <div class="error-message" id="emailError">올바른 이메일 주소를 입력해주세요.</div>
+                </div>
+                <div class="form-group">
+                    <label for="message">문의내용</label>
+                    <textarea id="message" name="message" placeholder="문의하실 내용을 자세히 적어주세요." required></textarea>
+                    <div class="error-message" id="messageError">문의내용을 10글자 이상 입력해주세요.</div>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <span class="text">문의 보내기</span>
+                    <span class="loading"><i class="fas fa-spinner"></i></span>
+                </button>
+            </form>
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i>
+                문의가 성공적으로 전송되었습니다. 빠른 시일 내에 연락드리겠습니다.
+            </div>
+            <div class="submission-counter" id="submissionCounter"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Philosophy AI Education. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Admin Panel -->
+    <button class="admin-trigger" id="adminTrigger" title="관리자 패널">
+        <i class="fas fa-cog"></i>
+    </button>
+
+    <div class="admin-modal" id="adminModal">
+        <div class="admin-content">
+            <div class="admin-header">
+                <h2>문의 관리</h2>
+                <button class="admin-close" id="adminClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-controls">
+                <input type="text" class="admin-search" id="adminSearch" placeholder="이름, 이메일, 메시지로 검색...">
+                <button class="admin-btn export" id="exportJson">JSON 내보내기</button>
+                <button class="admin-btn export" id="exportCsv">CSV 내보내기</button>
+                <button class="admin-btn clear" id="clearData">전체 삭제</button>
+            </div>
+            <div class="inquiries-list" id="inquiriesList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let isSubmitting = false;
+        let submissionCount = 0;
+
+        // DOM elements
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+        const contactForm = document.getElementById('contactForm');
+        const successMessage = document.getElementById('successMessage');
+        const submissionCounter = document.getElementById('submissionCounter');
+        
+        // Admin panel elements
+        const adminTrigger = document.getElementById('adminTrigger');
+        const adminModal = document.getElementById('adminModal');
+        const adminClose = document.getElementById('adminClose');
+        const adminSearch = document.getElementById('adminSearch');
+        const exportJson = document.getElementById('exportJson');
+        const exportCsv = document.getElementById('exportCsv');
+        const clearData = document.getElementById('clearData');
+        const inquiriesList = document.getElementById('inquiriesList');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSubmissionCounter();
+            setupEventListeners();
+            setupScrollAnimations();
+            setupFormValidation();
+            setupAdminPanel();
+            
+            // Run development tests
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                runDevelopmentTests();
+            }
+        });
+
+        // Event Listeners Setup
+        function setupEventListeners() {
+            // Mobile navigation
+            hamburger?.addEventListener('click', () => {
+                navMenu?.classList.toggle('active');
+                hamburger.classList.toggle('active');
+            });
+
+            // Smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                        // Close mobile menu if open
+                        navMenu?.classList.remove('active');
+                        hamburger?.classList.remove('active');
+                    }
+                });
+            });
+
+            // Form submission
+            contactForm?.addEventListener('submit', handleFormSubmission);
+
+            // Real-time validation
+            setupRealTimeValidation();
+        }
+
+        // Form Validation
+        function setupFormValidation() {
+            const nameField = document.getElementById('name');
+            const emailField = document.getElementById('email');
+            const messageField = document.getElementById('message');
+
+            // Clear errors on input
+            [nameField, emailField, messageField].forEach(field => {
+                if (field) {
+                    field.addEventListener('input', () => clearFieldError(field));
+                    field.addEventListener('blur', () => validateField(field));
+                }
+            });
+        }
+
+        function setupRealTimeValidation() {
+            const fields = ['name', 'email', 'message'];
+            
+            fields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (field) {
+                    field.addEventListener('blur', () => validateField(field));
+                    field.addEventListener('input', () => {
+                        if (field.closest('.form-group').classList.contains('error')) {
+                            validateField(field);
+                        }
+                    });
+                }
+            });
+        }
+
+        function validateField(field) {
+            const fieldName = field.name;
+            const value = field.value.trim();
+            let isValid = true;
+            let errorMessage = '';
+
+            switch (fieldName) {
+                case 'name':
+                    if (value.length < 2) {
+                        isValid = false;
+                        errorMessage = '이름을 2글자 이상 입력해주세요.';
+                    } else if (!isValidKoreanName(value)) {
+                        isValid = false;
+                        errorMessage = '올바른 이름을 입력해주세요.';
+                    }
+                    break;
+                case 'email':
+                    if (!isValidEmail(value)) {
+                        isValid = false;
+                        errorMessage = '올바른 이메일 주소를 입력해주세요.';
+                    }
+                    break;
+                case 'message':
+                    if (value.length < 10) {
+                        isValid = false;
+                        errorMessage = '문의내용을 10글자 이상 입력해주세요.';
+                    }
+                    break;
+            }
+
+            updateFieldValidation(field, isValid, errorMessage);
+            return isValid;
+        }
+
+        function isValidKoreanName(name) {
+            // Allow Korean characters, English letters, and spaces
+            const koreanNameRegex = /^[가-힣a-zA-Z\s]+$/;
+            return koreanNameRegex.test(name);
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function updateFieldValidation(field, isValid, errorMessage) {
+            const formGroup = field.closest('.form-group');
+            const errorElement = formGroup.querySelector('.error-message');
+
+            formGroup.classList.remove('error', 'success');
+            
+            if (isValid) {
+                formGroup.classList.add('success');
+                errorElement.classList.remove('show');
+            } else {
+                formGroup.classList.add('error');
+                errorElement.textContent = errorMessage;
+                errorElement.classList.add('show');
+            }
+        }
+
+        function clearFieldError(field) {
+            const formGroup = field.closest('.form-group');
+            const errorElement = formGroup.querySelector('.error-message');
+            
+            formGroup.classList.remove('error');
+            errorElement.classList.remove('show');
+        }
+
+        function validateForm() {
+            const name = document.getElementById('name');
+            const email = document.getElementById('email');
+            const message = document.getElementById('message');
+
+            const nameValid = validateField(name);
+            const emailValid = validateField(email);
+            const messageValid = validateField(message);
+
+            return nameValid && emailValid && messageValid;
+        }
+
+        // Form Submission
+        async function handleFormSubmission(e) {
+            e.preventDefault();
+            
+            if (isSubmitting) return;
+            
+            if (!validateForm()) {
+                return;
+            }
+
+            isSubmitting = true;
+            const submitBtn = document.querySelector('.submit-btn');
+            
+            // Show loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            try {
+                const formData = new FormData(contactForm);
+                const inquiryData = {
+                    id: `inquiry_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    message: formData.get('message'),
+                    timestamp: new Date().toISOString(),
+                    dateFormatted: new Date().toLocaleString('ko-KR')
+                };
+
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Save to localStorage
+                saveInquiry(inquiryData);
+                
+                // Show success message
+                showSuccessMessage();
+                
+                // Reset form
+                contactForm.reset();
+                clearAllFieldStates();
+                
+                // Update counter
+                updateSubmissionCounter();
+                
+            } catch (error) {
+                console.error('문의 전송 중 오류가 발생했습니다:', error);
+                alert('문의 전송 중 오류가 발생했습니다. 다시 시도해 주세요.');
+            } finally {
+                isSubmitting = false;
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        }
+
+        function clearAllFieldStates() {
+            document.querySelectorAll('.form-group').forEach(group => {
+                group.classList.remove('error', 'success');
+                const errorElement = group.querySelector('.error-message');
+                if (errorElement) {
+                    errorElement.classList.remove('show');
+                }
+            });
+        }
+
+        function showSuccessMessage() {
+            successMessage.classList.add('show');
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 5000);
+        }
+
+        // Data Management
+        function saveInquiry(inquiryData) {
+            try {
+                const inquiries = getInquiries();
+                inquiries.unshift(inquiryData); // Add to beginning of array
+                localStorage.setItem('philosophyAI_inquiries', JSON.stringify(inquiries));
+            } catch (error) {
+                console.error('문의 저장 중 오류:', error);
+            }
+        }
+
+        function getInquiries() {
+            try {
+                const data = localStorage.getItem('philosophyAI_inquiries');
+                return data ? JSON.parse(data) : [];
+            } catch (error) {
+                console.error('문의 데이터 로드 중 오류:', error);
+                return [];
+            }
+        }
+
+        function updateSubmissionCounter() {
+            const inquiries = getInquiries();
+            submissionCount = inquiries.length;
+            if (submissionCounter) {
+                submissionCounter.textContent = `총 ${submissionCount}개의 문의가 접수되었습니다.`;
+            }
+        }
+
+        // Admin Panel
+        function setupAdminPanel() {
+            adminTrigger?.addEventListener('click', openAdminPanel);
+            adminClose?.addEventListener('click', closeAdminPanel);
+            adminModal?.addEventListener('click', (e) => {
+                if (e.target === adminModal) closeAdminPanel();
+            });
+
+            adminSearch?.addEventListener('input', filterInquiries);
+            exportJson?.addEventListener('click', () => exportData('json'));
+            exportCsv?.addEventListener('click', () => exportData('csv'));
+            clearData?.addEventListener('click', clearAllData);
+        }
+
+        function openAdminPanel() {
+            loadInquiries();
+            adminModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAdminPanel() {
+            adminModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function loadInquiries() {
+            const inquiries = getInquiries();
+            displayInquiries(inquiries);
+        }
+
+        function displayInquiries(inquiries) {
+            if (!inquiriesList) return;
+
+            if (inquiries.length === 0) {
+                inquiriesList.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 2rem;">아직 문의가 없습니다.</p>';
+                return;
+            }
+
+            inquiriesList.innerHTML = inquiries.map(inquiry => `
+                <div class="inquiry-item">
+                    <div class="inquiry-header">
+                        <span class="inquiry-name">${escapeHtml(inquiry.name)}</span>
+                        <span class="inquiry-date">${inquiry.dateFormatted}</span>
+                    </div>
+                    <div class="inquiry-email">${escapeHtml(inquiry.email)}</div>
+                    <div class="inquiry-message">${escapeHtml(inquiry.message)}</div>
+                </div>
+            `).join('');
+        }
+
+        function filterInquiries() {
+            const searchTerm = adminSearch.value.toLowerCase();
+            const inquiries = getInquiries();
+            
+            const filtered = inquiries.filter(inquiry => 
+                inquiry.name.toLowerCase().includes(searchTerm) ||
+                inquiry.email.toLowerCase().includes(searchTerm) ||
+                inquiry.message.toLowerCase().includes(searchTerm)
+            );
+            
+            displayInquiries(filtered);
+        }
+
+        function exportData(format) {
+            const inquiries = getInquiries();
+            
+            if (inquiries.length === 0) {
+                alert('내보낼 데이터가 없습니다.');
+                return;
+            }
+
+            const timestamp = new Date().toISOString().slice(0, 16);
+            
+            if (format === 'json') {
+                const dataStr = JSON.stringify(inquiries, null, 2);
+                downloadFile(dataStr, `inquiries_${timestamp}.json`, 'application/json');
+            } else if (format === 'csv') {
+                const csvData = convertToCSV(inquiries);
+                downloadFile(csvData, `inquiries_${timestamp}.csv`, 'text/csv');
+            }
+        }
+
+        function convertToCSV(inquiries) {
+            const headers = ['이름', '이메일', '메시지', '날짜'];
+            const csvContent = [
+                headers.join(','),
+                ...inquiries.map(inquiry => [
+                    `"${inquiry.name}"`,
+                    `"${inquiry.email}"`,
+                    `"${inquiry.message.replace(/"/g, '""')}"`,
+                    `"${inquiry.dateFormatted}"`
+                ].join(','))
+            ].join('\n');
+            
+            return '\uFEFF' + csvContent; // Add BOM for Korean characters
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function clearAllData() {
+            if (confirm('모든 문의 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                localStorage.removeItem('philosophyAI_inquiries');
+                loadInquiries();
+                updateSubmissionCounter();
+                alert('모든 데이터가 삭제되었습니다.');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Scroll Animations
+        function setupScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate');
+                        observer.unobserve(entry.target); // Unobserve for performance
+                    }
+                });
+            }, observerOptions);
+
+            // Observe elements that should animate
+            const animateElements = document.querySelectorAll(
+                '.section-title, .about-content, .service-card, .feature-item, .contact-form'
+            );
+            
+            animateElements.forEach(el => observer.observe(el));
+        }
+
+        // Error Handling
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'exception', {
+                    description: e.error?.message || 'Unknown error',
+                    fatal: false
+                });
+            }
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'exception', {
+                    description: e.reason?.message || 'Unhandled promise rejection',
+                    fatal: false
+                });
+            }
+        });
+
+        // Development Testing
+        function runDevelopmentTests() {
+            console.log('🧪 Running development tests...');
+            
+            // Test responsive breakpoints
+            testResponsiveBreakpoints();
+            
+            // Test form validation
+            testFormValidation();
+            
+            // Test localStorage functionality
+            testLocalStorage();
+            
+            // Test performance
+            testPerformance();
+            
+            console.log('✅ Development tests completed');
+        }
+
+        function testResponsiveBreakpoints() {
+            const breakpoints = [360, 480, 768, 1024, 1200];
+            console.log('📱 Testing responsive breakpoints:', breakpoints);
+        }
+
+        function testFormValidation() {
+            console.log('📝 Testing form validation...');
+            
+            // Test Korean name validation
+            const testNames = ['김철수', 'John Doe', '가', '김', 'a', '김철수철수철수철수'];
+            testNames.forEach(name => {
+                const isValid = isValidKoreanName(name);
+                console.log(`Name "${name}": ${isValid ? '✅' : '❌'}`);
+            });
+            
+            // Test email validation
+            const testEmails = ['test@example.com', 'invalid-email', 'test@', '@example.com', 'test@example'];
+            testEmails.forEach(email => {
+                const isValid = isValidEmail(email);
+                console.log(`Email "${email}": ${isValid ? '✅' : '❌'}`);
+            });
+        }
+
+        function testLocalStorage() {
+            console.log('💾 Testing localStorage functionality...');
+            
+            try {
+                const testData = { test: 'data', timestamp: Date.now() };
+                localStorage.setItem('test_key', JSON.stringify(testData));
+                const retrieved = JSON.parse(localStorage.getItem('test_key'));
+                const isValid = retrieved.test === 'data';
+                console.log(`localStorage test: ${isValid ? '✅' : '❌'}`);
+                localStorage.removeItem('test_key');
+            } catch (error) {
+                console.log('localStorage test: ❌', error);
+            }
+        }
+
+        function testPerformance() {
+            console.log('⚡ Testing performance...');
+            
+            const startTime = performance.now();
+            
+            // Test animation performance
+            requestAnimationFrame(() => {
+                const endTime = performance.now();
+                const animationTime = endTime - startTime;
+                console.log(`Animation frame time: ${animationTime.toFixed(2)}ms`);
+                
+                if (animationTime > 16.67) { // 60fps threshold
+                    console.warn('⚠️ Animation performance may be suboptimal');
+                }
+            });
+            
+            // Test memory usage (if available)
+            if (performance.memory) {
+                const memory = performance.memory;
+                console.log(`Memory usage: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB`);
+            }
+        }
+
+        // Performance optimizations
+        let ticking = false;
+        
+        function onScroll() {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    // Scroll-based animations can go here
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }
+        
+        window.addEventListener('scroll', onScroll, { passive: true });
+    </script>
+</body>
+</html>
