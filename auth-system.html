@@ -630,7 +630,7 @@
                 const { data, error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: window.location.origin + '/auth-system.html'
+                        redirectTo: 'https://philosophyaiedu.com/auth-system.html'
                     }
                 });
 
@@ -1022,4 +1022,4 @@
         initDemo();
     </script>
 </body>
-</html>
+</htm
