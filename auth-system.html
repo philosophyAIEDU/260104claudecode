@@ -541,7 +541,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwbmZnaWJ2cGJ3c2V0b3JoaHNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2MDQwNzMsImV4cCI6MjA4MzE4MDA3M30.enDBWvK5nOHEHl33eXhVHbL4MsSgM2pbk4VMZ3FOV48'
         
         // Supabase 클라이언트 초기화
-        const supabase = supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
         // DOM 요소들
         const authSection = document.getElementById('authSection');
@@ -563,7 +563,11 @@
 
         // 초기화
         document.addEventListener('DOMContentLoaded', async function() {
-            if (!supabase) {
+            console.log('🔍 Supabase 초기화 상태:', !!supabaseClient);
+            console.log('🔍 Supabase URL:', SUPABASE_URL);
+            console.log('🔍 API 키 길이:', SUPABASE_ANON_KEY.length);
+            
+            if (!supabaseClient) {
                 showError('Supabase가 초기화되지 않았습니다. API 키를 확인해주세요.');
                 return;
             }
@@ -586,8 +590,8 @@
             document.getElementById('userProfileForm')?.addEventListener('submit', handleProfileSubmit);
 
             // Supabase 인증 상태 변경 감지
-            if (supabase) {
-                supabase.auth.onAuthStateChange((event, session) => {
+            if (supabaseClient) {
+                supabaseClient.auth.onAuthStateChange((event, session) => {
                     console.log('Auth state changed:', event, session);
                     handleAuthStateChange(event, session);
                 });
@@ -609,39 +613,48 @@
 
         // 구글 로그인 처리
         async function handleGoogleLogin() {
-            if (!supabase) {
+            console.log('🚀 Google 로그인 시도 시작');
+            
+            if (!supabaseClient) {
+                console.error('❌ Supabase 클라이언트가 없습니다');
                 showError('Supabase가 초기화되지 않았습니다.');
                 return;
             }
 
             try {
+                console.log('📍 현재 URL:', window.location.href);
+                console.log('📍 리디렉트 URL:', window.location.origin);
+                
                 showMessage('구글 로그인을 진행 중입니다...');
                 
-                const { data, error } = await supabase.auth.signInWithOAuth({
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: window.location.origin + window.location.pathname
+                        redirectTo: window.location.origin + '/auth-system.html'
                     }
                 });
 
+                console.log('🔍 OAuth 응답 데이터:', data);
+                
                 if (error) {
+                    console.error('❌ OAuth 오류:', error);
                     throw error;
                 }
 
-                // OAuth는 리디렉션을 통해 진행되므로 여기서는 대기
+                console.log('✅ OAuth 요청 성공, 리디렉션 대기 중...');
                 
             } catch (error) {
-                console.error('Google 로그인 오류:', error);
+                console.error('❌ Google 로그인 오류:', error);
                 showError('로그인 중 오류가 발생했습니다: ' + error.message);
             }
         }
 
         // 로그아웃 처리
         async function handleLogout() {
-            if (!supabase) return;
+            if (!supabaseClient) return;
 
             try {
-                const { error } = await supabase.auth.signOut();
+                const { error } = await supabaseClient.auth.signOut();
                 if (error) throw error;
 
                 currentUser = null;
@@ -656,10 +669,10 @@
 
         // 인증 상태 확인
         async function checkAuthState() {
-            if (!supabase) return;
+            if (!supabaseClient) return;
 
             try {
-                const { data: { session }, error } = await supabase.auth.getSession();
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
                 
                 if (error) throw error;
 
@@ -710,10 +723,10 @@
 
         // 사용자 프로필 가져오기
         async function getUserProfile(userId) {
-            if (!supabase) return null;
+            if (!supabaseClient) return null;
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('users')
                     .select('*')
                     .eq('id', userId)
@@ -735,7 +748,7 @@
         async function handleProfileSubmit(e) {
             e.preventDefault();
             
-            if (!supabase || !currentUser) return;
+            if (!supabaseClient || !currentUser) return;
 
             try {
                 const formData = new FormData(e.target);
@@ -760,7 +773,7 @@
                 };
 
                 // 사용자 정보 저장
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('users')
                     .upsert(profileData);
 
@@ -791,10 +804,10 @@
 
         // 로그인 세션 기록
         async function recordLoginSession() {
-            if (!supabase || !currentUser) return;
+            if (!supabaseClient || !currentUser) return;
 
             try {
-                await supabase.rpc('record_login_session', {
+                await supabaseClient.rpc('record_login_session', {
                     user_ip_address: null, // 클라이언트에서는 실제 IP를 가져올 수 없음
                     user_agent: navigator.userAgent
                 });
@@ -805,11 +818,11 @@
 
         // 관리자 대시보드 표시
         async function showAdminDashboard() {
-            if (!supabase) return;
+            if (!supabaseClient) return;
 
             try {
                 // 통계 데이터 가져오기
-                const { data: stats, error: statsError } = await supabase
+                const { data: stats, error: statsError } = await supabaseClient
                     .from('dashboard_stats')
                     .select('*')
                     .single();
@@ -817,7 +830,7 @@
                 if (statsError) throw statsError;
 
                 // 관심사 분석 데이터
-                const { data: interests, error: interestsError } = await supabase
+                const { data: interests, error: interestsError } = await supabaseClient
                     .from('interest_analysis')
                     .select('*')
                     .limit(5);
@@ -825,7 +838,7 @@
                 if (interestsError) throw interestsError;
 
                 // 사용자 목록
-                const { data: users, error: usersError } = await supabase
+                const { data: users, error: usersError } = await supabaseClient
                     .from('admin_user_summary')
                     .select('*')
                     .order('created_at', { ascending: false })
