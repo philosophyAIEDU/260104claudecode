@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philosophy AI Education - 구글 로그인 시스템</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-color: #e67e22;
+            --primary-dark: #d35400;
+            --secondary-color: #f39c12;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --background-light: #f8f9fa;
+            --white: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-hover: rgba(0, 0, 0, 0.15);
+            --gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--background-light);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            box-shadow: 0 2px 10px var(--shadow);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            background: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* Main Content */
+        .main-content {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+
+        .auth-section {
+            background: var(--white);
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .auth-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .auth-subtitle {
+            color: var(--text-light);
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        .google-login-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 1rem 2rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .google-login-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow-hover);
+        }
+
+        .google-icon {
+            width: 24px;
+            height: 24px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%234285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="%2334A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="%23FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="%23EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+
+        .logout-btn {
+            background: var(--error-color);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* User Profile Form */
+        .profile-form {
+            display: none;
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow);
+            margin: 2rem 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+        }
+
+        .interests-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .interest-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .interest-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .submit-btn {
+            background: var(--gradient);
+            color: var(--white);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(230, 126, 34, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Admin Dashboard */
+        .admin-dashboard {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px var(--shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow-hover);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+
+        .users-table {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: var(--gradient);
+            color: var(--white);
+            padding: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .users-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr auto;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .user-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-item:hover {
+            background: var(--background-light);
+        }
+
+        .user-email {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .user-company {
+            color: var(--text-light);
+        }
+
+        .user-interests {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .user-date {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem 0;
+            }
+
+            .auth-section {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .auth-title {
+                font-size: 2rem;
+            }
+
+            .user-item {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+                text-align: left;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+        }
+
+        /* Loading states */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            background: var(--success-color);
+            color: var(--white);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .error-message {
+            background: var(--error-color);
+            color: var(--white);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav container">
+            <a href="#" class="logo">Philosophy AI Education</a>
+            <div class="user-menu">
+                <div class="user-info" id="userInfo">
+                    <img id="userAvatar" class="user-avatar" src="" alt="User Avatar">
+                    <span id="userName" class="user-name"></span>
+                    <button id="logoutBtn" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> 로그아웃
+                    </button>
+                </div>
+                <div id="loginSection">
+                    <button id="googleLoginBtn" class="google-login-btn">
+                        <div class="google-icon"></div>
+                        구글 계정으로 로그인
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- 로그인 화면 -->
+            <div id="authSection" class="auth-section">
+                <h1 class="auth-title">환영합니다!</h1>
+                <p class="auth-subtitle">Philosophy AI Education에 가입하여<br>최신 AI 교육 소식을 받아보세요</p>
+                
+                <button id="googleLogin" class="google-login-btn">
+                    <div class="google-icon"></div>
+                    구글 계정으로 시작하기
+                </button>
+
+                <div id="authMessage" class="success-message"></div>
+                <div id="authError" class="error-message"></div>
+            </div>
+
+            <!-- 프로필 완성 폼 -->
+            <div id="profileForm" class="profile-form">
+                <h2>프로필 정보 입력</h2>
+                <p style="color: var(--text-light); margin-bottom: 2rem;">
+                    맞춤형 교육 추천을 위해 추가 정보를 입력해주세요.
+                </p>
+
+                <form id="userProfileForm">
+                    <div class="form-group">
+                        <label for="phone">전화번호</label>
+                        <input type="tel" id="phone" name="phone" placeholder="010-1234-5678">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="company">회사/소속</label>
+                        <input type="text" id="company" name="company" placeholder="회사명 또는 소속 기관">
+                    </div>
+
+                    <div class="form-group">
+                        <label>관심사 (복수선택 가능)</label>
+                        <div class="interests-container" id="interestsContainer">
+                            <!-- 동적으로 생성됨 -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="marketingAgreed" name="marketingAgreed">
+                            마케팅 정보 수신에 동의합니다
+                        </label>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="profileSubmitBtn">
+                        프로필 저장하기
+                    </button>
+                </form>
+
+                <div id="profileMessage" class="success-message"></div>
+                <div id="profileError" class="error-message"></div>
+            </div>
+
+            <!-- 관리자 대시보드 -->
+            <div id="adminDashboard" class="admin-dashboard">
+                <div class="dashboard-header">
+                    <h1 class="dashboard-title">관리자 대시보드</h1>
+                    <p style="color: var(--text-light);">가입자 현황 및 통계 정보</p>
+                </div>
+
+                <div class="stats-grid" id="statsGrid">
+                    <!-- 동적으로 생성됨 -->
+                </div>
+
+                <div class="users-table">
+                    <div class="table-header">
+                        <i class="fas fa-users"></i> 가입자 목록
+                    </div>
+                    <div class="users-list" id="usersList">
+                        <!-- 동적으로 생성됨 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Supabase 설정
+        const SUPABASE_URL = 'https://dpnfgibvpbwsetorhhsn.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwbmZnaWJ2cGJ3c2V0b3JoaHNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2MDQwNzMsImV4cCI6MjA4MzE4MDA3M30.enDBWvK5nOHEHl33eXhVHbL4MsSgM2pbk4VMZ3FOV48'
+        
+        // Supabase 클라이언트 초기화
+        const supabase = supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        // DOM 요소들
+        const authSection = document.getElementById('authSection');
+        const profileForm = document.getElementById('profileForm');
+        const adminDashboard = document.getElementById('adminDashboard');
+        const userInfo = document.getElementById('userInfo');
+        const loginSection = document.getElementById('loginSection');
+        const authMessage = document.getElementById('authMessage');
+        const authError = document.getElementById('authError');
+
+        // 현재 사용자 상태
+        let currentUser = null;
+
+        // 관심사 카테고리 (데이터베이스에서 가져올 수 있음)
+        const interestCategories = [
+            '철학', 'AI/인공지능', '교육학', '심리학', '사회학', 
+            '정치학', '경제학', '과학철학', '윤리학', '미학'
+        ];
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!supabase) {
+                showError('Supabase가 초기화되지 않았습니다. API 키를 확인해주세요.');
+                return;
+            }
+
+            setupEventListeners();
+            loadInterestCategories();
+            await checkAuthState();
+        });
+
+        // 이벤트 리스너 설정
+        function setupEventListeners() {
+            // 구글 로그인 버튼들
+            document.getElementById('googleLogin')?.addEventListener('click', handleGoogleLogin);
+            document.getElementById('googleLoginBtn')?.addEventListener('click', handleGoogleLogin);
+            
+            // 로그아웃
+            document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+            
+            // 프로필 폼
+            document.getElementById('userProfileForm')?.addEventListener('submit', handleProfileSubmit);
+
+            // Supabase 인증 상태 변경 감지
+            if (supabase) {
+                supabase.auth.onAuthStateChange((event, session) => {
+                    console.log('Auth state changed:', event, session);
+                    handleAuthStateChange(event, session);
+                });
+            }
+        }
+
+        // 관심사 카테고리 로드
+        function loadInterestCategories() {
+            const container = document.getElementById('interestsContainer');
+            if (!container) return;
+
+            container.innerHTML = interestCategories.map(interest => `
+                <div class="interest-item">
+                    <input type="checkbox" id="interest_${interest}" name="interests" value="${interest}">
+                    <label for="interest_${interest}">${interest}</label>
+                </div>
+            `).join('');
+        }
+
+        // 구글 로그인 처리
+        async function handleGoogleLogin() {
+            if (!supabase) {
+                showError('Supabase가 초기화되지 않았습니다.');
+                return;
+            }
+
+            try {
+                showMessage('구글 로그인을 진행 중입니다...');
+                
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin + window.location.pathname
+                    }
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                // OAuth는 리디렉션을 통해 진행되므로 여기서는 대기
+                
+            } catch (error) {
+                console.error('Google 로그인 오류:', error);
+                showError('로그인 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        // 로그아웃 처리
+        async function handleLogout() {
+            if (!supabase) return;
+
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+
+                currentUser = null;
+                showLoginScreen();
+                showMessage('로그아웃되었습니다.');
+
+            } catch (error) {
+                console.error('로그아웃 오류:', error);
+                showError('로그아웃 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 인증 상태 확인
+        async function checkAuthState() {
+            if (!supabase) return;
+
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) throw error;
+
+                if (session) {
+                    await handleAuthenticatedUser(session.user);
+                } else {
+                    showLoginScreen();
+                }
+
+            } catch (error) {
+                console.error('인증 상태 확인 오류:', error);
+                showLoginScreen();
+            }
+        }
+
+        // 인증 상태 변경 처리
+        async function handleAuthStateChange(event, session) {
+            if (event === 'SIGNED_IN' && session) {
+                await handleAuthenticatedUser(session.user);
+            } else if (event === 'SIGNED_OUT') {
+                currentUser = null;
+                showLoginScreen();
+            }
+        }
+
+        // 인증된 사용자 처리
+        async function handleAuthenticatedUser(user) {
+            currentUser = user;
+            
+            // 사용자 정보 표시
+            updateUserInfo(user);
+            
+            // 데이터베이스에서 사용자 프로필 확인
+            const userProfile = await getUserProfile(user.id);
+            
+            if (!userProfile) {
+                // 새 사용자 - 프로필 입력 화면
+                showProfileForm(user);
+            } else {
+                // 기존 사용자 - 관리자인지 확인
+                if (userProfile.email === 'admin@example.com') { // 관리자 이메일 설정
+                    await showAdminDashboard();
+                } else {
+                    showWelcomeScreen(userProfile);
+                }
+            }
+        }
+
+        // 사용자 프로필 가져오기
+        async function getUserProfile(userId) {
+            if (!supabase) return null;
+
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+                    throw error;
+                }
+
+                return data;
+
+            } catch (error) {
+                console.error('프로필 가져오기 오류:', error);
+                return null;
+            }
+        }
+
+        // 프로필 폼 제출 처리
+        async function handleProfileSubmit(e) {
+            e.preventDefault();
+            
+            if (!supabase || !currentUser) return;
+
+            try {
+                const formData = new FormData(e.target);
+                const submitBtn = document.getElementById('profileSubmitBtn');
+                
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '저장 중... <div class="spinner"></div>';
+
+                // 관심사 수집
+                const interests = Array.from(document.querySelectorAll('input[name="interests"]:checked'))
+                    .map(input => input.value);
+
+                const profileData = {
+                    id: currentUser.id,
+                    email: currentUser.email,
+                    name: currentUser.user_metadata?.full_name || currentUser.email,
+                    phone: formData.get('phone'),
+                    company: formData.get('company'),
+                    interests: interests,
+                    marketing_agreed: formData.get('marketingAgreed') === 'on',
+                    profile_image_url: currentUser.user_metadata?.avatar_url
+                };
+
+                // 사용자 정보 저장
+                const { error } = await supabase
+                    .from('users')
+                    .upsert(profileData);
+
+                if (error) throw error;
+
+                // 로그인 세션 기록
+                await recordLoginSession();
+
+                showMessage('프로필이 저장되었습니다!');
+                
+                setTimeout(() => {
+                    if (currentUser.email === 'admin@example.com') {
+                        showAdminDashboard();
+                    } else {
+                        showWelcomeScreen(profileData);
+                    }
+                }, 1500);
+
+            } catch (error) {
+                console.error('프로필 저장 오류:', error);
+                showError('프로필 저장 중 오류가 발생했습니다: ' + error.message, 'profileError');
+            } finally {
+                const submitBtn = document.getElementById('profileSubmitBtn');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '프로필 저장하기';
+            }
+        }
+
+        // 로그인 세션 기록
+        async function recordLoginSession() {
+            if (!supabase || !currentUser) return;
+
+            try {
+                await supabase.rpc('record_login_session', {
+                    user_ip_address: null, // 클라이언트에서는 실제 IP를 가져올 수 없음
+                    user_agent: navigator.userAgent
+                });
+            } catch (error) {
+                console.error('세션 기록 오류:', error);
+            }
+        }
+
+        // 관리자 대시보드 표시
+        async function showAdminDashboard() {
+            if (!supabase) return;
+
+            try {
+                // 통계 데이터 가져오기
+                const { data: stats, error: statsError } = await supabase
+                    .from('dashboard_stats')
+                    .select('*')
+                    .single();
+
+                if (statsError) throw statsError;
+
+                // 관심사 분석 데이터
+                const { data: interests, error: interestsError } = await supabase
+                    .from('interest_analysis')
+                    .select('*')
+                    .limit(5);
+
+                if (interestsError) throw interestsError;
+
+                // 사용자 목록
+                const { data: users, error: usersError } = await supabase
+                    .from('admin_user_summary')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+
+                if (usersError) throw usersError;
+
+                // UI 업데이트
+                hideAllScreens();
+                adminDashboard.style.display = 'block';
+
+                // 통계 카드 생성
+                renderStatsCards(stats);
+                
+                // 사용자 목록 렌더링
+                renderUsersList(users);
+
+                console.log('관리자 대시보드 로드됨', { stats, interests, users });
+
+            } catch (error) {
+                console.error('대시보드 로드 오류:', error);
+                showError('대시보드를 로드할 수 없습니다: ' + error.message);
+            }
+        }
+
+        // 통계 카드 렌더링
+        function renderStatsCards(stats) {
+            const statsGrid = document.getElementById('statsGrid');
+            if (!statsGrid || !stats) return;
+
+            const statsCards = [
+                { label: '총 가입자', value: stats.total_users, icon: 'fas fa-users' },
+                { label: '오늘 신규', value: stats.new_users_today, icon: 'fas fa-user-plus' },
+                { label: '이번 주 신규', value: stats.new_users_this_week, icon: 'fas fa-chart-line' },
+                { label: '이번 달 신규', value: stats.new_users_this_month, icon: 'fas fa-calendar' },
+                { label: '마케팅 동의', value: stats.marketing_agreed_users, icon: 'fas fa-envelope' },
+                { label: '등록 회사', value: stats.total_companies, icon: 'fas fa-building' }
+            ];
+
+            statsGrid.innerHTML = statsCards.map(stat => `
+                <div class="stat-card">
+                    <i class="${stat.icon}" style="color: var(--primary-color); font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <span class="stat-number">${stat.value || 0}</span>
+                    <div class="stat-label">${stat.label}</div>
+                </div>
+            `).join('');
+        }
+
+        // 사용자 목록 렌더링
+        function renderUsersList(users) {
+            const usersList = document.getElementById('usersList');
+            if (!usersList) return;
+
+            if (!users || users.length === 0) {
+                usersList.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-light);">아직 가입자가 없습니다.</div>';
+                return;
+            }
+
+            usersList.innerHTML = users.map(user => `
+                <div class="user-item">
+                    <div>
+                        <div class="user-email">${user.email}</div>
+                        <div style="font-weight: 600; color: var(--text-dark);">${user.name}</div>
+                    </div>
+                    <div>
+                        <div class="user-company">${user.company || '미입력'}</div>
+                        <div class="user-interests">${Array.isArray(user.interests) ? user.interests.join(', ') : '미입력'}</div>
+                    </div>
+                    <div class="user-date">${new Date(user.created_at).toLocaleDateString('ko-KR')}</div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.9rem; color: var(--text-light);">
+                            ${user.marketing_agreed ? '마케팅 동의' : '마케팅 비동의'}
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-light);">
+                            ${user.last_login ? new Date(user.last_login).toLocaleDateString('ko-KR') : '로그인 없음'}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 화면 표시 함수들
+        function showLoginScreen() {
+            hideAllScreens();
+            authSection.style.display = 'block';
+            userInfo.style.display = 'none';
+            loginSection.style.display = 'block';
+        }
+
+        function showProfileForm(user) {
+            hideAllScreens();
+            profileForm.style.display = 'block';
+            userInfo.style.display = 'flex';
+            loginSection.style.display = 'none';
+        }
+
+        function showWelcomeScreen(profile) {
+            hideAllScreens();
+            authSection.style.display = 'block';
+            authSection.innerHTML = `
+                <h1 class="auth-title">환영합니다, ${profile.name}님!</h1>
+                <p class="auth-subtitle">로그인이 완료되었습니다.<br>곧 Philosophy AI Education의 최신 소식을 받아보실 수 있습니다.</p>
+                <div style="margin-top: 2rem;">
+                    <a href="/" style="color: var(--primary-color); text-decoration: none;">← 메인 페이지로 돌아가기</a>
+                </div>
+            `;
+            userInfo.style.display = 'flex';
+            loginSection.style.display = 'none';
+        }
+
+        function hideAllScreens() {
+            authSection.style.display = 'none';
+            profileForm.style.display = 'none';
+            adminDashboard.style.display = 'none';
+        }
+
+        // 사용자 정보 업데이트
+        function updateUserInfo(user) {
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+
+            if (userAvatar && user.user_metadata?.avatar_url) {
+                userAvatar.src = user.user_metadata.avatar_url;
+                userAvatar.alt = user.user_metadata?.full_name || user.email;
+            }
+
+            if (userName) {
+                userName.textContent = user.user_metadata?.full_name || user.email.split('@')[0];
+            }
+        }
+
+        // 메시지 표시 함수들
+        function showMessage(message, elementId = 'authMessage') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.style.display = 'block';
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function showError(message, elementId = 'authError') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.style.display = 'block';
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // 데모용 함수 (개발 시에만 사용)
+        function initDemo() {
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.log('🧪 데모 모드 활성화');
+                
+                // 데모용 관리자 로그인 버튼 추가
+                const demoBtn = document.createElement('button');
+                demoBtn.textContent = '데모: 관리자 로그인';
+                demoBtn.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; padding: 0.5rem; background: #e74c3c; color: white; border: none; border-radius: 4px; font-size: 0.8rem;';
+                demoBtn.onclick = async () => {
+                    // 데모용 관리자 데이터
+                    currentUser = {
+                        id: 'demo-admin',
+                        email: 'admin@example.com',
+                        user_metadata: {
+                            full_name: '관리자',
+                            avatar_url: 'https://via.placeholder.com/40'
+                        }
+                    };
+                    await showAdminDashboard();
+                };
+                document.body.appendChild(demoBtn);
+            }
+        }
+
+        // 데모 초기화 (개발용)
+        initDemo();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philosophy AI Education - 관리자 대시보드</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #e67e22;
+            --primary-dark: #d35400;
+            --secondary-color: #f39c12;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --background-light: #f8f9fa;
+            --white: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-hover: rgba(0, 0, 0, 0.15);
+            --gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--background-light);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            box-shadow: 0 2px 10px var(--shadow);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--gradient);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+        }
+
+        /* Main Dashboard */
+        .dashboard {
+            padding: 2rem 0;
+        }
+
+        .dashboard-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 3rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px var(--shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow-hover);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .stat-change.positive {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .stat-change.negative {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--error-color);
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px var(--shadow);
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Data Tables */
+        .data-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .table-card {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: var(--gradient);
+            color: var(--white);
+            padding: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .table-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-item:last-child {
+            border-bottom: none;
+        }
+
+        .table-item:hover {
+            background: var(--background-light);
+        }
+
+        /* Users Management */
+        .users-section {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px var(--shadow);
+            overflow: hidden;
+        }
+
+        .users-header {
+            background: var(--gradient);
+            color: var(--white);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            width: 250px;
+        }
+
+        .export-btn {
+            background: var(--accent-color);
+            color: var(--white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .users-table {
+            overflow-x: auto;
+        }
+
+        .users-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .users-table th {
+            background: var(--background-light);
+            font-weight: 600;
+            color: var(--text-dark);
+            position: sticky;
+            top: 0;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-inactive {
+            background: rgba(149, 165, 166, 0.1);
+            color: var(--text-light);
+        }
+
+        .interests-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        .interest-tag {
+            background: rgba(230, 126, 34, 0.1);
+            color: var(--primary-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .action-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            color: var(--white);
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px var(--shadow-hover);
+        }
+
+        .action-refresh {
+            background: var(--accent-color);
+        }
+
+        .action-export {
+            background: var(--success-color);
+        }
+
+        .action-settings {
+            background: var(--text-light);
+        }
+
+        /* Loading and Error States */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--error-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid var(--error-color);
+        }
+
+        .spinner {
+            border: 2px solid var(--background-light);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .data-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .dashboard-title {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+
+            .stat-card {
+                padding: 1.5rem;
+            }
+
+            .chart-card {
+                padding: 1.5rem;
+            }
+
+            .search-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .users-table {
+                font-size: 0.9rem;
+            }
+
+            .users-table th,
+            .users-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav container">
+            <a href="/" class="logo">Philosophy AI Education</a>
+            <div class="admin-info">
+                <i class="fas fa-shield-alt"></i>
+                <span>관리자 대시보드</span>
+                <div style="margin-left: 1rem; padding-left: 1rem; border-left: 1px solid rgba(255,255,255,0.3);">
+                    <span id="lastUpdate">데이터 로딩중...</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="dashboard container">
+        <h1 class="dashboard-title">
+            <i class="fas fa-chart-dashboard"></i>
+            가입자 관리 대시보드
+        </h1>
+
+        <!-- 통계 카드 -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="loading">
+                <div class="spinner"></div>
+                통계 데이터를 로드하는 중...
+            </div>
+        </div>
+
+        <!-- 차트 섹션 -->
+        <div class="charts-section">
+            <div class="chart-card">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-line"></i>
+                    가입자 추이 (최근 30일)
+                </h3>
+                <div class="chart-container">
+                    <canvas id="signupChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-pie"></i>
+                    관심사별 분포
+                </h3>
+                <div class="chart-container">
+                    <canvas id="interestChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 데이터 테이블 -->
+        <div class="data-section">
+            <div class="table-card">
+                <div class="table-header">
+                    <span><i class="fas fa-building"></i> 회사별 가입자</span>
+                    <span id="companyCount">0개</span>
+                </div>
+                <div class="table-content" id="companyTable">
+                    <div class="loading">데이터 로딩중...</div>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-header">
+                    <span><i class="fas fa-heart"></i> 관심사 TOP 10</span>
+                    <span id="interestCount">0개</span>
+                </div>
+                <div class="table-content" id="interestTable">
+                    <div class="loading">데이터 로딩중...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 사용자 관리 -->
+        <div class="users-section">
+            <div class="users-header">
+                <h3><i class="fas fa-users"></i> 가입자 목록</h3>
+                <div class="search-controls">
+                    <input type="text" class="search-input" id="userSearch" placeholder="이름, 이메일, 회사로 검색...">
+                    <button class="export-btn" id="exportUsersBtn">
+                        <i class="fas fa-download"></i> CSV 내보내기
+                    </button>
+                </div>
+            </div>
+            <div class="users-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>프로필</th>
+                            <th>이름</th>
+                            <th>이메일</th>
+                            <th>회사</th>
+                            <th>관심사</th>
+                            <th>가입일</th>
+                            <th>마지막 로그인</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td colspan="8" class="loading">
+                                <div class="spinner"></div>
+                                사용자 데이터를 로드하는 중...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <button class="action-btn action-refresh" id="refreshBtn" title="데이터 새로고침">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+        <button class="action-btn action-export" id="exportAllBtn" title="전체 데이터 내보내기">
+            <i class="fas fa-download"></i>
+        </button>
+        <button class="action-btn action-settings" id="settingsBtn" title="설정">
+            <i class="fas fa-cog"></i>
+        </button>
+    </div>
+
+    <script>
+        // Supabase 설정
+        const SUPABASE_URL = 'https://dpnfgibvpbwsetorhhsn.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwbmZnaWJ2cGJ3c2V0b3JoaHNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2MDQwNzMsImV4cCI6MjA4MzE4MDA3M30.enDBWvK5nOHEHl33eXhVHbL4MsSgM2pbk4VMZ3FOV48'
+        
+        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        // 차트 인스턴스
+        let signupChart = null;
+        let interestChart = null;
+
+        // 데이터 캐시
+        let dashboardData = {
+            stats: null,
+            users: [],
+            companies: [],
+            interests: [],
+            dailySignups: []
+        };
+
+        // 검색 상태
+        let searchTerm = '';
+        let filteredUsers = [];
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!supabase) {
+                showError('Supabase 연결에 실패했습니다. API 키를 확인해주세요.');
+                return;
+            }
+
+            setupEventListeners();
+            loadDashboardData();
+            
+            // 자동 새로고침 (5분마다)
+            setInterval(loadDashboardData, 5 * 60 * 1000);
+        });
+
+        // 이벤트 리스너 설정
+        function setupEventListeners() {
+            document.getElementById('refreshBtn')?.addEventListener('click', loadDashboardData);
+            document.getElementById('exportUsersBtn')?.addEventListener('click', exportUsersCSV);
+            document.getElementById('exportAllBtn')?.addEventListener('click', exportAllData);
+            document.getElementById('userSearch')?.addEventListener('input', handleUserSearch);
+        }
+
+        // 대시보드 데이터 로드
+        async function loadDashboardData() {
+            try {
+                updateLastUpdateTime();
+                
+                // 병렬로 모든 데이터 가져오기
+                const [statsResult, usersResult, companiesResult, interestsResult, dailyResult] = await Promise.all([
+                    supabase.from('dashboard_stats').select('*').single(),
+                    supabase.from('admin_user_summary').select('*').order('created_at', { ascending: false }),
+                    supabase.rpc('get_company_stats'),
+                    supabase.from('interest_analysis').select('*').order('user_count', { ascending: false }),
+                    supabase.rpc('get_daily_signups', { days: 30 })
+                ]);
+
+                // 에러 처리
+                if (statsResult.error) throw statsResult.error;
+                if (usersResult.error) throw usersResult.error;
+                if (companiesResult.error) throw companiesResult.error;
+                if (interestsResult.error) throw interestsResult.error;
+                if (dailyResult.error) throw dailyResult.error;
+
+                // 데이터 저장
+                dashboardData = {
+                    stats: statsResult.data,
+                    users: usersResult.data || [],
+                    companies: companiesResult.data || [],
+                    interests: interestsResult.data || [],
+                    dailySignups: dailyResult.data || []
+                };
+
+                // UI 업데이트
+                renderStatsCards();
+                renderCharts();
+                renderDataTables();
+                renderUsersTable();
+
+                console.log('대시보드 데이터 로드 완료', dashboardData);
+
+            } catch (error) {
+                console.error('대시보드 로드 오류:', error);
+                showError('데이터를 불러오는 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        // 통계 카드 렌더링
+        function renderStatsCards() {
+            const statsGrid = document.getElementById('statsGrid');
+            const stats = dashboardData.stats;
+
+            if (!stats) {
+                statsGrid.innerHTML = '<div class="error">통계 데이터를 불러올 수 없습니다.</div>';
+                return;
+            }
+
+            const cards = [
+                {
+                    icon: 'fas fa-users',
+                    number: stats.total_users,
+                    label: '총 가입자',
+                    change: null
+                },
+                {
+                    icon: 'fas fa-user-plus',
+                    number: stats.new_users_today,
+                    label: '오늘 신규',
+                    change: stats.new_users_today > 0 ? '+' + stats.new_users_today : null
+                },
+                {
+                    icon: 'fas fa-chart-line',
+                    number: stats.new_users_this_week,
+                    label: '이번 주 신규',
+                    change: null
+                },
+                {
+                    icon: 'fas fa-calendar',
+                    number: stats.new_users_this_month,
+                    label: '이번 달 신규',
+                    change: null
+                },
+                {
+                    icon: 'fas fa-envelope',
+                    number: stats.marketing_agreed_users,
+                    label: '마케팅 동의',
+                    change: stats.total_users > 0 ? Math.round((stats.marketing_agreed_users / stats.total_users) * 100) + '%' : null
+                },
+                {
+                    icon: 'fas fa-building',
+                    number: stats.total_companies,
+                    label: '등록 회사',
+                    change: null
+                }
+            ];
+
+            statsGrid.innerHTML = cards.map(card => `
+                <div class="stat-card">
+                    <i class="${card.icon} stat-icon"></i>
+                    <span class="stat-number">${card.number || 0}</span>
+                    <div class="stat-label">${card.label}</div>
+                    ${card.change ? `<div class="stat-change positive">${card.change}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // 차트 렌더링
+        function renderCharts() {
+            renderSignupChart();
+            renderInterestChart();
+        }
+
+        // 가입자 추이 차트
+        function renderSignupChart() {
+            const ctx = document.getElementById('signupChart');
+            if (!ctx) return;
+
+            // 기존 차트 제거
+            if (signupChart) {
+                signupChart.destroy();
+            }
+
+            const dailyData = dashboardData.dailySignups.slice(-30); // 최근 30일
+            const labels = dailyData.map(item => new Date(item.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }));
+            const data = dailyData.map(item => item.count);
+
+            signupChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '일일 가입자',
+                        data: data,
+                        borderColor: '#e67e22',
+                        backgroundColor: 'rgba(230, 126, 34, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 관심사 분포 차트
+        function renderInterestChart() {
+            const ctx = document.getElementById('interestChart');
+            if (!ctx) return;
+
+            // 기존 차트 제거
+            if (interestChart) {
+                interestChart.destroy();
+            }
+
+            const topInterests = dashboardData.interests.slice(0, 6); // TOP 6
+            const labels = topInterests.map(item => item.interest);
+            const data = topInterests.map(item => item.user_count);
+            const colors = [
+                '#e67e22', '#3498db', '#27ae60', '#9b59b6', '#e74c3c', '#f39c12'
+            ];
+
+            interestChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // 데이터 테이블 렌더링
+        function renderDataTables() {
+            renderCompanyTable();
+            renderInterestTable();
+        }
+
+        // 회사별 테이블
+        function renderCompanyTable() {
+            const container = document.getElementById('companyTable');
+            const countElement = document.getElementById('companyCount');
+            const companies = dashboardData.companies.slice(0, 10); // TOP 10
+
+            if (countElement) {
+                countElement.textContent = companies.length + '개';
+            }
+
+            if (!companies.length) {
+                container.innerHTML = '<div class="loading">회사 데이터가 없습니다.</div>';
+                return;
+            }
+
+            container.innerHTML = companies.map(company => `
+                <div class="table-item">
+                    <div>
+                        <strong>${company.company_name}</strong>
+                        <div style="font-size: 0.9rem; color: var(--text-light);">
+                            마케팅 동의율: ${company.marketing_rate}%
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-weight: 600; color: var(--primary-color);">${company.user_count}명</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 관심사별 테이블
+        function renderInterestTable() {
+            const container = document.getElementById('interestTable');
+            const countElement = document.getElementById('interestCount');
+            const interests = dashboardData.interests.slice(0, 10); // TOP 10
+
+            if (countElement) {
+                countElement.textContent = interests.length + '개';
+            }
+
+            if (!interests.length) {
+                container.innerHTML = '<div class="loading">관심사 데이터가 없습니다.</div>';
+                return;
+            }
+
+            container.innerHTML = interests.map((interest, index) => `
+                <div class="table-item">
+                    <div>
+                        <strong>#${index + 1} ${interest.interest}</strong>
+                        <div style="font-size: 0.9rem; color: var(--text-light);">
+                            ${interest.unique_companies}개 회사 • 마케팅 동의율: ${interest.marketing_rate}%
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-weight: 600; color: var(--primary-color);">${interest.user_count}명</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 사용자 테이블 렌더링
+        function renderUsersTable() {
+            const tbody = document.getElementById('usersTableBody');
+            const users = searchTerm ? filteredUsers : dashboardData.users;
+
+            if (!users.length) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-light);">
+                            ${searchTerm ? '검색 결과가 없습니다.' : '가입자가 없습니다.'}
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>
+                        <img src="${user.profile_image_url || 'https://via.placeholder.com/32'}" 
+                             alt="${user.name}" class="user-avatar">
+                    </td>
+                    <td><strong>${user.name}</strong></td>
+                    <td style="color: var(--accent-color);">${user.email}</td>
+                    <td>${user.company || '미입력'}</td>
+                    <td>
+                        <div class="interests-tags">
+                            ${(user.interests || []).slice(0, 3).map(interest => 
+                                `<span class="interest-tag">${interest}</span>`
+                            ).join('')}
+                            ${(user.interests || []).length > 3 ? 
+                                `<span class="interest-tag">+${(user.interests || []).length - 3}</span>` : ''
+                            }
+                        </div>
+                    </td>
+                    <td>${new Date(user.created_at).toLocaleDateString('ko-KR')}</td>
+                    <td>${user.last_login ? new Date(user.last_login).toLocaleDateString('ko-KR') : '없음'}</td>
+                    <td>
+                        <span class="user-status ${user.is_active ? 'status-active' : 'status-inactive'}">
+                            ${user.is_active ? '활성' : '비활성'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 사용자 검색 처리
+        function handleUserSearch(e) {
+            searchTerm = e.target.value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                filteredUsers = [];
+                renderUsersTable();
+                return;
+            }
+
+            filteredUsers = dashboardData.users.filter(user => 
+                user.name.toLowerCase().includes(searchTerm) ||
+                user.email.toLowerCase().includes(searchTerm) ||
+                (user.company && user.company.toLowerCase().includes(searchTerm))
+            );
+
+            renderUsersTable();
+        }
+
+        // CSV 내보내기
+        function exportUsersCSV() {
+            const users = searchTerm ? filteredUsers : dashboardData.users;
+            
+            if (!users.length) {
+                alert('내보낼 데이터가 없습니다.');
+                return;
+            }
+
+            const headers = ['이름', '이메일', '전화번호', '회사', '관심사', '마케팅 동의', '가입일', '마지막 로그인'];
+            const csvData = [
+                headers.join(','),
+                ...users.map(user => [
+                    `"${user.name}"`,
+                    `"${user.email}"`,
+                    `"${user.phone || ''}"`,
+                    `"${user.company || ''}"`,
+                    `"${(user.interests || []).join(', ')}"`,
+                    `"${user.marketing_agreed ? '동의' : '비동의'}"`,
+                    `"${new Date(user.created_at).toLocaleDateString('ko-KR')}"`,
+                    `"${user.last_login ? new Date(user.last_login).toLocaleDateString('ko-KR') : '없음'}"`
+                ].join(','))
+            ].join('\n');
+
+            downloadCSV(csvData, 'philosophy-ai-users');
+        }
+
+        // 전체 데이터 내보내기
+        function exportAllData() {
+            const data = {
+                stats: dashboardData.stats,
+                users: dashboardData.users,
+                companies: dashboardData.companies,
+                interests: dashboardData.interests,
+                exportDate: new Date().toISOString()
+            };
+
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `philosophy-ai-dashboard-${new Date().toISOString().slice(0, 16)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // CSV 다운로드 유틸리티
+        function downloadCSV(csvContent, filename) {
+            const BOM = '\uFEFF';
+            const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${filename}-${new Date().toISOString().slice(0, 16)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 마지막 업데이트 시간 표시
+        function updateLastUpdateTime() {
+            const element = document.getElementById('lastUpdate');
+            if (element) {
+                element.textContent = '마지막 업데이트: ' + new Date().toLocaleTimeString('ko-KR');
+            }
+        }
+
+        // 에러 메시지 표시
+        function showError(message) {
+            console.error(message);
+            
+            // 간단한 에러 알림
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            errorDiv.style.position = 'fixed';
+            errorDiv.style.top = '20px';
+            errorDiv.style.right = '20px';
+            errorDiv.style.zIndex = '9999';
+            errorDiv.style.maxWidth = '400px';
+            
+            document.body.appendChild(errorDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(errorDiv);
+            }, 5000);
+        }
+
+        // 데모용 함수 (실제 Supabase 연결 전 테스트용)
+        function loadDemoData() {
+            const now = new Date();
+            
+            dashboardData = {
+                stats: {
+                    total_users: 42,
+                    new_users_today: 3,
+                    new_users_this_week: 12,
+                    new_users_this_month: 28,
+                    marketing_agreed_users: 25,
+                    total_companies: 8
+                },
+                users: Array.from({ length: 20 }, (_, i) => ({
+                    id: `user_${i}`,
+                    name: `사용자 ${i + 1}`,
+                    email: `user${i + 1}@example.com`,
+                    company: i % 3 === 0 ? '서울대학교' : i % 3 === 1 ? '카카오' : '네이버',
+                    interests: ['철학', 'AI/인공지능', '교육학'].slice(0, Math.floor(Math.random() * 3) + 1),
+                    marketing_agreed: Math.random() > 0.4,
+                    created_at: new Date(now.getTime() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+                    last_login: Math.random() > 0.3 ? new Date(now.getTime() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString() : null,
+                    is_active: Math.random() > 0.1,
+                    profile_image_url: `https://via.placeholder.com/32?text=U${i + 1}`
+                })),
+                companies: [
+                    { company_name: '서울대학교', user_count: 8, marketing_rate: 75 },
+                    { company_name: '카카오', user_count: 6, marketing_rate: 83 },
+                    { company_name: '네이버', user_count: 5, marketing_rate: 60 },
+                    { company_name: '삼성전자', user_count: 4, marketing_rate: 100 },
+                ],
+                interests: [
+                    { interest: '철학', user_count: 15, unique_companies: 5, marketing_rate: 73 },
+                    { interest: 'AI/인공지능', user_count: 12, unique_companies: 4, marketing_rate: 83 },
+                    { interest: '교육학', user_count: 8, unique_companies: 3, marketing_rate: 62 },
+                ],
+                dailySignups: Array.from({ length: 30 }, (_, i) => ({
+                    date: new Date(now.getTime() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    count: Math.floor(Math.random() * 5)
+                }))
+            };
+
+            renderStatsCards();
+            renderCharts();
+            renderDataTables();
+            renderUsersTable();
+            updateLastUpdateTime();
+        }
+
+        // 실제 Supabase 연결이 안 될 때 데모 데이터 로드
+        if (!supabase || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+            console.warn('Supabase 키가 설정되지 않았습니다. 데모 데이터를 사용합니다.');
+            setTimeout(loadDemoData, 1000);
+        }
+    </script>
+</body>
+</html>
