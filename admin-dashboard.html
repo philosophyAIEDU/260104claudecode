@@ -608,7 +608,7 @@
         const SUPABASE_URL = 'https://dpnfgibvpbwsetorhhsn.supabase.co'
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwbmZnaWJ2cGJ3c2V0b3JoaHNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2MDQwNzMsImV4cCI6MjA4MzE4MDA3M30.enDBWvK5nOHEHl33eXhVHbL4MsSgM2pbk4VMZ3FOV48'
         
-        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
         // 차트 인스턴스
         let signupChart = null;
@@ -629,7 +629,7 @@
 
         // 초기화
         document.addEventListener('DOMContentLoaded', function() {
-            if (!supabase) {
+            if (!supabaseClient) {
                 showError('Supabase 연결에 실패했습니다. API 키를 확인해주세요.');
                 return;
             }
@@ -656,11 +656,11 @@
                 
                 // 병렬로 모든 데이터 가져오기
                 const [statsResult, usersResult, companiesResult, interestsResult, dailyResult] = await Promise.all([
-                    supabase.from('dashboard_stats').select('*').single(),
-                    supabase.from('admin_user_summary').select('*').order('created_at', { ascending: false }),
-                    supabase.rpc('get_company_stats'),
-                    supabase.from('interest_analysis').select('*').order('user_count', { ascending: false }),
-                    supabase.rpc('get_daily_signups', { days: 30 })
+                    supabaseClient.from('dashboard_stats').select('*').single(),
+                    supabaseClient.from('admin_user_summary').select('*').order('created_at', { ascending: false }),
+                    supabaseClient.rpc('get_company_stats'),
+                    supabaseClient.from('interest_analysis').select('*').order('user_count', { ascending: false }),
+                    supabaseClient.rpc('get_daily_signups', { days: 30 })
                 ]);
 
                 // 에러 처리
@@ -1121,10 +1121,6 @@
         }
 
         // 실제 Supabase 연결이 안 될 때 데모 데이터 로드
-        if (!supabase || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+        if (!supabaseClient || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
             console.warn('Supabase 키가 설정되지 않았습니다. 데모 데이터를 사용합니다.');
-            setTimeout(loadDemoData, 1000);
-        }
-    </script>
-</body>
-</html>
+            setTimeout(loadDemoData
