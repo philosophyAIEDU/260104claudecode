@@ -829,6 +829,7 @@
                 <li><a href="#services">서비스</a></li>
                 <li><a href="#why-us">강점</a></li>
                 <li><a href="#contact">문의</a></li>
+                <li><a href="auth-system.html" style="background: var(--gradient); color: white; padding: 0.5rem 1rem; border-radius: 20px; text-decoration: none;">로그인</a></li>
             </ul>
             <div class="hamburger">
                 <span></span>
@@ -844,9 +845,14 @@
             <div class="hero-content">
                 <h1>Philosophy AI Education</h1>
                 <p class="slogan">AI로 미래를 교육합니다</p>
-                <a href="#contact" class="cta-button">
-                    <i class="fas fa-rocket"></i> 강의 문의하기
-                </a>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="auth-system.html" class="cta-button">
+                        <i class="fas fa-sign-in-alt"></i> 회원가입/로그인
+                    </a>
+                    <a href="#contact" class="cta-button" style="background: transparent; border: 2px solid white; color: white;">
+                        <i class="fas fa-rocket"></i> 강의 문의하기
+                    </a>
+                </div>
             </div>
         </div>
     </section>
@@ -962,9 +968,9 @@
     </footer>
 
     <!-- Admin Panel -->
-    <button class="admin-trigger" id="adminTrigger" title="관리자 패널">
-        <i class="fas fa-cog"></i>
-    </button>
+    <a href="admin-dashboard.html" class="admin-trigger" title="관리자 대시보드" style="display: flex; align-items: center; justify-content: center; text-decoration: none; color: white;">
+        <i class="fas fa-chart-dashboard"></i>
+    </a>
 
     <div class="admin-modal" id="adminModal">
         <div class="admin-content">
