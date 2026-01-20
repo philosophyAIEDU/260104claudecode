@@ -816,6 +816,212 @@
         .cta-button {
             border-radius: 50px !important;
         }
+
+        /* AI Tools Section */
+        .ai-tools {
+            background: var(--background-light);
+        }
+
+        .ai-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .ai-tool-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px var(--shadow);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(50px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ai-tool-card.animate {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .ai-tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--shadow-hover);
+        }
+
+        .ai-tool-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-tool-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+            flex-shrink: 0;
+        }
+
+        .ai-tool-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .ai-tool-category {
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            background: rgba(230, 126, 34, 0.1);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.3rem;
+        }
+
+        .ai-tool-description {
+            color: var(--text-light);
+            line-height: 1.6;
+            flex-grow: 1;
+            margin-bottom: 1rem;
+        }
+
+        .ai-tool-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .ai-tool-link:hover {
+            color: var(--primary-color);
+        }
+
+        .ai-tool-link i {
+            transition: transform 0.3s ease;
+        }
+
+        .ai-tool-link:hover i {
+            transform: translateX(3px);
+        }
+
+        /* AI Tool Submit Form */
+        .ai-tool-submit-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 3rem;
+            box-shadow: 0 5px 20px var(--shadow);
+        }
+
+        .ai-tool-submit-section h3 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-tool-submit-section .subtitle {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .ai-tool-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .ai-tool-form .form-group {
+            margin-bottom: 0;
+        }
+
+        .ai-tool-form .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .ai-tool-form select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--white);
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .ai-tool-form select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+        }
+
+        .ai-tool-form .submit-btn {
+            margin-top: 0.5rem;
+        }
+
+        /* Filter tabs */
+        .ai-tools-filter {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .filter-btn {
+            padding: 0.6rem 1.2rem;
+            border: 2px solid var(--primary-color);
+            background: transparent;
+            color: var(--primary-color);
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        /* User submitted badge */
+        .user-submitted-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: #27ae60;
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            margin-left: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .ai-tool-form {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-tool-submit-section {
+                padding: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -827,6 +1033,7 @@
                 <li><a href="#home">홈</a></li>
                 <li><a href="#about">회사소개</a></li>
                 <li><a href="#services">서비스</a></li>
+                <li><a href="#ai-tools">AI 도구</a></li>
                 <li><a href="#why-us">강점</a></li>
                 <li><a href="#contact">문의</a></li>
                 <li><a href="auth-system.html" style="background: var(--gradient); color: white; padding: 0.5rem 1rem; border-radius: 20px; text-decoration: none;">로그인</a></li>
@@ -892,6 +1099,204 @@
                     </div>
                     <h3>기업 교육 프로그램</h3>
                     <p>기업의 디지털 전환을 지원하는 체계적인 AI 교육 프로그램으로 조직 역량을 강화합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Tools Section -->
+    <section id="ai-tools" class="ai-tools">
+        <div class="container">
+            <h2 class="section-title">교육자를 위한 AI 도구</h2>
+
+            <!-- Filter Buttons -->
+            <div class="ai-tools-filter">
+                <button class="filter-btn active" data-filter="all">전체</button>
+                <button class="filter-btn" data-filter="writing">글쓰기</button>
+                <button class="filter-btn" data-filter="image">이미지</button>
+                <button class="filter-btn" data-filter="video">영상</button>
+                <button class="filter-btn" data-filter="presentation">프레젠테이션</button>
+                <button class="filter-btn" data-filter="research">연구/검색</button>
+                <button class="filter-btn" data-filter="coding">코딩</button>
+            </div>
+
+            <!-- AI Tools Grid -->
+            <div class="ai-tools-grid" id="aiToolsGrid">
+                <!-- Default AI Tools -->
+                <div class="ai-tool-card" data-category="writing">
+                    <div class="ai-tool-header">
+                        <div class="ai-tool-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <div class="ai-tool-title">Claude</div>
+                            <span class="ai-tool-category">글쓰기</span>
+                        </div>
+                    </div>
+                    <p class="ai-tool-description">Anthropic에서 개발한 AI 어시스턴트로, 교육 콘텐츠 작성, 수업 계획, 학생 피드백 작성에 탁월합니다.</p>
+                    <a href="https://claude.ai" target="_blank" rel="noopener" class="ai-tool-link">
+                        방문하기 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="ai-tool-card" data-category="writing">
+                    <div class="ai-tool-header">
+                        <div class="ai-tool-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div>
+                            <div class="ai-tool-title">ChatGPT</div>
+                            <span class="ai-tool-category">글쓰기</span>
+                        </div>
+                    </div>
+                    <p class="ai-tool-description">OpenAI의 대화형 AI로, 수업 자료 생성, 퀴즈 제작, 교육 콘텐츠 브레인스토밍에 유용합니다.</p>
+                    <a href="https://chat.openai.com" target="_blank" rel="noopener" class="ai-tool-link">
+                        방문하기 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="ai-tool-card" data-category="image">
+                    <div class="ai-tool-header">
+                        <div class="ai-tool-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div>
+                            <div class="ai-tool-title">DALL-E</div>
+                            <span class="ai-tool-category">이미지</span>
+                        </div>
+                    </div>
+                    <p class="ai-tool-description">텍스트를 이미지로 변환하는 AI로, 교육 자료용 일러스트레이션이나 시각 자료를 생성할 수 있습니다.</p>
+                    <a href="https://openai.com/dall-e-3" target="_blank" rel="noopener" class="ai-tool-link">
+                        방문하기 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="ai-tool-card" data-category="image">
+                    <div class="ai-tool-header">
+                        <div class="ai-tool-icon">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <div>
+                            <div class="ai-tool-title">Midjourney</div>
+                            <span class="ai-tool-category">이미지</span>
+                        </div>
+                    </div>
+                    <p class="ai-tool-description">고품질 이미지 생성 AI로, 수업 자료나 프레젠테이션에 사용할 창의적인 비주얼을 만들 수 있습니다.</p>
+                    <a href="https://midjourney.com" target="_blank" rel="noopener" class="ai-tool-link">
+                        방문하기 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="ai-tool-card" data-category="presentation">
+                    <div class="ai-tool-header">
+                        <div class="ai-tool-icon">
+                            <i class="fas fa-presentation"></i>
+                        </div>
+                        <div>
+                            <div class="ai-tool-title">Gamma</div>
+                            <span class="ai-tool-category">프레젠테이션</span>
+                        </div>
+                    </div>
+                    <p class="ai-tool-description">AI 기반 프레젠테이션 도구로, 텍스트만 입력하면 전문적인 슬라이드를 자동으로 생성합니다.</p>
+                    <a href="https://gamma.app" target="_blank" rel="noopener" class="ai-tool-link">
+                        방문하기 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="ai-tool-card" data-category="research">
+                    <div class="ai-tool-header">
+                        <div class="ai-tool-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div>
+                            <div class="ai-tool-title">Perplexity AI</div>
+                            <span class="ai-tool-category">연구/검색</span>
+                        </div>
+                    </div>
+                    <p class="ai-tool-description">AI 기반 검색 엔진으로, 학술 자료 조사와 최신 정보 검색에 유용하며 출처를 함께 제공합니다.</p>
+                    <a href="https://perplexity.ai" target="_blank" rel="noopener" class="ai-tool-link">
+                        방문하기 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="ai-tool-card" data-category="video">
+                    <div class="ai-tool-header">
+                        <div class="ai-tool-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div>
+                            <div class="ai-tool-title">Synthesia</div>
+                            <span class="ai-tool-category">영상</span>
+                        </div>
+                    </div>
+                    <p class="ai-tool-description">AI 아바타를 활용한 교육 영상 제작 도구로, 강의 영상을 쉽고 빠르게 만들 수 있습니다.</p>
+                    <a href="https://synthesia.io" target="_blank" rel="noopener" class="ai-tool-link">
+                        방문하기 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="ai-tool-card" data-category="coding">
+                    <div class="ai-tool-header">
+                        <div class="ai-tool-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div>
+                            <div class="ai-tool-title">GitHub Copilot</div>
+                            <span class="ai-tool-category">코딩</span>
+                        </div>
+                    </div>
+                    <p class="ai-tool-description">AI 코딩 어시스턴트로, 프로그래밍 교육에서 코드 예제 생성과 설명에 활용할 수 있습니다.</p>
+                    <a href="https://github.com/features/copilot" target="_blank" rel="noopener" class="ai-tool-link">
+                        방문하기 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Submit New AI Tool Form -->
+            <div class="ai-tool-submit-section">
+                <h3><i class="fas fa-plus-circle"></i> AI 도구 추천하기</h3>
+                <p class="subtitle">교육에 유용한 AI 웹사이트를 알고 계신가요? 다른 교육자분들과 공유해주세요!</p>
+
+                <form class="ai-tool-form" id="aiToolForm">
+                    <div class="form-group">
+                        <label for="toolName">도구 이름 *</label>
+                        <input type="text" id="toolName" name="toolName" placeholder="예: Claude AI" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="toolUrl">웹사이트 URL *</label>
+                        <input type="url" id="toolUrl" name="toolUrl" placeholder="https://example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="toolCategory">카테고리 *</label>
+                        <select id="toolCategory" name="toolCategory" required>
+                            <option value="">선택하세요</option>
+                            <option value="writing">글쓰기</option>
+                            <option value="image">이미지</option>
+                            <option value="video">영상</option>
+                            <option value="presentation">프레젠테이션</option>
+                            <option value="research">연구/검색</option>
+                            <option value="coding">코딩</option>
+                            <option value="other">기타</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="submitterName">추천인 이름</label>
+                        <input type="text" id="submitterName" name="submitterName" placeholder="선생님 성함">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="toolDescription">설명 *</label>
+                        <textarea id="toolDescription" name="toolDescription" placeholder="이 AI 도구가 교육에 어떻게 도움이 되는지 설명해주세요." required></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <button type="submit" class="submit-btn">
+                            <span class="text"><i class="fas fa-paper-plane"></i> AI 도구 추천하기</span>
+                            <span class="loading"><i class="fas fa-spinner"></i></span>
+                        </button>
+                    </div>
+                </form>
+                <div class="success-message" id="toolSuccessMessage">
+                    <i class="fas fa-check-circle"></i>
+                    AI 도구가 성공적으로 추천되었습니다. 감사합니다!
                 </div>
             </div>
         </div>
@@ -1413,9 +1818,9 @@
 
             // Observe elements that should animate
             const animateElements = document.querySelectorAll(
-                '.section-title, .about-content, .service-card, .feature-item, .contact-form'
+                '.section-title, .about-content, .service-card, .feature-item, .contact-form, .ai-tool-card'
             );
-            
+
             animateElements.forEach(el => observer.observe(el));
         }
 
@@ -1534,6 +1939,189 @@
         }
         
         window.addEventListener('scroll', onScroll, { passive: true });
+
+        // ===== AI Tools Section Functions =====
+        const categoryNames = {
+            'writing': '글쓰기',
+            'image': '이미지',
+            'video': '영상',
+            'presentation': '프레젠테이션',
+            'research': '연구/검색',
+            'coding': '코딩',
+            'other': '기타'
+        };
+
+        const categoryIcons = {
+            'writing': 'fa-pen-fancy',
+            'image': 'fa-image',
+            'video': 'fa-video',
+            'presentation': 'fa-desktop',
+            'research': 'fa-search',
+            'coding': 'fa-code',
+            'other': 'fa-star'
+        };
+
+        // Initialize AI Tools Section
+        function setupAIToolsSection() {
+            setupFilterButtons();
+            setupAIToolForm();
+            loadUserSubmittedTools();
+        }
+
+        // Filter Buttons
+        function setupFilterButtons() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active state
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    const filter = btn.dataset.filter;
+                    filterTools(filter);
+                });
+            });
+        }
+
+        function filterTools(category) {
+            const toolCards = document.querySelectorAll('.ai-tool-card');
+
+            toolCards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'flex';
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.3s ease';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // AI Tool Form
+        function setupAIToolForm() {
+            const aiToolForm = document.getElementById('aiToolForm');
+            const toolSuccessMessage = document.getElementById('toolSuccessMessage');
+
+            if (!aiToolForm) return;
+
+            aiToolForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const submitBtn = aiToolForm.querySelector('.submit-btn');
+                submitBtn.classList.add('loading');
+                submitBtn.disabled = true;
+
+                try {
+                    const formData = new FormData(aiToolForm);
+                    const toolData = {
+                        id: `tool_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                        name: formData.get('toolName'),
+                        url: formData.get('toolUrl'),
+                        category: formData.get('toolCategory'),
+                        description: formData.get('toolDescription'),
+                        submitterName: formData.get('submitterName') || '익명',
+                        timestamp: new Date().toISOString(),
+                        dateFormatted: new Date().toLocaleString('ko-KR'),
+                        isUserSubmitted: true
+                    };
+
+                    // Simulate API delay
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Save to localStorage
+                    saveAITool(toolData);
+
+                    // Add to grid
+                    addToolToGrid(toolData);
+
+                    // Show success message
+                    toolSuccessMessage.classList.add('show');
+                    setTimeout(() => {
+                        toolSuccessMessage.classList.remove('show');
+                    }, 5000);
+
+                    // Reset form
+                    aiToolForm.reset();
+
+                } catch (error) {
+                    console.error('AI 도구 추천 중 오류가 발생했습니다:', error);
+                    alert('AI 도구 추천 중 오류가 발생했습니다. 다시 시도해 주세요.');
+                } finally {
+                    submitBtn.classList.remove('loading');
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+
+        function saveAITool(toolData) {
+            try {
+                const tools = getUserSubmittedTools();
+                tools.unshift(toolData);
+                localStorage.setItem('philosophyAI_tools', JSON.stringify(tools));
+            } catch (error) {
+                console.error('AI 도구 저장 중 오류:', error);
+            }
+        }
+
+        function getUserSubmittedTools() {
+            try {
+                const data = localStorage.getItem('philosophyAI_tools');
+                return data ? JSON.parse(data) : [];
+            } catch (error) {
+                console.error('AI 도구 데이터 로드 중 오류:', error);
+                return [];
+            }
+        }
+
+        function loadUserSubmittedTools() {
+            const tools = getUserSubmittedTools();
+            tools.forEach(tool => addToolToGrid(tool));
+        }
+
+        function addToolToGrid(toolData) {
+            const grid = document.getElementById('aiToolsGrid');
+            if (!grid) return;
+
+            const icon = categoryIcons[toolData.category] || 'fa-star';
+            const categoryName = categoryNames[toolData.category] || '기타';
+
+            const card = document.createElement('div');
+            card.className = 'ai-tool-card animate';
+            card.dataset.category = toolData.category;
+            card.innerHTML = `
+                <div class="ai-tool-header">
+                    <div class="ai-tool-icon">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <div>
+                        <div class="ai-tool-title">
+                            ${escapeHtml(toolData.name)}
+                            ${toolData.isUserSubmitted ? '<span class="user-submitted-badge"><i class="fas fa-user"></i> 추천</span>' : ''}
+                        </div>
+                        <span class="ai-tool-category">${categoryName}</span>
+                    </div>
+                </div>
+                <p class="ai-tool-description">${escapeHtml(toolData.description)}</p>
+                <a href="${escapeHtml(toolData.url)}" target="_blank" rel="noopener" class="ai-tool-link">
+                    방문하기 <i class="fas fa-arrow-right"></i>
+                </a>
+            `;
+
+            // Insert at the beginning of the grid
+            grid.insertBefore(card, grid.firstChild);
+        }
+
+        // Initialize AI Tools Section on DOM Ready
+        document.addEventListener('DOMContentLoaded', function() {
+            setupAIToolsSection();
+        });
     </script>
 </body>
 </html>
