@@ -1779,11 +1779,11 @@
                     <button onclick="window.open('https://padlet.com/warmcomfortforyou/ai-2-7-ftxqlkdvb76p3r3', '_blank')" class="our-tool-link" style="border: none; cursor: pointer;">
                         <i class="fas fa-book-open"></i> 26년 2월 7일 스터디 실습 자료
                     </button>
-                    <div style="margin-top: 0.8rem; font-size: 0.75rem; color: var(--text-light); word-break: break-all;">
-                        <i class="fas fa-link" style="margin-right: 0.3rem;"></i>
-                        <a href="https://padlet.com/warmcomfortforyou/ai-2-7-ftxqlkdvb76p3r3" target="_blank" style="color: var(--primary-color); text-decoration: underline;">
-                            padlet.com/warmcomfortforyou/ai-2-7-ftxqlkdvb76p3r3
-                        </a>
+                    <div style="margin-top: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="text" value="https://padlet.com/warmcomfortforyou/ai-2-7-ftxqlkdvb76p3r3" readonly id="studyLink" style="flex: 1; padding: 0.5rem; font-size: 0.75rem; border: 1px solid #ddd; border-radius: 8px; background: #f8f9fa; color: var(--text-medium);">
+                        <button onclick="navigator.clipboard.writeText('https://padlet.com/warmcomfortforyou/ai-2-7-ftxqlkdvb76p3r3').then(() => { this.innerHTML = '<i class=\'fas fa-check\'></i>'; setTimeout(() => { this.innerHTML = '<i class=\'fas fa-copy\'></i>'; }, 2000); })" style="padding: 0.5rem 0.8rem; border: none; background: var(--primary-color); color: white; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
+                            <i class="fas fa-copy"></i>
+                        </button>
                     </div>
                 </div>
 
