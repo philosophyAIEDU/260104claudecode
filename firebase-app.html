@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Auth & Firestore CRUD</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4285F4;
+            --secondary-color: #34A853;
+            --danger-color: #EA4335;
+            --background: #f4f6f9;
+            --text-dark: #2c3e50;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-google {
+            background-color: var(--white);
+            color: var(--text-dark);
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+        .btn-google:hover { background-color: #f1f1f1; }
+        .btn-logout {
+            background-color: #f1f3f4;
+            color: var(--text-dark);
+        }
+        .btn-logout:hover { background-color: #e8eaed; }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        .btn-primary:hover { background-color: #3367D6; }
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: var(--white);
+            padding: 5px 10px;
+        }
+        .btn-edit {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            padding: 5px 10px;
+        }
+        
+        .crud-section { display: none; }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .data-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+        .data-content { flex: 1; }
+        .data-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        #loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>내 메모장</h2>
+        <div id="auth-container">
+            <button id="login-btn" class="btn-google">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="20" alt="Google">
+                Google 로그인
+            </button>
+            <div id="user-profile" class="user-info" style="display: none;">
+                <img id="user-photo" src="" alt="Profile">
+                <span id="user-name"></span>
+                <button id="logout-btn" class="btn-logout">로그아웃</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="crud-section" class="crud-section">
+        <div class="input-group">
+            <input type="text" id="data-input" placeholder="새로운 내용을 입력하세요...">
+            <button id="add-btn" class="btn-primary">추가</button>
+        </div>
+        <div id="loading"><i class="fas fa-spinner fa-spin"></i> 데이터를 불러오는 중...</div>
+        <ul id="data-list" class="data-list">
+            <!-- 데이터가 여기에 추가됩니다 -->
+        </ul>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } 
+        from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc, serverTimestamp } 
+        from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    // Firebase 설정 (philosophyaiedumain 프로젝트)
+    const firebaseConfig = {
+        projectId: "philosophyaiedumain",
+        appId: "1:791707583638:web:b86d59d52a20330baaaeb7",
+        storageBucket: "philosophyaiedumain.firebasestorage.app",
+        apiKey: "AIzaSyBylDxamogm1_g2URVxGQFz_c05pOWqjEI",
+        authDomain: "philosophyaiedumain.firebaseapp.com",
+        messagingSenderId: "791707583638",
+        measurementId: "G-KWCY47PZWB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // DOM 요소
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const userProfile = document.getElementById('user-profile');
+    const crudSection = document.getElementById('crud-section');
+    const dataInput = document.getElementById('data-input');
+    const addBtn = document.getElementById('add-btn');
+    const dataList = document.getElementById('data-list');
+    const loading = document.getElementById('loading');
+
+    let unsubscribeSnapshot = null;
+
+    // 1. Google 로그인/로그아웃 기능
+    loginBtn.addEventListener('click', async () => {
+        try {
+            const provider = new GoogleAuthProvider();
+            await signInWithPopup(auth, provider);
+        } catch (error) {
+            console.error("로그인 에러:", error);
+            alert("로그인 중 오류가 발생했습니다: " + error.message);
+        }
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error("로그아웃 에러:", error);
+        }
+    });
+
+    // 인증 상태 감지
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // 로그인 됨
+            loginBtn.style.display = 'none';
+            userProfile.style.display = 'flex';
+            crudSection.style.display = 'block';
+            
+            document.getElementById('user-name').textContent = user.displayName;
+            document.getElementById('user-photo').src = user.photoURL || 'https://via.placeholder.com/40';
+            
+            loadUserData(user.uid);
+        } else {
+            // 로그아웃 됨
+            loginBtn.style.display = 'flex';
+            userProfile.style.display = 'none';
+            crudSection.style.display = 'none';
+            dataList.innerHTML = '';
+            
+            if (unsubscribeSnapshot) {
+                unsubscribeSnapshot();
+                unsubscribeSnapshot = null;
+            }
+        }
+    });
+
+    // 2 & 3 & 4. 본인 데이터 읽기, 쓰기, 수정, 삭제 기능 (users/{userId}/notes 경로)
+    function loadUserData(userId) {
+        loading.style.display = 'block';
+        dataList.innerHTML = '';
+        
+        // 데이터 경로: users/{userId}/notes
+        const notesRef = collection(db, "users", userId, "notes");
+        const q = query(notesRef, orderBy("createdAt", "desc"));
+        
+        // 실시간 업데이트 수신 (onSnapshot)
+        unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+            loading.style.display = 'none';
+            dataList.innerHTML = '';
+            
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                createListItem(docSnap.id, data.text, userId);
+            });
+            
+            if (snapshot.empty) {
+                dataList.innerHTML = '<li style="text-align:center; color:#999; padding:20px;">등록된 메모가 없습니다.</li>';
+            }
+        }, (error) => {
+            console.error("데이터 불러오기 에러:", error);
+            loading.style.display = 'none';
+            
+            if (error.code === 'permission-denied') {
+                dataList.innerHTML = '<li style="color:red;">권한이 없습니다. Firestore 규칙 설정을 확인해주세요.</li>';
+            }
+        });
+    }
+
+    // 데이터 추가 (Create)
+    addBtn.addEventListener('click', async () => {
+        const text = dataInput.value.trim();
+        const user = auth.currentUser;
+        if (!text) return alert('내용을 입력해주세요.');
+        if (!user) return alert('로그인이 필요합니다.');
+
+        try {
+            dataInput.disabled = true;
+            addBtn.disabled = true;
+            
+            const notesRef = collection(db, "users", user.uid, "notes");
+            await addDoc(notesRef, {
+                text: text,
+                createdAt: serverTimestamp()
+            });
+            
+            dataInput.value = '';
+        } catch (error) {
+            console.error("데이터 추가 에러:", error);
+            alert("저장 실패: " + error.message);
+        } finally {
+            dataInput.disabled = false;
+            addBtn.disabled = false;
+            dataInput.focus();
+        }
+    });
+
+    // 엔터키로 추가
+    dataInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addBtn.click();
+    });
+
+    // 데이터 목록 UI 생성
+    function createListItem(docId, text, userId) {
+        const li = document.createElement('li');
+        li.className = 'data-item';
+        
+        const contentSpan = document.createElement('span');
+        contentSpan.className = 'data-content';
+        contentSpan.textContent = text;
+        
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'data-actions';
+        
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn-edit';
+        editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+        editBtn.title = '수정';
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn-danger';
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        deleteBtn.title = '삭제';
+        
+        // 데이터 수정 (Update)
+        editBtn.addEventListener('click', async () => {
+            const newText = prompt("수정할 내용을 입력하세요:", text);
+            if (newText && newText.trim() !== text) {
+                try {
+                    const docRef = doc(db, "users", userId, "notes", docId);
+                    await updateDoc(docRef, {
+                        text: newText.trim(),
+                        updatedAt: serverTimestamp()
+                    });
+                } catch (error) {
+                    console.error("수정 에러:", error);
+                    alert("수정 실패: " + error.message);
+                }
+            }
+        });
+
+        // 데이터 삭제 (Delete)
+        deleteBtn.addEventListener('click', async () => {
+            if (confirm("정말로 삭제하시겠습니까?")) {
+                try {
+                    const docRef = doc(db, "users", userId, "notes", docId);
+                    await deleteDoc(docRef);
+                } catch (error) {
+                    console.error("삭제 에러:", error);
+                    alert("삭제 실패: " + error.message);
+                }
+            }
+        });
+        
+        actionsDiv.appendChild(editBtn);
+        actionsDiv.appendChild(deleteBtn);
+        
+        li.appendChild(contentSpan);
+        li.appendChild(actionsDiv);
+        
+        dataList.appendChild(li);
+    }
+</script>
+</body>
+</html>
