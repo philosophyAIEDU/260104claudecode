@@ -1616,6 +1616,73 @@
                 padding: 1.5rem;
             }
         }
+    <!-- Firebase JS (모듈형) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        
+        window.initializeApp = initializeApp;
+        window.getAuth = getAuth;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signOut = signOut;
+        window.getFirestore = getFirestore;
+        window.doc = doc;
+        window.getDoc = getDoc;
+    </script>
+
+    <style>
+        /* User Profile in Nav */
+        .user-info-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--background-light);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            margin-left: 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .user-avatar-sm {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--white);
+            object-fit: cover;
+        }
+
+        #navUserName {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .logout-btn-sm {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .logout-btn-sm:hover {
+            color: var(--secondary-color);
+            background: rgba(236, 72, 153, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .user-info-nav {
+                margin: 1rem auto;
+                width: fit-content;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1630,7 +1697,16 @@
                 <li><a href="#our-tools">우리 AI 도구</a></li>
                 <li><a href="#ai-tools">추천 도구</a></li>
                 <li><a href="#contact">문의</a></li>
-                <li><a href="auth-system.html" class="login-btn">로그인</a></li>
+                <li id="navLoginItem"><a href="auth-system.html" class="login-btn">로그인</a></li>
+                <li id="navUserItem" style="display: none;">
+                    <div class="user-info-nav">
+                        <img id="navUserAvatar" class="user-avatar-sm" src="" alt="User Avatar">
+                        <span id="navUserName"></span>
+                        <button id="navLogoutBtn" class="logout-btn-sm">
+                            <i class="fas fa-sign-out-alt"></i> 로그아웃
+                        </button>
+                    </div>
+                </li>
             </ul>
             <div class="hamburger">
                 <span></span>
@@ -2852,7 +2928,84 @@
         // Initialize AI Tools Section on DOM Ready
         document.addEventListener('DOMContentLoaded', function() {
             setupAIToolsSection();
+            initFirebase();
         });
+
+        // Firebase Initialization for index.html
+        const firebaseConfig = {
+            projectId: "philosophyaiedumain",
+            appId: "1:791707583638:web:b86d59d52a20330baaaeb7",
+            storageBucket: "philosophyaiedumain.firebasestorage.app",
+            apiKey: "AIzaSyBylDxamogm1_g2URVxGQFz_c05pOWqjEI",
+            authDomain: "philosophyaiedumain.firebaseapp.com",
+            messagingSenderId: "791707583638",
+            measurementId: "G-KWCY47PZWB"
+        };
+
+        let app, auth, db;
+
+        function initFirebase() {
+            let attempts = 0;
+            const initInterval = setInterval(() => {
+                if (window.initializeApp) {
+                    clearInterval(initInterval);
+                    app = window.initializeApp(firebaseConfig);
+                    auth = window.getAuth(app);
+                    db = window.getFirestore(app);
+                    
+                    window.onAuthStateChanged(auth, (user) => {
+                        updateAuthUI(user);
+                    });
+
+                    setupLogout();
+                }
+                attempts++;
+                if (attempts > 50) clearInterval(initInterval);
+            }, 100);
+        }
+
+        function updateAuthUI(user) {
+            const navLoginItem = document.getElementById('navLoginItem');
+            const navUserItem = document.getElementById('navUserItem');
+            const navUserAvatar = document.getElementById('navUserAvatar');
+            const navUserName = document.getElementById('navUserName');
+            const heroStartBtn = document.querySelector('.hero-buttons .cta-button:first-child');
+
+            if (user) {
+                navLoginItem.style.display = 'none';
+                navUserItem.style.display = 'block';
+                navUserAvatar.src = user.photoURL || 'https://via.placeholder.com/32';
+                navUserName.textContent = user.displayName || '사용자';
+                
+                // Update Hero button link if logged in
+                if (heroStartBtn) {
+                    heroStartBtn.href = '#our-tools';
+                    heroStartBtn.innerHTML = '<i class="fas fa-rocket"></i> 도구 사용하기';
+                }
+            } else {
+                navLoginItem.style.display = 'block';
+                navUserItem.style.display = 'none';
+                
+                if (heroStartBtn) {
+                    heroStartBtn.href = 'auth-system.html';
+                    heroStartBtn.innerHTML = '<i class="fas fa-arrow-right"></i> 시작하기';
+                }
+            }
+        }
+
+        function setupLogout() {
+            const logoutBtn = document.getElementById('navLogoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async () => {
+                    try {
+                        await window.signOut(auth);
+                        window.location.reload();
+                    } catch (error) {
+                        console.error('로그아웃 중 오류:', error);
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>

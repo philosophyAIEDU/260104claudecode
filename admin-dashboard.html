@@ -905,15 +905,14 @@
                 return;
             }
 
-            const headers = ['이름', '이메일', '전화번호', '회사', '관심사', '마케팅 동의', '가입일'];
+            const headers = ['이름', '계정 이메일', '연락처 이메일', '회사', '마케팅 동의', '가입일'];
             const csvData = [
                 headers.join(','),
                 ...users.map(user => [
                     `"${user.name || ''}"`,
                     `"${user.email || ''}"`,
-                    `"${user.phone || ''}"`,
+                    `"${user.profileEmail || ''}"`,
                     `"${user.company || ''}"`,
-                    `"${(user.interests || []).join(', ')}"`,
                     `"${user.marketingAgreed ? '동의' : '비동의'}"`,
                     `"${new Date(user.created_at).toLocaleDateString('ko-KR')}"`
                 ].join(','))
