@@ -630,7 +630,7 @@
 
             container.querySelectorAll('.interest-chip').forEach(chip => {
                 chip.addEventListener('click', function(e) {
-                    if (e.target.tagName === 'INPUT') return;
+                    e.preventDefault();
                     const checkbox = this.querySelector('input');
                     checkbox.checked = !checkbox.checked;
                     this.classList.toggle('selected', checkbox.checked);
