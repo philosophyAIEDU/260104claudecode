@@ -5,8 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Philosophy AI Education - 구글 로그인 시스템</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Firebase JS (모듈형) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        
+        window.initializeApp = initializeApp;
+        window.getAuth = getAuth;
+        window.signInWithPopup = signInWithPopup;
+        window.GoogleAuthProvider = GoogleAuthProvider;
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.getFirestore = getFirestore;
+        window.doc = doc;
+        window.getDoc = getDoc;
+        window.setDoc = setDoc;
+        window.serverTimestamp = serverTimestamp;
+        window.collection = collection;
+        window.getDocs = getDocs;
+        window.query = query;
+        window.orderBy = orderBy;
+        window.limit = limit;
+    </script>
     <style>
         :root {
             --primary-color: #e67e22;
@@ -536,13 +557,19 @@
     </main>
 
     <script>
-        // Supabase 설정
-        const SUPABASE_URL = 'https://dpnfgibvpbwsetorhhsn.supabase.co'
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwbmZnaWJ2cGJ3c2V0b3JoaHNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2MDQwNzMsImV4cCI6MjA4MzE4MDA3M30.enDBWvK5nOHEHl33eXhVHbL4MsSgM2pbk4VMZ3FOV48'
-        
-        // Supabase 클라이언트 초기화
-        const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        // Firebase 설정 (philosophyaiedumain 프로젝트)
+        const firebaseConfig = {
+            projectId: "philosophyaiedumain",
+            appId: "1:791707583638:web:b86d59d52a20330baaaeb7",
+            storageBucket: "philosophyaiedumain.firebasestorage.app",
+            apiKey: "AIzaSyBylDxamogm1_g2URVxGQFz_c05pOWqjEI",
+            authDomain: "philosophyaiedumain.firebaseapp.com",
+            messagingSenderId: "791707583638",
+            measurementId: "G-KWCY47PZWB"
+        };
 
+        let app, auth, db;
+        
         // DOM 요소들
         const authSection = document.getElementById('authSection');
         const profileForm = document.getElementById('profileForm');
@@ -552,311 +579,198 @@
         const authMessage = document.getElementById('authMessage');
         const authError = document.getElementById('authError');
 
-        // 현재 사용자 상태
         let currentUser = null;
 
-        // 관심사 카테고리 (데이터베이스에서 가져올 수 있음)
         const interestCategories = [
             '철학', 'AI/인공지능', '교육학', '심리학', '사회학', 
             '정치학', '경제학', '과학철학', '윤리학', '미학'
         ];
 
-        // 초기화
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🔍 Supabase 초기화 상태:', !!supabaseClient);
-            console.log('🔍 Supabase URL:', SUPABASE_URL);
-            console.log('🔍 API 키 길이:', SUPABASE_ANON_KEY.length);
-            
-            if (!supabaseClient) {
-                showError('Supabase가 초기화되지 않았습니다. API 키를 확인해주세요.');
-                return;
-            }
-
-            setupEventListeners();
-            loadInterestCategories();
-            await checkAuthState();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Firebase 로드가 완료될 때까지 대기 (모듈이 글로벌 윈도우에 바인딩됨)
+            let attempts = 0;
+            const initInterval = setInterval(() => {
+                if (window.initializeApp) {
+                    clearInterval(initInterval);
+                    app = window.initializeApp(firebaseConfig);
+                    auth = window.getAuth(app);
+                    db = window.getFirestore(app);
+                    setupEventListeners();
+                    loadInterestCategories();
+                    
+                    window.onAuthStateChanged(auth, (user) => {
+                        handleAuthStateChange(user);
+                    });
+                }
+                attempts++;
+                if (attempts > 50) { // 5초
+                    clearInterval(initInterval);
+                    showError('Firebase 초기화에 실패했습니다. 페이지를 새로고침해주세요.');
+                }
+            }, 100);
         });
 
-        // 이벤트 리스너 설정
         function setupEventListeners() {
-            // 구글 로그인 버튼들
             document.getElementById('googleLogin')?.addEventListener('click', handleGoogleLogin);
             document.getElementById('googleLoginBtn')?.addEventListener('click', handleGoogleLogin);
-            
-            // 로그아웃
             document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
-            
-            // 프로필 폼
             document.getElementById('userProfileForm')?.addEventListener('submit', handleProfileSubmit);
-
-            // Supabase 인증 상태 변경 감지
-            if (supabaseClient) {
-                supabaseClient.auth.onAuthStateChange((event, session) => {
-                    console.log('Auth state changed:', event, session);
-                    handleAuthStateChange(event, session);
-                });
-            }
         }
 
-        // 관심사 카테고리 로드
         function loadInterestCategories() {
             const container = document.getElementById('interestsContainer');
             if (!container) return;
 
-            container.innerHTML = interestCategories.map(interest => `
-                <div class="interest-item">
-                    <input type="checkbox" id="interest_${interest}" name="interests" value="${interest}">
-                    <label for="interest_${interest}">${interest}</label>
-                </div>
+            container.innerHTML = interestCategories.map(category => `
+                <label class="interest-chip">
+                    <input type="checkbox" name="interests" value="${category}" style="display: none;">
+                    ${category}
+                </label>
             `).join('');
-        }
 
-        // 구글 로그인 처리
-        async function handleGoogleLogin() {
-            console.log('🚀 Google 로그인 시도 시작');
-            
-            if (!supabaseClient) {
-                console.error('❌ Supabase 클라이언트가 없습니다');
-                showError('Supabase가 초기화되지 않았습니다.');
-                return;
-            }
-
-            try {
-                console.log('📍 현재 URL:', window.location.href);
-                console.log('📍 리디렉트 URL:', window.location.origin);
-                
-                showMessage('구글 로그인을 진행 중입니다...');
-                
-                const { data, error } = await supabaseClient.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                        redirectTo: 'https://philosophyaiedu.com/auth-system.html'
-                    }
+            container.querySelectorAll('.interest-chip').forEach(chip => {
+                chip.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'INPUT') return;
+                    const checkbox = this.querySelector('input');
+                    checkbox.checked = !checkbox.checked;
+                    this.classList.toggle('selected', checkbox.checked);
                 });
+            });
+        }
 
-                console.log('🔍 OAuth 응답 데이터:', data);
-                
-                if (error) {
-                    console.error('❌ OAuth 오류:', error);
-                    throw error;
-                }
-
-                console.log('✅ OAuth 요청 성공, 리디렉션 대기 중...');
-                
+        async function handleGoogleLogin() {
+            if (!auth) return;
+            try {
+                const provider = new window.GoogleAuthProvider();
+                await window.signInWithPopup(auth, provider);
             } catch (error) {
-                console.error('❌ Google 로그인 오류:', error);
-                showError('로그인 중 오류가 발생했습니다: ' + error.message);
+                console.error('로그인 에러:', error);
+                showError('로그인 중 오류가 발생했습니다.');
             }
         }
 
-        // 로그아웃 처리
         async function handleLogout() {
-            if (!supabaseClient) return;
-
+            if (!auth) return;
             try {
-                const { error } = await supabaseClient.auth.signOut();
-                if (error) throw error;
-
+                await window.signOut(auth);
                 currentUser = null;
                 showLoginScreen();
-                showMessage('로그아웃되었습니다.');
-
             } catch (error) {
-                console.error('로그아웃 오류:', error);
-                showError('로그아웃 중 오류가 발생했습니다.');
+                console.error('로그아웃 에러:', error);
             }
         }
 
-        // 인증 상태 확인
-        async function checkAuthState() {
-            if (!supabaseClient) return;
-
-            try {
-                const { data: { session }, error } = await supabaseClient.auth.getSession();
-                
-                if (error) throw error;
-
-                if (session) {
-                    await handleAuthenticatedUser(session.user);
-                } else {
-                    showLoginScreen();
-                }
-
-            } catch (error) {
-                console.error('인증 상태 확인 오류:', error);
-                showLoginScreen();
-            }
-        }
-
-        // 인증 상태 변경 처리
-        async function handleAuthStateChange(event, session) {
-            if (event === 'SIGNED_IN' && session) {
-                await handleAuthenticatedUser(session.user);
-            } else if (event === 'SIGNED_OUT') {
-                currentUser = null;
-                showLoginScreen();
-            }
-        }
-
-        // 인증된 사용자 처리
-        async function handleAuthenticatedUser(user) {
-            currentUser = user;
-            
-            // 사용자 정보 표시
-            updateUserInfo(user);
-            
-            // 데이터베이스에서 사용자 프로필 확인
-            const userProfile = await getUserProfile(user.id);
-            
-            if (!userProfile) {
-                // 새 사용자 - 프로필 입력 화면
-                showProfileForm(user);
+        async function handleAuthStateChange(user) {
+            if (user) {
+                currentUser = user;
+                updateUserInfo(user);
+                await checkUser(user);
             } else {
-                // 기존 사용자 - 관리자인지 확인
-                if (userProfile.email === 'admin@example.com') { // 관리자 이메일 설정
-                    await showAdminDashboard();
-                } else {
-                    showWelcomeScreen(userProfile);
-                }
+                currentUser = null;
+                showLoginScreen();
             }
         }
 
-        // 사용자 프로필 가져오기
-        async function getUserProfile(userId) {
-            if (!supabaseClient) return null;
-
+        async function checkUser(user) {
             try {
-                const { data, error } = await supabaseClient
-                    .from('users')
-                    .select('*')
-                    .eq('id', userId)
-                    .single();
-
-                if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-                    throw error;
+                // Check if admin
+                if (user.email === 'admin@example.com' || user.email === 'hwangeu@gmail.com') {
+                    await showAdminDashboard();
+                    return;
                 }
 
-                return data;
+                const docRef = window.doc(db, 'users', user.uid);
+                const docSnap = await window.getDoc(docRef);
 
+                if (docSnap.exists() && docSnap.data().profileCompleted) {
+                    showWelcomeScreen(docSnap.data());
+                } else {
+                    showProfileForm(user);
+                }
             } catch (error) {
-                console.error('프로필 가져오기 오류:', error);
-                return null;
+                console.error('사용자 확인 오류:', error);
+                showError('사용자 정보를 확인하는 중 오류가 발생했습니다.');
             }
         }
 
-        // 프로필 폼 제출 처리
         async function handleProfileSubmit(e) {
             e.preventDefault();
-            
-            if (!supabaseClient || !currentUser) return;
+            if (!currentUser) return;
+
+            const submitBtn = document.getElementById('profileSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="spinner"></div> 처리 중...';
 
             try {
                 const formData = new FormData(e.target);
-                const submitBtn = document.getElementById('profileSubmitBtn');
+                const interests = Array.from(formData.getAll('interests'));
                 
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '저장 중... <div class="spinner"></div>';
-
-                // 관심사 수집
-                const interests = Array.from(document.querySelectorAll('input[name="interests"]:checked'))
-                    .map(input => input.value);
+                if (interests.length === 0) {
+                    throw new Error('최소 한 개의 관심사를 선택해주세요.');
+                }
 
                 const profileData = {
-                    id: currentUser.id,
+                    name: currentUser.displayName,
                     email: currentUser.email,
-                    name: currentUser.user_metadata?.full_name || currentUser.email,
                     phone: formData.get('phone'),
                     company: formData.get('company'),
                     interests: interests,
-                    marketing_agreed: formData.get('marketingAgreed') === 'on',
-                    profile_image_url: currentUser.user_metadata?.avatar_url
+                    marketingAgreed: formData.get('marketingAgreed') === 'on',
+                    profileCompleted: true,
+                    updatedAt: window.serverTimestamp()
                 };
 
-                // 사용자 정보 저장
-                const { error } = await supabaseClient
-                    .from('users')
-                    .upsert(profileData);
-
-                if (error) throw error;
-
-                // 로그인 세션 기록
-                await recordLoginSession();
-
-                showMessage('프로필이 저장되었습니다!');
+                // Create document only if it doesn't exist, else merge
+                const userRef = window.doc(db, 'users', currentUser.uid);
+                const docSnap = await window.getDoc(userRef);
                 
-                setTimeout(() => {
-                    if (currentUser.email === 'admin@example.com') {
-                        showAdminDashboard();
-                    } else {
-                        showWelcomeScreen(profileData);
-                    }
-                }, 1500);
+                if (!docSnap.exists()) {
+                    profileData.createdAt = window.serverTimestamp();
+                }
+                
+                await window.setDoc(userRef, profileData, { merge: true });
+
+                showMessage('프로필이 성공적으로 저장되었습니다.', 'profileMessage');
+                setTimeout(() => showWelcomeScreen(profileData), 1500);
 
             } catch (error) {
                 console.error('프로필 저장 오류:', error);
-                showError('프로필 저장 중 오류가 발생했습니다: ' + error.message, 'profileError');
-            } finally {
-                const submitBtn = document.getElementById('profileSubmitBtn');
+                showError(error.message, 'profileError');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '프로필 저장하기';
             }
         }
 
-        // 로그인 세션 기록
-        async function recordLoginSession() {
-            if (!supabaseClient || !currentUser) return;
-
-            try {
-                await supabaseClient.rpc('record_login_session', {
-                    user_ip_address: null, // 클라이언트에서는 실제 IP를 가져올 수 없음
-                    user_agent: navigator.userAgent
-                });
-            } catch (error) {
-                console.error('세션 기록 오류:', error);
-            }
-        }
-
-        // 관리자 대시보드 표시
         async function showAdminDashboard() {
-            if (!supabaseClient) return;
-
+            if (!db) return;
             try {
-                // 통계 데이터 가져오기
-                const { data: stats, error: statsError } = await supabaseClient
-                    .from('dashboard_stats')
-                    .select('*')
-                    .single();
-
-                if (statsError) throw statsError;
-
-                // 관심사 분석 데이터
-                const { data: interests, error: interestsError } = await supabaseClient
-                    .from('interest_analysis')
-                    .select('*')
-                    .limit(5);
-
-                if (interestsError) throw interestsError;
-
-                // 사용자 목록
-                const { data: users, error: usersError } = await supabaseClient
-                    .from('admin_user_summary')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(20);
-
-                if (usersError) throw usersError;
-
-                // UI 업데이트
                 hideAllScreens();
                 adminDashboard.style.display = 'block';
-
-                // 통계 카드 생성
-                renderStatsCards(stats);
                 
-                // 사용자 목록 렌더링
-                renderUsersList(users);
+                const usersRef = window.collection(db, 'users');
+                const q = window.query(usersRef, window.orderBy('createdAt', 'desc'), window.limit(20));
+                const querySnapshot = await window.getDocs(q);
+                
+                let users = [];
+                let totalMarketing = 0;
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    users.push(data);
+                    if (data.marketingAgreed) totalMarketing++;
+                });
 
-                console.log('관리자 대시보드 로드됨', { stats, interests, users });
+                const stats = {
+                    total_users: users.length, // 간이 통계
+                    new_users_today: 0,
+                    new_users_this_week: 0,
+                    new_users_this_month: 0,
+                    marketing_agreed_users: totalMarketing,
+                    total_companies: new Set(users.map(u => u.company).filter(c => c)).size
+                };
+
+                renderStatsCards(stats);
+                renderUsersList(users);
 
             } catch (error) {
                 console.error('대시보드 로드 오류:', error);
@@ -864,16 +778,12 @@
             }
         }
 
-        // 통계 카드 렌더링
         function renderStatsCards(stats) {
             const statsGrid = document.getElementById('statsGrid');
             if (!statsGrid || !stats) return;
 
             const statsCards = [
-                { label: '총 가입자', value: stats.total_users, icon: 'fas fa-users' },
-                { label: '오늘 신규', value: stats.new_users_today, icon: 'fas fa-user-plus' },
-                { label: '이번 주 신규', value: stats.new_users_this_week, icon: 'fas fa-chart-line' },
-                { label: '이번 달 신규', value: stats.new_users_this_month, icon: 'fas fa-calendar' },
+                { label: '최근 가입자', value: stats.total_users, icon: 'fas fa-users' },
                 { label: '마케팅 동의', value: stats.marketing_agreed_users, icon: 'fas fa-envelope' },
                 { label: '등록 회사', value: stats.total_companies, icon: 'fas fa-building' }
             ];
@@ -887,7 +797,6 @@
             `).join('');
         }
 
-        // 사용자 목록 렌더링
         function renderUsersList(users) {
             const usersList = document.getElementById('usersList');
             if (!usersList) return;
@@ -900,27 +809,23 @@
             usersList.innerHTML = users.map(user => `
                 <div class="user-item">
                     <div>
-                        <div class="user-email">${user.email}</div>
-                        <div style="font-weight: 600; color: var(--text-dark);">${user.name}</div>
+                        <div class="user-email">${user.email || '이메일 없음'}</div>
+                        <div style="font-weight: 600; color: var(--text-dark);">${user.name || '이름 없음'}</div>
                     </div>
                     <div>
                         <div class="user-company">${user.company || '미입력'}</div>
                         <div class="user-interests">${Array.isArray(user.interests) ? user.interests.join(', ') : '미입력'}</div>
                     </div>
-                    <div class="user-date">${new Date(user.created_at).toLocaleDateString('ko-KR')}</div>
+                    <div class="user-date">${user.createdAt ? new Date(user.createdAt.toDate ? user.createdAt.toDate() : user.createdAt).toLocaleDateString('ko-KR') : '날짜 없음'}</div>
                     <div style="text-align: right;">
                         <div style="font-size: 0.9rem; color: var(--text-light);">
-                            ${user.marketing_agreed ? '마케팅 동의' : '마케팅 비동의'}
-                        </div>
-                        <div style="font-size: 0.8rem; color: var(--text-light);">
-                            ${user.last_login ? new Date(user.last_login).toLocaleDateString('ko-KR') : '로그인 없음'}
+                            ${user.marketingAgreed ? '마케팅 동의' : '마케팅 비동의'}
                         </div>
                     </div>
                 </div>
             `).join('');
         }
 
-        // 화면 표시 함수들
         function showLoginScreen() {
             hideAllScreens();
             authSection.style.display = 'block';
@@ -955,22 +860,20 @@
             adminDashboard.style.display = 'none';
         }
 
-        // 사용자 정보 업데이트
         function updateUserInfo(user) {
             const userAvatar = document.getElementById('userAvatar');
             const userName = document.getElementById('userName');
 
-            if (userAvatar && user.user_metadata?.avatar_url) {
-                userAvatar.src = user.user_metadata.avatar_url;
-                userAvatar.alt = user.user_metadata?.full_name || user.email;
+            if (userAvatar && user.photoURL) {
+                userAvatar.src = user.photoURL;
+                userAvatar.alt = user.displayName || user.email;
             }
 
             if (userName) {
-                userName.textContent = user.user_metadata?.full_name || user.email.split('@')[0];
+                userName.textContent = user.displayName || user.email.split('@')[0];
             }
         }
 
-        // 메시지 표시 함수들
         function showMessage(message, elementId = 'authMessage') {
             const element = document.getElementById(elementId);
             if (element) {
@@ -992,34 +895,6 @@
                 }, 5000);
             }
         }
-
-        // 데모용 함수 (개발 시에만 사용)
-        function initDemo() {
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                console.log('🧪 데모 모드 활성화');
-                
-                // 데모용 관리자 로그인 버튼 추가
-                const demoBtn = document.createElement('button');
-                demoBtn.textContent = '데모: 관리자 로그인';
-                demoBtn.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; padding: 0.5rem; background: #e74c3c; color: white; border: none; border-radius: 4px; font-size: 0.8rem;';
-                demoBtn.onclick = async () => {
-                    // 데모용 관리자 데이터
-                    currentUser = {
-                        id: 'demo-admin',
-                        email: 'admin@example.com',
-                        user_metadata: {
-                            full_name: '관리자',
-                            avatar_url: 'https://via.placeholder.com/40'
-                        }
-                    };
-                    await showAdminDashboard();
-                };
-                document.body.appendChild(demoBtn);
-            }
-        }
-
-        // 데모 초기화 (개발용)
-        initDemo();
     </script>
 </body>
-</htm
+</html>
