@@ -526,15 +526,6 @@
                 </div>
             </div>
 
-            <div class="chart-card">
-                <h3 class="chart-title">
-                    <i class="fas fa-chart-pie"></i>
-                    관심사별 분포
-                </h3>
-                <div class="chart-container">
-                    <canvas id="interestChart"></canvas>
-                </div>
-            </div>
         </div>
 
         <!-- 데이터 테이블 -->
@@ -549,15 +540,6 @@
                 </div>
             </div>
 
-            <div class="table-card">
-                <div class="table-header">
-                    <span><i class="fas fa-heart"></i> 관심사 TOP 10</span>
-                    <span id="interestCount">0개</span>
-                </div>
-                <div class="table-content" id="interestTable">
-                    <div class="loading">데이터 로딩중...</div>
-                </div>
-            </div>
         </div>
 
         <!-- 사용자 관리 -->
@@ -579,7 +561,7 @@
                             <th>이름</th>
                             <th>이메일</th>
                             <th>회사</th>
-                            <th>관심사</th>
+                            <th>연락처</th>
                             <th>가입일</th>
                             <th>마지막 로그인</th>
                             <th>상태</th>
@@ -698,14 +680,6 @@
                         if (data.marketingAgreed) companyMap[data.company].marketing++;
                     }
                     
-                    if (Array.isArray(data.interests)) {
-                        data.interests.forEach(interest => {
-                            if (!interestMap[interest]) interestMap[interest] = { count: 0, companies: new Set(), marketing: 0 };
-                            interestMap[interest].count++;
-                            if (data.company) interestMap[interest].companies.add(data.company);
-                            if (data.marketingAgreed) interestMap[interest].marketing++;
-                        });
-                    }
                     
                     const dateStr = createdAt.toISOString().split('T')[0];
                     if (!dateMap[dateStr]) dateMap[dateStr] = 0;
@@ -720,12 +694,6 @@
                     marketing_rate: Math.round((data.marketing / data.count) * 100)
                 })).sort((a, b) => b.user_count - a.user_count);
 
-                const interests = Object.entries(interestMap).map(([name, data]) => ({
-                    interest: name,
-                    user_count: data.count,
-                    unique_companies: data.companies.size,
-                    marketing_rate: Math.round((data.marketing / data.count) * 100)
-                })).sort((a, b) => b.user_count - a.user_count);
 
                 const dailySignups = Object.entries(dateMap).map(([date, count]) => ({
                     date: date,
@@ -743,7 +711,6 @@
                     },
                     users: users,
                     companies: companies,
-                    interests: interests,
                     dailySignups: dailySignups
                 };
 
@@ -846,36 +813,6 @@
                 }
             });
 
-            // 2. 관심사 분포 차트
-            if (interestChart) interestChart.destroy();
-            
-            const topInterests = dashboardData.interests.slice(0, 5);
-            
-            interestChart = new Chart(ctxInterest, {
-                type: 'doughnut',
-                data: {
-                    labels: topInterests.map(i => i.interest),
-                    datasets: [{
-                        data: topInterests.map(i => i.user_count),
-                        backgroundColor: [
-                            '#e67e22', '#f39c12', '#3498db', '#2ecc71', '#9b59b6'
-                        ],
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: { padding: 20, usePointStyle: true, pointStyle: 'circle' }
-                        }
-                    }
-                }
-            });
         }
 
         function renderDataTables() {
@@ -904,30 +841,6 @@
                 `).join('');
             }
 
-            // 2. 관심사 TOP 10 테이블
-            const interestTable = document.getElementById('interestTable');
-            const interestCount = document.getElementById('interestCount');
-            const interests = dashboardData.interests.slice(0, 10);
-
-            if (interestCount) interestCount.textContent = `${dashboardData.interests.length}개`;
-            
-            if (!interests.length) {
-                interestTable.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-light);">데이터가 없습니다.</div>';
-            } else {
-                interestTable.innerHTML = interests.map((interest, index) => `
-                    <div class="table-item">
-                        <div>
-                            <strong>#${index + 1} ${interest.interest}</strong>
-                            <div style="font-size: 0.9rem; color: var(--text-light);">
-                                ${interest.unique_companies}개 회사 • 마케팅 동의율: ${interest.marketing_rate}%
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <span style="font-weight: 600; color: var(--primary-color);">${interest.user_count}명</span>
-                        </div>
-                    </div>
-                `).join('');
-            }
         }
 
         function renderUsersTable() {
@@ -954,16 +867,7 @@
                     <td><strong>${user.name || '이름 없음'}</strong></td>
                     <td style="color: var(--accent-color);">${user.email}</td>
                     <td>${user.company || '미입력'}</td>
-                    <td>
-                        <div class="interests-tags">
-                            ${(user.interests || []).slice(0, 3).map(interest => 
-                                `<span class="interest-tag">${interest}</span>`
-                            ).join('')}
-                            ${(user.interests || []).length > 3 ? 
-                                `<span class="interest-tag">+${(user.interests || []).length - 3}</span>` : ''
-                            }
-                        </div>
-                    </td>
+                    <td>${user.profileEmail || '미입력'}</td>
                     <td>${new Date(user.created_at).toLocaleDateString('ko-KR')}</td>
                     <td>${user.last_login ? new Date(user.last_login).toLocaleDateString('ko-KR') : '없음'}</td>
                     <td>

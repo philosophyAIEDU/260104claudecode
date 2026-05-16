@@ -501,20 +501,13 @@
 
                 <form id="userProfileForm">
                     <div class="form-group">
-                        <label for="phone">전화번호</label>
-                        <input type="tel" id="phone" name="phone" placeholder="010-1234-5678">
+                        <label for="profileEmail">연락처 이메일</label>
+                        <input type="email" id="profileEmail" name="profileEmail" placeholder="example@email.com">
                     </div>
 
                     <div class="form-group">
                         <label for="company">회사/소속</label>
                         <input type="text" id="company" name="company" placeholder="회사명 또는 소속 기관">
-                    </div>
-
-                    <div class="form-group">
-                        <label>관심사 (복수선택 가능)</label>
-                        <div class="interests-container" id="interestsContainer">
-                            <!-- 동적으로 생성됨 -->
-                        </div>
                     </div>
 
                     <div class="form-group">
@@ -581,10 +574,6 @@
 
         let currentUser = null;
 
-        const interestCategories = [
-            '철학', 'AI/인공지능', '교육학', '심리학', '사회학', 
-            '정치학', '경제학', '과학철학', '윤리학', '미학'
-        ];
 
         document.addEventListener('DOMContentLoaded', function() {
             // Firebase 로드가 완료될 때까지 대기 (모듈이 글로벌 윈도우에 바인딩됨)
@@ -596,7 +585,7 @@
                     auth = window.getAuth(app);
                     db = window.getFirestore(app);
                     setupEventListeners();
-                    loadInterestCategories();
+                    loadDashboardDataIfAdmin();
                     
                     window.onAuthStateChanged(auth, (user) => {
                         handleAuthStateChange(user);
@@ -617,25 +606,10 @@
             document.getElementById('userProfileForm')?.addEventListener('submit', handleProfileSubmit);
         }
 
-        function loadInterestCategories() {
-            const container = document.getElementById('interestsContainer');
-            if (!container) return;
-
-            container.innerHTML = interestCategories.map(category => `
-                <label class="interest-chip">
-                    <input type="checkbox" name="interests" value="${category}" style="display: none;">
-                    ${category}
-                </label>
-            `).join('');
-
-            container.querySelectorAll('.interest-chip').forEach(chip => {
-                chip.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const checkbox = this.querySelector('input');
-                    checkbox.checked = !checkbox.checked;
-                    this.classList.toggle('selected', checkbox.checked);
-                });
-            });
+        async function loadDashboardDataIfAdmin() {
+            if (currentUser && (currentUser.email === 'admin@example.com' || currentUser.email === 'hwangeu@gmail.com')) {
+                await showAdminDashboard();
+            }
         }
 
         async function handleGoogleLogin() {
@@ -702,19 +676,11 @@
             submitBtn.innerHTML = '<div class="spinner"></div> 처리 중...';
 
             try {
-                const formData = new FormData(e.target);
-                const interests = Array.from(formData.getAll('interests'));
-                
-                if (interests.length === 0) {
-                    throw new Error('최소 한 개의 관심사를 선택해주세요.');
-                }
-
                 const profileData = {
                     name: currentUser.displayName,
                     email: currentUser.email,
-                    phone: formData.get('phone'),
+                    profileEmail: formData.get('profileEmail'),
                     company: formData.get('company'),
-                    interests: interests,
                     marketingAgreed: formData.get('marketingAgreed') === 'on',
                     profileCompleted: true,
                     updatedAt: window.serverTimestamp()
@@ -814,7 +780,7 @@
                     </div>
                     <div>
                         <div class="user-company">${user.company || '미입력'}</div>
-                        <div class="user-interests">${Array.isArray(user.interests) ? user.interests.join(', ') : '미입력'}</div>
+                        <div class="user-email" style="font-size: 0.8rem; color: var(--text-light);">${user.profileEmail || '연락처 없음'}</div>
                     </div>
                     <div class="user-date">${user.createdAt ? new Date(user.createdAt.toDate ? user.createdAt.toDate() : user.createdAt).toLocaleDateString('ko-KR') : '날짜 없음'}</div>
                     <div style="text-align: right;">
