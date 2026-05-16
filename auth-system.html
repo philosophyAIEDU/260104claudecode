@@ -676,6 +676,7 @@
             submitBtn.innerHTML = '<div class="spinner"></div> 처리 중...';
 
             try {
+                const formData = new FormData(e.target);
                 const profileData = {
                     name: currentUser.displayName,
                     email: currentUser.email,
