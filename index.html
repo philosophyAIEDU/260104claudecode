@@ -169,7 +169,7 @@
             filter: blur(6px); z-index: 0;
         }
         .hero-figure img {
-            position: relative; z-index: 1; width: 100%; max-width: 380px; border-radius: 28px;
+            position: relative; z-index: 1; width: 100%; max-width: 300px; border-radius: 28px;
             box-shadow: var(--shadow-xl); border: 6px solid #fff;
             animation: floaty 5s ease-in-out infinite;
         }
@@ -181,7 +181,7 @@
         }
         .hero-badge i { color: var(--accent); }
         .hero h1 { font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 900; line-height: 1.15; letter-spacing: -1.5px; color: var(--ink); margin-bottom: 1.3rem; }
-        .hero .lead { font-size: clamp(1rem, 2vw, 1.18rem); color: var(--text-soft); max-width: 640px; margin-bottom: 1.1rem; }
+        .hero .lead { font-size: clamp(0.92rem, 1.7vw, 1.05rem); color: var(--text-soft); max-width: 620px; margin-bottom: 1rem; }
         .hero .lead strong { color: var(--text); font-weight: 700; }
         .hero-note {
             display: flex; align-items: flex-start; gap: 0.7rem; max-width: 640px;
@@ -202,6 +202,9 @@
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -8px rgba(200, 137, 15, 0.65); }
         .btn-ghost { background: #fff; color: var(--ink); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
         .btn-ghost:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: var(--shadow); }
+        .btn-youtube { background: #ff0000; color: #fff; box-shadow: 0 10px 24px -8px rgba(255, 0, 0, 0.55); }
+        .btn-youtube i { font-size: 1.2rem; }
+        .btn-youtube:hover { background: #d90000; transform: translateY(-2px); box-shadow: 0 16px 30px -8px rgba(255, 0, 0, 0.6); }
 
         .hero-stats { display: flex; flex-wrap: wrap; gap: 2.8rem; }
         .hero-stat .num { font-size: 1.9rem; font-weight: 800; color: var(--ink); letter-spacing: -0.5px; }
@@ -420,7 +423,7 @@
         @media (max-width: 900px) {
             .hero-layout { grid-template-columns: 1fr; gap: 2rem; }
             .hero-figure { order: -1; }
-            .hero-figure img { max-width: 280px; }
+            .hero-figure img { max-width: 230px; }
             .tools-grid { grid-template-columns: 1fr; }
             .gallery-grid { grid-template-columns: 1fr 1fr; }
             .contact-wrap { grid-template-columns: 1fr; gap: 2.5rem; }
@@ -483,14 +486,14 @@
                 <div class="hero-content">
                     <div class="hero-badge"><i class="fas fa-compass"></i> 교육자를 위한 AI 연구 채널</div>
                     <h1>AI 사용법이라는 <span class="gradient-text">지도</span>를 넘어,<br>길을 잃지 않는 <span class="gradient-text">나침반</span>으로</h1>
-                    <p class="lead">AI를 활용한 학습에 깊은 관심을 두고 있습니다.
-                        AI 사용법이라는 지도뿐 아니라, AI 시대에 길을 잃지 않도록
-                        <strong>나침반이 되는 철학적 인사이트</strong>를 함께 드리고자 합니다.</p>
+                    <p class="lead">AI 사용법이라는 지도뿐만 아니라, AI 시대에 길을 잃지 않도록
+                        <strong>나침반이 되는 철학적 인사이트</strong>를 함께 드립니다.</p>
                     <p class="lead">AI의 한계는 무엇인지, AI가 못 하는 일은 무엇인지,
                         그래서 <strong>우리가 할 수 있는 일</strong>은 무엇인지 — 사용법 너머의 질문을 함께 고민합니다.</p>
                     <div class="hero-note"><i class="fas fa-chalkboard-user"></i>
                         학생들에게 AI를 어떻게 가르쳐야 할지 고민하시는 <strong>교육자분들을 위한 AI 연구 채널</strong>입니다.</div>
                     <div class="hero-buttons">
+                        <a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="btn btn-youtube"><i class="fab fa-youtube"></i> 유튜브 바로 가기</a>
                         <a href="#tools" class="btn btn-primary"><i class="fas fa-toolbox"></i> 교육자용 AI 툴 보기</a>
                         <a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener" class="btn btn-ghost"><i class="fas fa-users"></i> 커뮤니티 합류하기</a>
                     </div>
