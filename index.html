@@ -118,6 +118,12 @@
             padding: 0.55rem 0.9rem; border-radius: 10px; transition: var(--transition);
         }
         .nav-menu > li > a:hover { color: var(--primary); background: rgba(200, 137, 15, 0.07); }
+        .nav-menu > li > a.nav-youtube {
+            display: inline-flex; align-items: center; gap: 0.4rem; color: #ff0000; font-weight: 600;
+            border: 1px solid rgba(255, 0, 0, 0.25); background: rgba(255, 0, 0, 0.05);
+        }
+        .nav-menu > li > a.nav-youtube i { font-size: 1.05rem; }
+        .nav-menu > li > a.nav-youtube:hover { color: #fff; background: #ff0000; border-color: #ff0000; }
 
         .login-btn {
             background: var(--ink); color: #fff !important; font-weight: 600;
@@ -465,6 +471,7 @@
                 <li><a href="#gallery">교육 사진</a></li>
                 <li><a href="#community">커뮤니티</a></li>
                 <li><a href="#contact">문의</a></li>
+                <li><a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="nav-youtube"><i class="fab fa-youtube"></i> 필로소피 AI 교육 유튜브</a></li>
                 <li id="navLoginItem"><a href="auth-system.html" class="login-btn">로그인</a></li>
                 <li id="navUserItem" style="display: none;">
                     <div class="user-info-nav">
@@ -493,7 +500,7 @@
                     <div class="hero-note"><i class="fas fa-chalkboard-user"></i>
                         학생들에게 AI를 어떻게 가르쳐야 할지 고민하시는 <strong>교육자분들을 위한 AI 연구 채널</strong>입니다.</div>
                     <div class="hero-buttons">
-                        <a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="btn btn-youtube"><i class="fab fa-youtube"></i> 유튜브 바로 가기</a>
+                        <a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="btn btn-youtube"><i class="fab fa-youtube"></i> 필로소피 AI 교육 유튜브</a>
                         <a href="#tools" class="btn btn-primary"><i class="fas fa-toolbox"></i> 교육자용 AI 툴 보기</a>
                         <a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener" class="btn btn-ghost"><i class="fas fa-users"></i> 커뮤니티 합류하기</a>
                     </div>
