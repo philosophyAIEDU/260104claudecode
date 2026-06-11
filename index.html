@@ -656,7 +656,7 @@
                         교육 현장의 목소리가 다음 도구를 만듭니다.</p>
                     <ul class="contact-list">
                         <li><span class="ci"><i class="fas fa-envelope"></i></span>
-                            <div>이메일 문의<small>warmcomfortforyou@gmail.com</small></div></li>
+                            <div>이메일 문의<small>dearname27@naver.com</small></div></li>
                         <li><span class="ci"><i class="fas fa-lightbulb"></i></span>
                             <div>새로운 도구 제안<small>현장에서 필요한 AI 도구를 알려주세요</small></div></li>
                         <li><span class="ci"><i class="fas fa-chalkboard-user"></i></span>
@@ -687,7 +687,7 @@
                         </button>
                     </form>
                     <div class="success-message" id="successMessage">
-                        <i class="fas fa-circle-check"></i> 문의가 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.
+                        <i class="fas fa-circle-check"></i> 메일 작성 창이 열렸습니다. '보내기'를 누르면 문의가 전송됩니다.
                     </div>
                     <div class="submission-counter" id="submissionCounter"></div>
                 </div>
@@ -804,6 +804,7 @@
         document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
         // ===== Contact form =====
+        const CONTACT_EMAIL = 'dearname27@naver.com';
         const contactForm = document.getElementById('contactForm');
         const successMessage = document.getElementById('successMessage');
         const submissionCounter = document.getElementById('submissionCounter');
@@ -861,26 +862,37 @@
             btn.disabled = true;
 
             try {
-                await new Promise(r => setTimeout(r, 1200));
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const message = document.getElementById('message').value.trim();
+
+                // 로컬 기록(백업용)
                 const inquiries = getInquiries();
                 inquiries.unshift({
                     id: `inq_${Date.now()}`,
-                    name: document.getElementById('name').value.trim(),
-                    email: document.getElementById('email').value.trim(),
-                    message: document.getElementById('message').value.trim(),
+                    name, email, message,
                     timestamp: new Date().toISOString(),
                     dateFormatted: new Date().toLocaleString('ko-KR'),
                 });
                 localStorage.setItem('philosophyAI_inquiries', JSON.stringify(inquiries));
 
+                // 방문자의 기본 메일 앱으로 문의 메일 작성 창 열기
+                const subject = `[Philosophy AI Education 문의] ${name}님`;
+                const body =
+                    `이름: ${name}\n` +
+                    `회신 이메일: ${email}\n\n` +
+                    `문의 내용:\n${message}\n`;
+                const mailtoUrl = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = mailtoUrl;
+
                 successMessage.classList.add('show');
-                setTimeout(() => successMessage.classList.remove('show'), 5000);
+                setTimeout(() => successMessage.classList.remove('show'), 6000);
                 contactForm.reset();
                 contactForm.querySelectorAll('.form-group').forEach(g => g.classList.remove('error', 'success'));
                 updateCounter();
             } catch (err) {
                 console.error('문의 전송 오류:', err);
-                alert('문의 전송 중 오류가 발생했습니다. 다시 시도해 주세요.');
+                alert('메일 앱을 여는 중 오류가 발생했습니다. dearname27@naver.com 으로 직접 보내주세요.');
             } finally {
                 isSubmitting = false;
                 btn.classList.remove('loading');
