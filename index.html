@@ -13,15 +13,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Firebase (모듈형) — 로그인 상태 표시용 -->
+    <!-- Firebase (모듈형) — 로그인 상태 표시 + 갤러리 게시판 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         window.initializeApp = initializeApp;
         window.getAuth = getAuth;
         window.onAuthStateChanged = onAuthStateChanged;
         window.signOut = signOut;
+        window.getFirestore = getFirestore;
+        window.fsCollection = collection;
+        window.fsAddDoc = addDoc;
+        window.fsGetDocs = getDocs;
+        window.fsQuery = query;
+        window.fsOrderBy = orderBy;
+        window.fsDeleteDoc = deleteDoc;
+        window.fsDoc = doc;
+        window.fsServerTimestamp = serverTimestamp;
         window.__firebaseReady = true;
     </script>
 
@@ -245,29 +255,83 @@
         }
         .tool-link:hover { background: var(--primary); gap: 0.85rem; }
 
-        /* ===== Compass / Curation ===== */
-        .compass-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.3rem; }
-        .curate-card {
-            background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 1.6rem;
-            display: flex; flex-direction: column; transition: var(--transition);
+        /* ===== Photo Galleries (봉사단 소식 / 교육 사진) ===== */
+        .gallery-section.alt { background: var(--bg-soft); }
+        .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+        .post-card {
+            background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+            overflow: hidden; display: flex; flex-direction: column; transition: var(--transition); cursor: pointer;
         }
-        .curate-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: #cbd5e1; }
-        .curate-head { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 0.9rem; }
-        .curate-icon { width: 46px; height: 46px; border-radius: 12px; background: var(--gradient-soft); color: var(--primary); display: grid; place-items: center; font-size: 1.15rem; flex-shrink: 0; }
-        .curate-title { font-size: 1.05rem; font-weight: 700; color: var(--ink); }
-        .curate-cat { font-size: 0.78rem; font-weight: 600; color: var(--accent-dark); }
-        .curate-card p { font-size: 0.9rem; color: var(--text-soft); flex: 1; margin-bottom: 1.1rem; }
-        .curate-link { font-size: 0.9rem; font-weight: 600; color: var(--primary); display: inline-flex; align-items: center; gap: 0.4rem; transition: var(--transition); }
-        .curate-link:hover { gap: 0.7rem; }
+        .post-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .post-photo { position: relative; aspect-ratio: 4 / 3; background: var(--bg-tint); overflow: hidden; }
+        .post-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+        .post-card:hover .post-photo img { transform: scale(1.05); }
+        .post-photo .no-photo { position: absolute; inset: 0; display: grid; place-items: center; color: var(--text-soft); font-size: 2rem; }
+        .post-body { padding: 1.2rem 1.3rem 1.4rem; display: flex; flex-direction: column; flex: 1; }
+        .post-date { font-size: 0.78rem; font-weight: 600; color: var(--primary); margin-bottom: 0.35rem; }
+        .post-title { font-size: 1.08rem; font-weight: 700; color: var(--ink); margin-bottom: 0.4rem; line-height: 1.4; }
+        .post-text {
+            font-size: 0.9rem; color: var(--text-soft); flex: 1;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .post-delete {
+            margin-top: 0.9rem; align-self: flex-end; background: #fff; border: 1px solid var(--line);
+            color: var(--text-soft); font-size: 0.78rem; padding: 0.3rem 0.8rem; border-radius: 50px;
+            cursor: pointer; font-family: inherit; transition: var(--transition);
+        }
+        .post-delete:hover { color: #e11d48; border-color: #fecdd3; background: #fff1f2; }
+        .gallery-empty {
+            grid-column: 1 / -1; text-align: center; padding: 3.5rem 1rem; color: var(--text-soft);
+            background: #fff; border: 1px dashed var(--line); border-radius: var(--radius);
+        }
+        .gallery-empty i { font-size: 2rem; color: var(--accent); display: block; margin-bottom: 0.8rem; }
+        .gallery-loading { grid-column: 1 / -1; text-align: center; padding: 2.5rem; color: var(--text-soft); }
+        .gallery-loading i { animation: spin 0.9s linear infinite; margin-right: 0.5rem; }
 
-        /* ===== Approach (compass principles) ===== */
-        .approach { background: var(--bg-soft); }
-        .approach-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-        .approach-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 2.2rem; transition: var(--transition); }
-        .approach-card:hover { box-shadow: var(--shadow); transform: translateY(-4px); }
-        .approach-icon { width: 56px; height: 56px; border-radius: 14px; background: var(--gradient-soft); color: var(--primary); display: grid; place-items: center; font-size: 1.4rem; margin-bottom: 1.3rem; }
-        .approach-card h3 { font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-bottom: 0.6rem; }
-        .approach-card p { color: var(--text-soft); font-size: 0.96rem; }
+        .admin-add-btn {
+            display: none; margin: 0 auto 2.2rem; background: var(--gradient); color: #fff; border: none;
+            font-family: inherit; font-weight: 700; font-size: 0.95rem; padding: 0.85rem 1.7rem;
+            border-radius: 50px; cursor: pointer; box-shadow: 0 10px 24px -8px rgba(200,137,15,0.6);
+            transition: var(--transition); align-items: center; gap: 0.5rem;
+        }
+        .admin-add-btn.visible { display: inline-flex; }
+        .admin-add-btn:hover { transform: translateY(-2px); }
+        .admin-bar { text-align: center; }
+
+        /* ===== Post / Lightbox Modals ===== */
+        .modal-backdrop {
+            display: none; position: fixed; inset: 0; z-index: 2000;
+            background: rgba(43, 35, 23, 0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            padding: 1.5rem; overflow-y: auto;
+        }
+        .modal-backdrop.open { display: grid; place-items: center; }
+        .modal-panel {
+            background: #fff; border-radius: var(--radius-lg); max-width: 560px; width: 100%;
+            padding: 2rem; box-shadow: var(--shadow-xl); position: relative; margin: auto;
+        }
+        .modal-panel h3 { font-size: 1.25rem; font-weight: 800; color: var(--ink); margin-bottom: 1.4rem; display: flex; align-items: center; gap: 0.6rem; }
+        .modal-panel h3 i { color: var(--primary); }
+        .modal-close {
+            position: absolute; top: 1.1rem; right: 1.1rem; width: 36px; height: 36px; border-radius: 50%;
+            border: 1px solid var(--line); background: #fff; color: var(--text-soft); cursor: pointer;
+            font-size: 0.95rem; transition: var(--transition);
+        }
+        .modal-close:hover { color: var(--ink); border-color: var(--text-soft); }
+        .photo-input-wrap {
+            border: 2px dashed var(--line); border-radius: 12px; padding: 1.1rem; text-align: center;
+            color: var(--text-soft); font-size: 0.9rem; cursor: pointer; transition: var(--transition);
+        }
+        .photo-input-wrap:hover { border-color: var(--primary); color: var(--primary); }
+        .photo-input-wrap img { max-height: 180px; margin: 0.6rem auto 0; border-radius: 10px; }
+        .modal-error { display: none; color: #e11d48; font-size: 0.85rem; margin-top: 0.8rem; }
+        .modal-error.show { display: block; }
+
+        .lightbox-panel { max-width: 760px; padding: 0; overflow: hidden; }
+        .lightbox-panel img { width: 100%; max-height: 65vh; object-fit: contain; background: var(--bg-tint); }
+        .lightbox-body { padding: 1.6rem 2rem 2rem; }
+        .lightbox-body .post-date { margin-bottom: 0.4rem; }
+        .lightbox-body h3 { font-size: 1.3rem; font-weight: 800; color: var(--ink); margin-bottom: 0.7rem; }
+        .lightbox-body p { color: var(--text); font-size: 0.97rem; white-space: pre-wrap; }
 
         /* ===== Community CTA ===== */
         .community { padding: 100px 0; }
@@ -358,7 +422,7 @@
             .hero-figure { order: -1; }
             .hero-figure img { max-width: 280px; }
             .tools-grid { grid-template-columns: 1fr; }
-            .compass-grid, .approach-grid { grid-template-columns: 1fr 1fr; }
+            .gallery-grid { grid-template-columns: 1fr 1fr; }
             .contact-wrap { grid-template-columns: 1fr; gap: 2.5rem; }
             .community-inner { padding: 2.6rem; }
         }
@@ -379,7 +443,7 @@
             .section-pad { padding: 70px 0; }
             .hero { padding: 130px 0 70px; }
             .hero-stats { gap: 1.8rem; }
-            .compass-grid, .approach-grid { grid-template-columns: 1fr; }
+            .gallery-grid { grid-template-columns: 1fr; }
             .community { padding: 70px 0; }
         }
     </style>
@@ -394,8 +458,8 @@
             </a>
             <ul class="nav-menu" id="navMenu">
                 <li><a href="#tools">AI 툴</a></li>
-                <li><a href="#compass">AI 나침반</a></li>
-                <li><a href="#approach">방향</a></li>
+                <li><a href="#volunteer">봉사단 소식</a></li>
+                <li><a href="#gallery">교육 사진</a></li>
                 <li><a href="#community">커뮤니티</a></li>
                 <li><a href="#contact">문의</a></li>
                 <li id="navLoginItem"><a href="auth-system.html" class="login-btn">로그인</a></li>
@@ -523,92 +587,40 @@
         </div>
     </section>
 
-    <!-- ===== AI Compass (curated external tools) ===== -->
-    <section id="compass" class="section-pad">
+    <!-- ===== 필로소피 AI 봉사단 소식 ===== -->
+    <section id="volunteer" class="section-pad gallery-section">
         <div class="container">
             <div class="section-head reveal">
-                <span class="eyebrow"><i class="fas fa-compass"></i> AI Compass</span>
-                <h2 class="section-title">교육자를 위한 AI 나침반</h2>
-                <p class="section-sub">수많은 AI 도구 속에서 길을 잃지 않도록, 교육 현장에서 특히 쓸모 있는 도구만 엄선했습니다.</p>
+                <span class="eyebrow"><i class="fas fa-hand-holding-heart"></i> Volunteer</span>
+                <h2 class="section-title">필로소피 AI 봉사단 소식</h2>
+                <p class="section-sub">필로소피 AI 봉사단의 활동 사진과 이야기를 전합니다.</p>
             </div>
-
-            <div class="compass-grid">
-                <a class="curate-card reveal" href="https://claude.ai" target="_blank" rel="noopener">
-                    <div class="curate-head">
-                        <div class="curate-icon"><i class="fas fa-feather-pointed"></i></div>
-                        <div><div class="curate-title">Claude</div><div class="curate-cat">수업 준비 · 글쓰기</div></div>
-                    </div>
-                    <p>수업 계획, 평가 루브릭, 학생 피드백 작성까지. 길고 섬세한 글쓰기에 강한 AI 어시스턴트입니다.</p>
-                    <span class="curate-link">방문하기 <i class="fas fa-arrow-right"></i></span>
-                </a>
-                <a class="curate-card reveal" href="https://chat.openai.com" target="_blank" rel="noopener">
-                    <div class="curate-head">
-                        <div class="curate-icon"><i class="fas fa-comments"></i></div>
-                        <div><div class="curate-title">ChatGPT</div><div class="curate-cat">아이디어 · 자료 제작</div></div>
-                    </div>
-                    <p>퀴즈 제작, 수업 아이디어 브레인스토밍, 자료 초안 작성에 두루 쓰이는 범용 대화형 AI입니다.</p>
-                    <span class="curate-link">방문하기 <i class="fas fa-arrow-right"></i></span>
-                </a>
-                <a class="curate-card reveal" href="https://perplexity.ai" target="_blank" rel="noopener">
-                    <div class="curate-head">
-                        <div class="curate-icon"><i class="fas fa-magnifying-glass"></i></div>
-                        <div><div class="curate-title">Perplexity</div><div class="curate-cat">연구 · 출처 검색</div></div>
-                    </div>
-                    <p>출처를 함께 보여 주는 AI 검색 엔진. 신뢰할 수 있는 자료 조사와 사실 확인에 유용합니다.</p>
-                    <span class="curate-link">방문하기 <i class="fas fa-arrow-right"></i></span>
-                </a>
-                <a class="curate-card reveal" href="https://gamma.app" target="_blank" rel="noopener">
-                    <div class="curate-head">
-                        <div class="curate-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
-                        <div><div class="curate-title">Gamma</div><div class="curate-cat">프레젠테이션</div></div>
-                    </div>
-                    <p>텍스트만 넣으면 발표 슬라이드를 자동으로 완성. 수업 자료를 빠르게 시각화할 수 있습니다.</p>
-                    <span class="curate-link">방문하기 <i class="fas fa-arrow-right"></i></span>
-                </a>
-                <a class="curate-card reveal" href="https://www.napkin.ai" target="_blank" rel="noopener">
-                    <div class="curate-head">
-                        <div class="curate-icon"><i class="fas fa-diagram-project"></i></div>
-                        <div><div class="curate-title">Napkin AI</div><div class="curate-cat">시각화 · 다이어그램</div></div>
-                    </div>
-                    <p>글을 그림과 도식으로 바꿔 주는 도구. 개념을 한눈에 보이는 시각 자료로 정리할 수 있습니다.</p>
-                    <span class="curate-link">방문하기 <i class="fas fa-arrow-right"></i></span>
-                </a>
-                <a class="curate-card reveal" href="https://elevenlabs.io" target="_blank" rel="noopener">
-                    <div class="curate-head">
-                        <div class="curate-icon"><i class="fas fa-volume-high"></i></div>
-                        <div><div class="curate-title">ElevenLabs</div><div class="curate-cat">음성 · 듣기 자료</div></div>
-                    </div>
-                    <p>자연스러운 AI 음성 합성. 듣기 자료, 동화 낭독, 외국어 발음 예시 제작에 활용할 수 있습니다.</p>
-                    <span class="curate-link">방문하기 <i class="fas fa-arrow-right"></i></span>
-                </a>
+            <div class="admin-bar">
+                <button class="admin-add-btn" id="volunteerAddBtn" data-board="volunteer">
+                    <i class="fas fa-pen-to-square"></i> 봉사단 소식 쓰기
+                </button>
+            </div>
+            <div class="gallery-grid" id="volunteerGrid">
+                <div class="gallery-loading"><i class="fas fa-spinner"></i> 소식을 불러오는 중...</div>
             </div>
         </div>
     </section>
 
-    <!-- ===== Approach / Direction ===== -->
-    <section id="approach" class="section-pad approach">
+    <!-- ===== 필로소피 AI 교육 사진 ===== -->
+    <section id="gallery" class="section-pad gallery-section alt">
         <div class="container">
             <div class="section-head reveal">
-                <span class="eyebrow"><i class="fas fa-route"></i> Our Direction</span>
-                <h2 class="section-title">우리가 지키는 방향</h2>
-                <p class="section-sub">기술은 빠르게 변해도, 교육이 향해야 할 곳은 흔들리지 않습니다.</p>
+                <span class="eyebrow"><i class="fas fa-camera"></i> Gallery</span>
+                <h2 class="section-title">필로소피 AI 교육 사진</h2>
+                <p class="section-sub">교육 현장의 생생한 순간들을 사진으로 기록합니다.</p>
             </div>
-            <div class="approach-grid">
-                <div class="approach-card reveal">
-                    <div class="approach-icon"><i class="fas fa-seedling"></i></div>
-                    <h3>도구보다 사람</h3>
-                    <p>AI는 수단일 뿐, 중심은 언제나 배우는 사람입니다. 학생의 사고와 성장을 돕는 방향으로 기술을 사용합니다.</p>
-                </div>
-                <div class="approach-card reveal">
-                    <div class="approach-icon"><i class="fas fa-scale-balanced"></i></div>
-                    <h3>비판적 활용</h3>
-                    <p>무조건 따르지도, 무조건 거부하지도 않습니다. AI의 가능성과 한계를 함께 이해하고 현명하게 사용합니다.</p>
-                </div>
-                <div class="approach-card reveal">
-                    <div class="approach-icon"><i class="fas fa-people-group"></i></div>
-                    <h3>함께 배우기</h3>
-                    <p>혼자 쫓기보다 함께 나아갑니다. 교육자들이 경험과 자료를 나누며 변화의 속도를 따라잡습니다.</p>
-                </div>
+            <div class="admin-bar">
+                <button class="admin-add-btn" id="educationAddBtn" data-board="education">
+                    <i class="fas fa-camera"></i> 교육 사진 올리기
+                </button>
+            </div>
+            <div class="gallery-grid" id="educationGrid">
+                <div class="gallery-loading"><i class="fas fa-spinner"></i> 사진을 불러오는 중...</div>
             </div>
         </div>
     </section>
@@ -701,8 +713,8 @@
                     </div>
                     <div class="footer-col">
                         <h4>둘러보기</h4>
-                        <a href="#compass">AI 나침반</a>
-                        <a href="#approach">우리의 방향</a>
+                        <a href="#volunteer">봉사단 소식</a>
+                        <a href="#gallery">교육 사진</a>
                         <a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener">네이버 카페</a>
                         <a href="#contact">문의하기</a>
                     </div>
@@ -714,6 +726,50 @@
             </div>
         </div>
     </footer>
+
+    <!-- ===== 관리자 글쓰기 모달 ===== -->
+    <div class="modal-backdrop" id="postModal">
+        <div class="modal-panel">
+            <button class="modal-close" id="postModalClose" aria-label="닫기"><i class="fas fa-times"></i></button>
+            <h3 id="postModalTitle"><i class="fas fa-pen-to-square"></i> 소식 쓰기</h3>
+            <form id="postForm">
+                <div class="form-group">
+                    <label for="postTitle">제목</label>
+                    <input type="text" id="postTitle" placeholder="제목을 입력해 주세요" required maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label for="postContent">내용</label>
+                    <textarea id="postContent" placeholder="활동 내용을 적어주세요" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>사진</label>
+                    <label class="photo-input-wrap" id="photoInputWrap">
+                        <span id="photoInputLabel"><i class="fas fa-image"></i> 클릭해서 사진을 선택하세요 (선택)</span>
+                        <img id="photoPreview" style="display:none" alt="미리보기">
+                        <input type="file" id="postPhoto" accept="image/*" hidden>
+                    </label>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <span class="text"><i class="fas fa-paper-plane"></i> 게시하기</span>
+                    <span class="loading"><i class="fas fa-spinner"></i> 게시 중...</span>
+                </button>
+                <div class="modal-error" id="postError"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== 라이트박스 (게시물 크게 보기) ===== -->
+    <div class="modal-backdrop" id="lightbox">
+        <div class="modal-panel lightbox-panel">
+            <button class="modal-close" id="lightboxClose" aria-label="닫기" style="z-index:10; background:#fff;"><i class="fas fa-times"></i></button>
+            <img id="lightboxImg" src="" alt="" style="display:none">
+            <div class="lightbox-body">
+                <div class="post-date" id="lightboxDate"></div>
+                <h3 id="lightboxTitle"></h3>
+                <p id="lightboxText"></p>
+            </div>
+        </div>
+    </div>
 
     <script>
         // ===== Header scroll state =====
@@ -843,7 +899,15 @@
             messagingSenderId: "791707583638",
             measurementId: "G-KWCY47PZWB"
         };
-        let auth;
+        let auth, db;
+        const ADMIN_EMAIL = 'warmcomfortforyou@gmail.com';
+        let isAdmin = false;
+
+        const BOARDS = {
+            volunteer: { collection: 'volunteer_posts', grid: 'volunteerGrid', addBtn: 'volunteerAddBtn', emptyIcon: 'fa-hand-holding-heart', emptyText: '아직 등록된 봉사단 소식이 없습니다.', modalTitle: '봉사단 소식 쓰기' },
+            education: { collection: 'education_posts', grid: 'educationGrid', addBtn: 'educationAddBtn', emptyIcon: 'fa-camera', emptyText: '아직 등록된 교육 사진이 없습니다.', modalTitle: '교육 사진 올리기' },
+        };
+        const boardCache = { volunteer: [], education: [] };
 
         function initFirebase() {
             let attempts = 0;
@@ -853,9 +917,16 @@
                     try {
                         const app = window.initializeApp(firebaseConfig);
                         auth = window.getAuth(app);
+                        db = window.getFirestore(app);
                         window.onAuthStateChanged(auth, updateAuthUI);
                         setupLogout();
-                    } catch (e) { console.error('Firebase init 오류:', e); }
+                        loadBoard('volunteer');
+                        loadBoard('education');
+                    } catch (e) {
+                        console.error('Firebase init 오류:', e);
+                        showBoardError('volunteer');
+                        showBoardError('education');
+                    }
                 }
                 if (++attempts > 50) clearInterval(t);
             }, 100);
@@ -873,6 +944,14 @@
                 loginItem.style.display = 'block';
                 userItem.style.display = 'none';
             }
+
+            // 관리자 전용 UI 토글
+            isAdmin = !!user && (user.email || '').toLowerCase() === ADMIN_EMAIL;
+            Object.values(BOARDS).forEach(b => {
+                document.getElementById(b.addBtn).classList.toggle('visible', isAdmin);
+            });
+            renderBoard('volunteer');
+            renderBoard('education');
         }
 
         function setupLogout() {
@@ -882,6 +961,219 @@
                 catch (e) { console.error('로그아웃 오류:', e); }
             });
         }
+
+        // ===== 갤러리 게시판 (봉사단 소식 / 교육 사진) =====
+        async function loadBoard(boardKey) {
+            const board = BOARDS[boardKey];
+            try {
+                const q = window.fsQuery(window.fsCollection(db, board.collection), window.fsOrderBy('createdAt', 'desc'));
+                const snap = await window.fsGetDocs(q);
+                boardCache[boardKey] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderBoard(boardKey);
+            } catch (e) {
+                console.error(`${board.collection} 불러오기 오류:`, e);
+                showBoardError(boardKey);
+            }
+        }
+
+        function showBoardError(boardKey) {
+            const board = BOARDS[boardKey];
+            document.getElementById(board.grid).innerHTML =
+                `<div class="gallery-empty"><i class="fas fa-triangle-exclamation"></i>게시물을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.</div>`;
+        }
+
+        function renderBoard(boardKey) {
+            const board = BOARDS[boardKey];
+            const grid = document.getElementById(board.grid);
+            const posts = boardCache[boardKey];
+            if (!Array.isArray(posts)) return;
+
+            if (posts.length === 0) {
+                grid.innerHTML = `<div class="gallery-empty"><i class="fas ${board.emptyIcon}"></i>${board.emptyText}<br>곧 새로운 소식으로 찾아뵙겠습니다!</div>`;
+                return;
+            }
+
+            grid.innerHTML = posts.map((p, idx) => `
+                <article class="post-card" data-board="${boardKey}" data-idx="${idx}">
+                    <div class="post-photo">
+                        ${p.imageData
+                            ? `<img src="${p.imageData}" alt="${escapeHtml(p.title)}" loading="lazy">`
+                            : `<span class="no-photo"><i class="fas fa-image"></i></span>`}
+                    </div>
+                    <div class="post-body">
+                        <div class="post-date">${formatDate(p.createdAt)}</div>
+                        <div class="post-title">${escapeHtml(p.title)}</div>
+                        ${p.content ? `<p class="post-text">${escapeHtml(p.content)}</p>` : ''}
+                        ${isAdmin ? `<button class="post-delete" data-board="${boardKey}" data-id="${p.id}"><i class="fas fa-trash-can"></i> 삭제</button>` : ''}
+                    </div>
+                </article>
+            `).join('');
+
+            grid.querySelectorAll('.post-card').forEach(card => {
+                card.addEventListener('click', () => openLightbox(card.dataset.board, Number(card.dataset.idx)));
+            });
+            grid.querySelectorAll('.post-delete').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
+                    try {
+                        await window.fsDeleteDoc(window.fsDoc(db, BOARDS[btn.dataset.board].collection, btn.dataset.id));
+                        loadBoard(btn.dataset.board);
+                    } catch (err) {
+                        console.error('삭제 오류:', err);
+                        alert('삭제 중 오류가 발생했습니다.');
+                    }
+                });
+            });
+        }
+
+        function formatDate(ts) {
+            try {
+                const d = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+                return d ? d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+            } catch { return ''; }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text ?? '';
+            return div.innerHTML;
+        }
+
+        // ===== 글쓰기 모달 =====
+        const postModal = document.getElementById('postModal');
+        const postForm = document.getElementById('postForm');
+        const postError = document.getElementById('postError');
+        const photoInput = document.getElementById('postPhoto');
+        const photoPreview = document.getElementById('photoPreview');
+        const photoInputLabel = document.getElementById('photoInputLabel');
+        let activeBoard = null;
+        let pendingImageData = null;
+        let isPosting = false;
+
+        Object.entries(BOARDS).forEach(([key, b]) => {
+            document.getElementById(b.addBtn).addEventListener('click', () => openPostModal(key));
+        });
+
+        function openPostModal(boardKey) {
+            activeBoard = boardKey;
+            document.getElementById('postModalTitle').innerHTML =
+                `<i class="fas fa-pen-to-square"></i> ${BOARDS[boardKey].modalTitle}`;
+            postForm.reset();
+            pendingImageData = null;
+            photoPreview.style.display = 'none';
+            photoInputLabel.style.display = '';
+            postError.classList.remove('show');
+            postModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePostModal() {
+            postModal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        document.getElementById('postModalClose').addEventListener('click', closePostModal);
+        postModal.addEventListener('click', (e) => { if (e.target === postModal) closePostModal(); });
+
+        // 사진 선택 → 리사이즈(최대 1100px, JPEG) 후 데이터 URL로 보관 (Firestore 1MB 문서 제한 대응)
+        photoInput.addEventListener('change', () => {
+            const file = photoInput.files?.[0];
+            if (!file) return;
+            const img = new Image();
+            const url = URL.createObjectURL(file);
+            img.onload = () => {
+                URL.revokeObjectURL(url);
+                const maxDim = 1100;
+                const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.round(img.width * scale);
+                canvas.height = Math.round(img.height * scale);
+                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                let quality = 0.82;
+                let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                while (dataUrl.length > 900000 && quality > 0.4) {
+                    quality -= 0.1;
+                    dataUrl = canvas.toDataURL('image/jpeg', quality);
+                }
+                if (dataUrl.length > 900000) {
+                    showPostError('사진 용량이 너무 큽니다. 더 작은 사진을 선택해 주세요.');
+                    return;
+                }
+                pendingImageData = dataUrl;
+                photoPreview.src = dataUrl;
+                photoPreview.style.display = 'block';
+                photoInputLabel.style.display = 'none';
+                postError.classList.remove('show');
+            };
+            img.onerror = () => {
+                URL.revokeObjectURL(url);
+                showPostError('이미지 파일을 읽을 수 없습니다.');
+            };
+            img.src = url;
+        });
+
+        function showPostError(msg) {
+            postError.textContent = msg;
+            postError.classList.add('show');
+        }
+
+        postForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (isPosting || !activeBoard) return;
+            if (!isAdmin) { showPostError('관리자만 게시할 수 있습니다.'); return; }
+
+            const title = document.getElementById('postTitle').value.trim();
+            if (!title) { showPostError('제목을 입력해 주세요.'); return; }
+
+            isPosting = true;
+            const btn = postForm.querySelector('.submit-btn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                await window.fsAddDoc(window.fsCollection(db, BOARDS[activeBoard].collection), {
+                    title,
+                    content: document.getElementById('postContent').value.trim(),
+                    imageData: pendingImageData,
+                    authorEmail: ADMIN_EMAIL,
+                    createdAt: window.fsServerTimestamp(),
+                });
+                closePostModal();
+                loadBoard(activeBoard);
+            } catch (err) {
+                console.error('게시 오류:', err);
+                showPostError('게시 중 오류가 발생했습니다. 로그인 상태를 확인해 주세요.');
+            } finally {
+                isPosting = false;
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        });
+
+        // ===== 라이트박스 =====
+        const lightbox = document.getElementById('lightbox');
+        function openLightbox(boardKey, idx) {
+            const p = boardCache[boardKey]?.[idx];
+            if (!p) return;
+            const img = document.getElementById('lightboxImg');
+            if (p.imageData) { img.src = p.imageData; img.style.display = 'block'; }
+            else { img.style.display = 'none'; }
+            document.getElementById('lightboxDate').textContent = formatDate(p.createdAt);
+            document.getElementById('lightboxTitle').textContent = p.title || '';
+            document.getElementById('lightboxText').textContent = p.content || '';
+            lightbox.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeLightbox() {
+            lightbox.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { closeLightbox(); closePostModal(); }
+        });
 
         initFirebase();
     </script>
