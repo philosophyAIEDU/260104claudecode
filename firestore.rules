@@ -3,10 +3,24 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
-      
+
       match /{document=**} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+    }
+
+    // 필로소피 AI 봉사단 소식 — 누구나 읽기, 관리자만 쓰기
+    match /volunteer_posts/{postId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null
+        && request.auth.token.email == 'warmcomfortforyou@gmail.com';
+    }
+
+    // 필로소피 AI 교육 사진 — 누구나 읽기, 관리자만 쓰기
+    match /education_posts/{postId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null
+        && request.auth.token.email == 'warmcomfortforyou@gmail.com';
     }
   }
 }
