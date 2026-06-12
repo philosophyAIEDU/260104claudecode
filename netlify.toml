@@ -1,0 +1,13 @@
+# Netlify 배포 설정
+# 정적 사이트(빌드 없음) + 서버리스 함수(서울 공공데이터 프록시)
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# 서울 공공데이터 API 키는 코드에 넣지 말고 Netlify 환경변수로 설정하세요:
+#   Site settings → Environment variables → SEOUL_API_KEY (필수)
+#                                          → SEOUL_SERVICE (선택: 교육 데이터셋 서비스명)

@@ -13,11 +13,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Firebase (모듈형) — 로그인 상태 표시 + 갤러리 게시판 -->
+    <!-- Google Analytics (GA4) — 방문 데이터 수집 / 관리자 애널리틱스 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KWCY47PZWB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-KWCY47PZWB');
+    </script>
+
+    <!-- Firebase (모듈형) — 로그인 상태 표시 + 갤러리 게시판 + 방문자 통계 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         window.initializeApp = initializeApp;
         window.getAuth = getAuth;
@@ -31,6 +40,10 @@
         window.fsOrderBy = orderBy;
         window.fsDeleteDoc = deleteDoc;
         window.fsDoc = doc;
+        window.fsGetDoc = getDoc;
+        window.fsSetDoc = setDoc;
+        window.fsUpdateDoc = updateDoc;
+        window.fsIncrement = increment;
         window.fsServerTimestamp = serverTimestamp;
         window.__firebaseReady = true;
     </script>
@@ -457,6 +470,81 @@
             .gallery-grid { grid-template-columns: 1fr; }
             .community { padding: 70px 0; }
         }
+
+        /* ===== 서울 교육 공공데이터 섹션 ===== */
+        .seoul-section { background: var(--bg-soft); }
+        .seoul-toolbar {
+            display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;
+            justify-content: space-between; margin-bottom: 1.5rem;
+        }
+        .seoul-search {
+            flex: 1 1 240px; min-width: 200px; padding: 0.8rem 1rem;
+            border: 2px solid var(--line); border-radius: var(--radius);
+            font-family: inherit; font-size: 0.95rem; background: var(--white); color: var(--ink);
+        }
+        .seoul-search:focus { outline: none; border-color: var(--primary); }
+        .seoul-refresh {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.8rem 1.2rem; border: none; border-radius: var(--radius);
+            background: var(--gradient); color: #fff; font-weight: 600; cursor: pointer;
+            font-family: inherit; font-size: 0.9rem;
+        }
+        .seoul-refresh:hover { filter: brightness(1.05); }
+        .seoul-meta { font-size: 0.85rem; color: var(--text-soft); margin-bottom: 0.75rem; }
+        .seoul-table-wrap {
+            overflow-x: auto; background: var(--white);
+            border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow);
+        }
+        .seoul-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 640px; }
+        .seoul-table th {
+            position: sticky; top: 0; background: var(--bg-tint); color: var(--ink);
+            text-align: left; padding: 0.9rem 1rem; font-weight: 700; white-space: nowrap;
+            border-bottom: 2px solid var(--line);
+        }
+        .seoul-table td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--line); color: var(--text); vertical-align: top; }
+        .seoul-table tr:last-child td { border-bottom: none; }
+        .seoul-table tbody tr:hover { background: var(--bg-soft); }
+        .seoul-status {
+            padding: 2.5rem 1.5rem; text-align: center; color: var(--text-soft);
+            display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+        }
+        .seoul-status i { font-size: 1.8rem; color: var(--primary-light); }
+        .seoul-status code {
+            background: var(--bg-tint); padding: 0.1rem 0.4rem; border-radius: 6px; font-size: 0.85em;
+        }
+
+        /* ===== 관리자 통계/애널리틱스 패널 ===== */
+        .admin-panel { display: none; background: var(--ink); color: #fff; }
+        .admin-panel.visible { display: block; }
+        .admin-panel .section-title { color: #fff; }
+        .admin-panel .eyebrow { color: var(--accent); }
+        .admin-stat-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem; margin: 1.5rem 0 2rem;
+        }
+        .admin-stat {
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+            border-radius: var(--radius-lg); padding: 1.6rem; text-align: center;
+        }
+        .admin-stat .num { font-size: 2.4rem; font-weight: 800; color: var(--accent); line-height: 1.1; }
+        .admin-stat .label { margin-top: 0.5rem; color: rgba(255,255,255,0.75); font-size: 0.95rem; }
+        .admin-ga-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .admin-ga-btn {
+            display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.9rem 1.4rem;
+            border-radius: var(--radius); font-weight: 600; text-decoration: none; font-size: 0.95rem;
+        }
+        .admin-ga-btn.primary { background: var(--gradient); color: #fff; }
+        .admin-ga-btn.ghost { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+        .admin-ga-btn:hover { filter: brightness(1.08); }
+
+        /* ===== 푸터 방문자 카운터 ===== */
+        .footer-visitors {
+            display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center;
+            padding: 1.2rem 0; margin-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.12);
+        }
+        .footer-visitors .fv-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; opacity: 0.85; }
+        .footer-visitors .fv-item strong { font-weight: 700; }
+        .footer-visitors .fv-item i { color: var(--accent); }
     </style>
 </head>
 <body>
@@ -471,6 +559,7 @@
                 <li><a href="#tools">AI 툴</a></li>
                 <li><a href="#volunteer">봉사단 소식</a></li>
                 <li><a href="#gallery">교육 사진</a></li>
+                <li><a href="#seoul-edu">서울 교육데이터</a></li>
                 <li><a href="#community">커뮤니티</a></li>
                 <li><a href="#contact">문의</a></li>
                 <li><a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="nav-youtube"><i class="fab fa-youtube"></i> 필로소피 AI 교육 유튜브</a></li>
@@ -637,6 +726,61 @@
         </div>
     </section>
 
+    <!-- ===== 서울 교육 공공데이터 ===== -->
+    <section id="seoul-edu" class="section-pad seoul-section">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow"><i class="fas fa-building-columns"></i> Seoul Open Data</span>
+                <h2 class="section-title">서울 교육 공공데이터</h2>
+                <p class="section-sub">서울특별시 공공데이터(data.seoul.go.kr)의 교육청·학교 통계를
+                    교육자분들이 한눈에 보실 수 있도록 정리했습니다. 검색어로 원하는 항목을 빠르게 찾아보세요.</p>
+            </div>
+
+            <div class="reveal">
+                <div class="seoul-toolbar">
+                    <input type="text" id="seoulSearch" class="seoul-search" placeholder="🔍 학교명·지역·항목으로 검색">
+                    <button id="seoulRefresh" class="seoul-refresh"><i class="fas fa-rotate"></i> 새로고침</button>
+                </div>
+                <div class="seoul-meta" id="seoulMeta"></div>
+                <div class="seoul-table-wrap">
+                    <div id="seoulTableContainer">
+                        <div class="seoul-status">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>서울 교육 공공데이터를 불러오는 중입니다…</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 관리자 전용: 방문 통계 & 애널리틱스 ===== -->
+    <section id="adminStats" class="section-pad admin-panel">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow"><i class="fas fa-shield-halved"></i> Admin Only</span>
+                <h2 class="section-title">방문 통계 &amp; 애널리틱스</h2>
+                <p class="section-sub" style="color: rgba(255,255,255,0.75)">관리자에게만 표시됩니다. 실시간 방문자 기록과 Google Analytics 리포트를 확인하세요.</p>
+            </div>
+            <div class="admin-stat-grid">
+                <div class="admin-stat"><div class="num" id="adminTotalVisits">–</div><div class="label">누적 방문자수</div></div>
+                <div class="admin-stat"><div class="num" id="adminTodayVisits">–</div><div class="label">오늘 방문자수</div></div>
+                <div class="admin-stat"><div class="num" id="adminMemberCount">–</div><div class="label">누적 가입자수</div></div>
+            </div>
+            <div class="admin-ga-row">
+                <a href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener" class="admin-ga-btn primary">
+                    <i class="fas fa-chart-line"></i> Google Analytics 열기 (G-KWCY47PZWB)
+                </a>
+                <a href="admin-dashboard.html" class="admin-ga-btn ghost">
+                    <i class="fas fa-table-columns"></i> 가입자 관리 대시보드
+                </a>
+                <a href="https://analytics.google.com/analytics/web/#/p0/realtime/overview" target="_blank" rel="noopener" class="admin-ga-btn ghost">
+                    <i class="fas fa-bolt"></i> 실시간 방문자 (GA)
+                </a>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== Community CTA ===== -->
     <section id="community" class="community">
         <div class="container">
@@ -731,6 +875,10 @@
                         <a href="#contact">문의하기</a>
                     </div>
                 </div>
+            </div>
+            <div class="footer-visitors">
+                <span class="fv-item"><i class="fas fa-users"></i> 누적 방문자 <strong id="footerTotalVisits">–</strong></span>
+                <span class="fv-item"><i class="fas fa-calendar-day"></i> 오늘 방문자 <strong id="footerTodayVisits">–</strong></span>
             </div>
             <div class="footer-bottom">
                 <span>&copy; 2026 Philosophy AI Education. All rights reserved.</span>
@@ -946,6 +1094,7 @@
                         setupLogout();
                         loadBoard('volunteer');
                         loadBoard('education');
+                        recordVisit();
                     } catch (e) {
                         console.error('Firebase init 오류:', e);
                         showBoardError('volunteer');
@@ -974,8 +1123,79 @@
             Object.values(BOARDS).forEach(b => {
                 document.getElementById(b.addBtn).classList.toggle('visible', isAdmin);
             });
+            document.getElementById('adminStats').classList.toggle('visible', isAdmin);
+            if (isAdmin) loadAdminStats();
             renderBoard('volunteer');
             renderBoard('education');
+        }
+
+        // ===== 방문자 통계 (누적 / 오늘) =====
+        const VISIT_TOTAL_DOC = ['stats', 'visitors'];
+        function todayKey() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        async function recordVisit() {
+            if (!db) return;
+            // 한 세션당 1회만 집계 (새로고침 중복 방지)
+            const counted = sessionStorage.getItem('visitCounted');
+            const totalRef = window.fsDoc(db, VISIT_TOTAL_DOC[0], VISIT_TOTAL_DOC[1]);
+            const dayRef = window.fsDoc(db, 'daily_visits', todayKey());
+            try {
+                if (!counted) {
+                    await window.fsSetDoc(totalRef, {
+                        total: window.fsIncrement(1),
+                        updatedAt: window.fsServerTimestamp()
+                    }, { merge: true });
+                    await window.fsSetDoc(dayRef, {
+                        date: todayKey(),
+                        count: window.fsIncrement(1),
+                        updatedAt: window.fsServerTimestamp()
+                    }, { merge: true });
+                    sessionStorage.setItem('visitCounted', '1');
+                }
+                await refreshVisitDisplay();
+            } catch (e) {
+                console.error('방문자 집계 오류:', e);
+            }
+        }
+
+        async function refreshVisitDisplay() {
+            if (!db) return null;
+            try {
+                const [totalSnap, daySnap] = await Promise.all([
+                    window.fsGetDoc(window.fsDoc(db, VISIT_TOTAL_DOC[0], VISIT_TOTAL_DOC[1])),
+                    window.fsGetDoc(window.fsDoc(db, 'daily_visits', todayKey()))
+                ]);
+                const total = totalSnap.exists() ? (totalSnap.data().total || 0) : 0;
+                const today = daySnap.exists() ? (daySnap.data().count || 0) : 0;
+                const f = (n) => Number(n).toLocaleString('ko-KR');
+                const ft = document.getElementById('footerTotalVisits');
+                const fd = document.getElementById('footerTodayVisits');
+                if (ft) ft.textContent = f(total);
+                if (fd) fd.textContent = f(today);
+                return { total, today };
+            } catch (e) {
+                console.error('방문자 표시 오류:', e);
+                return null;
+            }
+        }
+
+        async function loadAdminStats() {
+            const stats = await refreshVisitDisplay();
+            const f = (n) => Number(n).toLocaleString('ko-KR');
+            if (stats) {
+                document.getElementById('adminTotalVisits').textContent = f(stats.total);
+                document.getElementById('adminTodayVisits').textContent = f(stats.today);
+            }
+            // 누적 가입자수
+            try {
+                const snap = await window.fsGetDocs(window.fsCollection(db, 'users'));
+                document.getElementById('adminMemberCount').textContent = f(snap.size);
+            } catch (e) {
+                document.getElementById('adminMemberCount').textContent = '–';
+            }
         }
 
         function setupLogout() {
@@ -1199,7 +1419,92 @@
             if (e.key === 'Escape') { closeLightbox(); closePostModal(); }
         });
 
+        // ===== 서울 교육 공공데이터 =====
+        // Netlify 서버리스 함수(/.netlify/functions/seoul-edu)가 환경변수 SEOUL_API_KEY로
+        // data.seoul.go.kr API를 서버에서 호출 → CORS/Mixed-content/키 노출 문제를 모두 해결합니다.
+        const SEOUL_ENDPOINT = '/.netlify/functions/seoul-edu';
+        // 교육자에게 보기 쉽도록 자주 쓰는 컬럼만 우선 노출 (없으면 전체 컬럼 자동 표시)
+        const SEOUL_PREFERRED_COLS = ['SCHUL_NM', 'SCHUL_KND_SC_NM', 'JU_ORG_NM', 'ADRES', 'FOND_SC_NM', 'TELNO', 'HMPG_ADRES', 'COEDU_SC_NM', 'ATPT_OFCDC_ORG_NM'];
+        const SEOUL_COL_LABELS = {
+            SCHUL_NM: '학교명', SCHUL_KND_SC_NM: '학교종류', JU_ORG_NM: '관할 교육청',
+            ATPT_OFCDC_ORG_NM: '시도교육청', ADRES: '주소', FOND_SC_NM: '설립구분',
+            TELNO: '전화번호', HMPG_ADRES: '홈페이지', COEDU_SC_NM: '남녀공학',
+        };
+        let seoulRows = [];
+
+        function colLabel(key) { return SEOUL_COL_LABELS[key] || key; }
+
+        function pickColumns(rows) {
+            if (!rows.length) return [];
+            const present = Object.keys(rows[0]);
+            const preferred = SEOUL_PREFERRED_COLS.filter(c => present.includes(c));
+            return preferred.length ? preferred : present.slice(0, 8);
+        }
+
+        function renderSeoulTable(rows) {
+            const container = document.getElementById('seoulTableContainer');
+            const meta = document.getElementById('seoulMeta');
+            if (!rows.length) {
+                container.innerHTML = `<div class="seoul-status"><i class="fas fa-circle-info"></i><span>검색 결과가 없습니다.</span></div>`;
+                meta.textContent = '';
+                return;
+            }
+            const cols = pickColumns(rows);
+            meta.textContent = `총 ${rows.length.toLocaleString('ko-KR')}건 · 출처: 서울특별시 공공데이터 (data.seoul.go.kr)`;
+            const thead = `<thead><tr>${cols.map(c => `<th>${escapeHtml(colLabel(c))}</th>`).join('')}</tr></thead>`;
+            const tbody = `<tbody>${rows.map(r => `<tr>${cols.map(c => {
+                const v = r[c] == null ? '' : String(r[c]);
+                if (c === 'HMPG_ADRES' && v) {
+                    const href = v.startsWith('http') ? v : 'http://' + v;
+                    return `<td><a href="${escapeHtml(href)}" target="_blank" rel="noopener">바로가기</a></td>`;
+                }
+                return `<td>${escapeHtml(v)}</td>`;
+            }).join('')}</tr>`).join('')}</tbody>`;
+            container.innerHTML = `<table class="seoul-table">${thead}${tbody}</table>`;
+        }
+
+        function filterSeoul(term) {
+            const q = (term || '').trim().toLowerCase();
+            if (!q) return renderSeoulTable(seoulRows);
+            const filtered = seoulRows.filter(r =>
+                Object.values(r).some(v => String(v ?? '').toLowerCase().includes(q)));
+            renderSeoulTable(filtered);
+        }
+
+        async function loadSeoulEdu() {
+            const container = document.getElementById('seoulTableContainer');
+            container.innerHTML = `<div class="seoul-status"><i class="fas fa-spinner fa-spin"></i><span>서울 교육 공공데이터를 불러오는 중입니다…</span></div>`;
+            try {
+                const res = await fetch(SEOUL_ENDPOINT);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                seoulRows = Array.isArray(data.rows) ? data.rows : [];
+                renderSeoulTable(seoulRows);
+            } catch (e) {
+                console.error('서울 데이터 로드 오류:', e);
+                container.innerHTML = `<div class="seoul-status">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <span>데이터를 불러오지 못했습니다.<br>
+                    Netlify에 <code>SEOUL_API_KEY</code> 환경변수와 서버리스 함수가 배포되어 있는지 확인해 주세요.</span>
+                </div>`;
+                document.getElementById('seoulMeta').textContent = '';
+            }
+        }
+
+        function initSeoulEdu() {
+            const search = document.getElementById('seoulSearch');
+            const refresh = document.getElementById('seoulRefresh');
+            let t;
+            search?.addEventListener('input', (e) => {
+                clearTimeout(t);
+                t = setTimeout(() => filterSeoul(e.target.value), 200);
+            });
+            refresh?.addEventListener('click', loadSeoulEdu);
+            loadSeoulEdu();
+        }
+
         initFirebase();
+        initSeoulEdu();
     </script>
 </body>
 </html>
