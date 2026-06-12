@@ -501,13 +501,35 @@
 
                 <form id="userProfileForm">
                     <div class="form-group">
-                        <label for="profileEmail">연락처 이메일</label>
-                        <input type="email" id="profileEmail" name="profileEmail" placeholder="example@email.com">
+                        <label for="displayName">이름 또는 닉네임 <span style="color: var(--error-color)">*</span></label>
+                        <input type="text" id="displayName" name="displayName" placeholder="예: 김선생 / 철학교사" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="company">회사/소속</label>
-                        <input type="text" id="company" name="company" placeholder="회사명 또는 소속 기관">
+                        <label for="profileEmail">이메일 <span style="color: var(--error-color)">*</span></label>
+                        <input type="email" id="profileEmail" name="profileEmail" placeholder="example@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="job">직업 <span style="color: var(--error-color)">*</span></label>
+                        <select id="job" name="job" required>
+                            <option value="" disabled selected>직업을 선택해 주세요</option>
+                            <option value="초등학교 교사">초등학교 교사</option>
+                            <option value="중학교 교사">중학교 교사</option>
+                            <option value="고등학교 교사">고등학교 교사</option>
+                            <option value="대학 교수">대학 교수</option>
+                            <option value="강사">강사 (학원·과외 등)</option>
+                            <option value="교육 연구자">교육 연구자</option>
+                            <option value="교육 행정">교육 행정·기관 종사자</option>
+                            <option value="학부모">학부모</option>
+                            <option value="학생">학생</option>
+                            <option value="기타">기타 (직접 입력)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="jobEtcGroup" style="display: none;">
+                        <label for="jobEtc">직업 직접 입력</label>
+                        <input type="text" id="jobEtc" name="jobEtc" placeholder="직업을 입력해 주세요">
                     </div>
 
                     <div class="form-group">
@@ -599,15 +621,28 @@
             }, 100);
         });
 
+        const ADMIN_EMAILS = ['warmcomfortforyou@gmail.com'];
+        function isAdminEmail(email) {
+            return ADMIN_EMAILS.includes((email || '').toLowerCase());
+        }
+
         function setupEventListeners() {
             document.getElementById('googleLogin')?.addEventListener('click', handleGoogleLogin);
             document.getElementById('googleLoginBtn')?.addEventListener('click', handleGoogleLogin);
             document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
             document.getElementById('userProfileForm')?.addEventListener('submit', handleProfileSubmit);
+            // '기타' 직업 선택 시 직접 입력란 표시
+            document.getElementById('job')?.addEventListener('change', (e) => {
+                const etc = document.getElementById('jobEtcGroup');
+                const etcInput = document.getElementById('jobEtc');
+                const show = e.target.value === '기타';
+                etc.style.display = show ? 'block' : 'none';
+                if (etcInput) etcInput.required = show;
+            });
         }
 
         async function loadDashboardDataIfAdmin() {
-            if (currentUser && (currentUser.email === 'admin@example.com' || currentUser.email === 'hwangeu@gmail.com')) {
+            if (currentUser && isAdminEmail(currentUser.email)) {
                 await showAdminDashboard();
             }
         }
@@ -648,7 +683,7 @@
         async function checkUser(user) {
             try {
                 // Check if admin
-                if (user.email === 'admin@example.com' || user.email === 'hwangeu@gmail.com') {
+                if (isAdminEmail(user.email)) {
                     await showAdminDashboard();
                     return;
                 }
@@ -659,7 +694,7 @@
                 if (docSnap.exists() && docSnap.data().profileCompleted) {
                     showWelcomeScreen(docSnap.data());
                 } else {
-                    showProfileForm(user);
+                    showProfileForm(user, docSnap.exists() ? docSnap.data() : null);
                 }
             } catch (error) {
                 console.error('사용자 확인 오류:', error);
@@ -677,11 +712,23 @@
 
             try {
                 const formData = new FormData(e.target);
+                const jobSelect = (formData.get('job') || '').trim();
+                const job = jobSelect === '기타' ? (formData.get('jobEtc') || '').trim() : jobSelect;
+                const name = (formData.get('displayName') || '').trim();
+                const email = (formData.get('profileEmail') || '').trim();
+
+                if (!name || !email || !job) {
+                    showError('이름/닉네임, 이메일, 직업은 필수 입력 항목입니다.', 'profileError');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '프로필 저장하기';
+                    return;
+                }
+
                 const profileData = {
-                    name: currentUser.displayName,
-                    email: currentUser.email,
-                    profileEmail: formData.get('profileEmail'),
-                    company: formData.get('company'),
+                    name: name,
+                    email: email,
+                    googleEmail: currentUser.email,
+                    job: job,
                     marketingAgreed: formData.get('marketingAgreed') === 'on',
                     profileCompleted: true,
                     updatedAt: window.serverTimestamp()
@@ -720,7 +767,7 @@
                 
                 let users = [];
                 let totalMarketing = 0;
-                
+
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     users.push(data);
@@ -733,7 +780,7 @@
                     new_users_this_week: 0,
                     new_users_this_month: 0,
                     marketing_agreed_users: totalMarketing,
-                    total_companies: new Set(users.map(u => u.company).filter(c => c)).size
+                    total_jobs: new Set(users.map(u => u.job).filter(c => c)).size
                 };
 
                 renderStatsCards(stats);
@@ -752,7 +799,7 @@
             const statsCards = [
                 { label: '최근 가입자', value: stats.total_users, icon: 'fas fa-users' },
                 { label: '마케팅 동의', value: stats.marketing_agreed_users, icon: 'fas fa-envelope' },
-                { label: '등록 회사', value: stats.total_companies, icon: 'fas fa-building' }
+                { label: '직업 종류', value: stats.total_jobs, icon: 'fas fa-briefcase' }
             ];
 
             statsGrid.innerHTML = statsCards.map(stat => `
@@ -776,12 +823,11 @@
             usersList.innerHTML = users.map(user => `
                 <div class="user-item">
                     <div>
-                        <div class="user-email">${user.email || '이메일 없음'}</div>
                         <div style="font-weight: 600; color: var(--text-dark);">${user.name || '이름 없음'}</div>
+                        <div class="user-email">${user.email || user.googleEmail || '이메일 없음'}</div>
                     </div>
                     <div>
-                        <div class="user-company">${user.company || '미입력'}</div>
-                        <div class="user-email" style="font-size: 0.8rem; color: var(--text-light);">${user.profileEmail || '연락처 없음'}</div>
+                        <div class="user-company"><i class="fas fa-briefcase" style="margin-right:0.4rem;color:var(--primary-color);"></i>${user.job || user.company || '미입력'}</div>
                     </div>
                     <div class="user-date">${user.createdAt ? new Date(user.createdAt.toDate ? user.createdAt.toDate() : user.createdAt).toLocaleDateString('ko-KR') : '날짜 없음'}</div>
                     <div style="text-align: right;">
@@ -800,11 +846,16 @@
             loginSection.style.display = 'block';
         }
 
-        function showProfileForm(user) {
+        function showProfileForm(user, existing) {
             hideAllScreens();
             profileForm.style.display = 'block';
             userInfo.style.display = 'flex';
             loginSection.style.display = 'none';
+            // 구글 계정 정보로 기본값 채우기
+            const nameInput = document.getElementById('displayName');
+            const emailInput = document.getElementById('profileEmail');
+            if (nameInput) nameInput.value = (existing && existing.name) || user.displayName || '';
+            if (emailInput) emailInput.value = (existing && existing.email) || user.email || '';
         }
 
         function showWelcomeScreen(profile) {

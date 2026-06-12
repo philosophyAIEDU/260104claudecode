@@ -5,15 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Philosophy AI Education - 관리자 대시보드</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KWCY47PZWB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-KWCY47PZWB');
+    </script>
     <!-- Firebase JS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
         window.initializeApp = initializeApp;
         window.getFirestore = getFirestore;
         window.collection = collection;
         window.getDocs = getDocs;
+        window.fsDoc = doc;
+        window.fsGetDoc = getDoc;
     </script>
     <!-- Chart.js for visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -514,6 +524,36 @@
             </div>
         </div>
 
+        <!-- 방문 통계 & 구글 애널리틱스 -->
+        <div class="charts-section">
+            <div class="chart-card">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-area"></i>
+                    방문자 통계 &amp; Google Analytics
+                </h3>
+                <div style="display:flex; flex-wrap:wrap; gap:1.5rem; margin:1rem 0 1.25rem;">
+                    <div style="flex:1 1 160px; background:var(--background-light,#f8f9fa); border-radius:12px; padding:1.25rem; text-align:center;">
+                        <div style="font-size:2rem; font-weight:800; color:var(--primary-color,#e67e22);" id="dashTotalVisits">–</div>
+                        <div style="color:#7f8c8d; margin-top:.25rem;">누적 방문자수</div>
+                    </div>
+                    <div style="flex:1 1 160px; background:var(--background-light,#f8f9fa); border-radius:12px; padding:1.25rem; text-align:center;">
+                        <div style="font-size:2rem; font-weight:800; color:var(--primary-color,#e67e22);" id="dashTodayVisits">–</div>
+                        <div style="color:#7f8c8d; margin-top:.25rem;">오늘 방문자수</div>
+                    </div>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:.75rem;">
+                    <a href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener"
+                       style="display:inline-flex; align-items:center; gap:.5rem; padding:.8rem 1.2rem; border-radius:10px; background:linear-gradient(135deg,#e67e22,#f39c12); color:#fff; font-weight:600; text-decoration:none;">
+                        <i class="fas fa-chart-line"></i> Google Analytics 열기 (G-KWCY47PZWB)
+                    </a>
+                    <a href="https://analytics.google.com/analytics/web/#/p0/realtime/overview" target="_blank" rel="noopener"
+                       style="display:inline-flex; align-items:center; gap:.5rem; padding:.8rem 1.2rem; border-radius:10px; background:#f1f1f1; color:#2c3e50; font-weight:600; text-decoration:none;">
+                        <i class="fas fa-bolt"></i> 실시간 방문자 보기
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <!-- 차트 섹션 -->
         <div class="charts-section">
             <div class="chart-card">
@@ -532,7 +572,7 @@
         <div class="data-section">
             <div class="table-card">
                 <div class="table-header">
-                    <span><i class="fas fa-building"></i> 회사별 가입자</span>
+                    <span><i class="fas fa-briefcase"></i> 직업별 가입자</span>
                     <span id="companyCount">0개</span>
                 </div>
                 <div class="table-content" id="companyTable">
@@ -558,10 +598,10 @@
                     <thead>
                         <tr>
                             <th>프로필</th>
-                            <th>이름</th>
+                            <th>이름/닉네임</th>
                             <th>이메일</th>
-                            <th>회사</th>
-                            <th>연락처</th>
+                            <th>직업</th>
+                            <th>구글 계정</th>
                             <th>가입일</th>
                             <th>마지막 로그인</th>
                             <th>상태</th>
@@ -634,7 +674,8 @@
                     db = window.getFirestore(app);
                     setupEventListeners();
                     loadDashboardData();
-                    setInterval(loadDashboardData, 5 * 60 * 1000);
+                    loadVisitorStats();
+                    setInterval(() => { loadDashboardData(); loadVisitorStats(); }, 5 * 60 * 1000);
                 }
                 attempts++;
                 if (attempts > 50) {
@@ -643,6 +684,28 @@
                 }
             }, 100);
         });
+
+        // 방문자 통계 (누적 / 오늘) 로드
+        async function loadVisitorStats() {
+            if (!db) return;
+            const d = new Date();
+            const todayKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            try {
+                const [totalSnap, daySnap] = await Promise.all([
+                    window.fsGetDoc(window.fsDoc(db, 'stats', 'visitors')),
+                    window.fsGetDoc(window.fsDoc(db, 'daily_visits', todayKey))
+                ]);
+                const total = totalSnap.exists() ? (totalSnap.data().total || 0) : 0;
+                const today = daySnap.exists() ? (daySnap.data().count || 0) : 0;
+                const f = (n) => Number(n).toLocaleString('ko-KR');
+                const t = document.getElementById('dashTotalVisits');
+                const td = document.getElementById('dashTodayVisits');
+                if (t) t.textContent = f(total);
+                if (td) td.textContent = f(today);
+            } catch (e) {
+                console.error('방문자 통계 로드 오류:', e);
+            }
+        }
 
         function setupEventListeners() {
             document.getElementById('refreshBtn')?.addEventListener('click', loadDashboardData);
@@ -673,11 +736,12 @@
                     users.push(data);
                     
                     if (data.marketingAgreed) totalMarketing++;
-                    
-                    if (data.company) {
-                        if (!companyMap[data.company]) companyMap[data.company] = { count: 0, marketing: 0 };
-                        companyMap[data.company].count++;
-                        if (data.marketingAgreed) companyMap[data.company].marketing++;
+
+                    const group = data.job || data.company;
+                    if (group) {
+                        if (!companyMap[group]) companyMap[group] = { count: 0, marketing: 0 };
+                        companyMap[group].count++;
+                        if (data.marketingAgreed) companyMap[group].marketing++;
                     }
                     
                     
@@ -865,9 +929,9 @@
                              alt="${user.name}" class="user-avatar">
                     </td>
                     <td><strong>${user.name || '이름 없음'}</strong></td>
-                    <td style="color: var(--accent-color);">${user.email}</td>
-                    <td>${user.company || '미입력'}</td>
-                    <td>${user.profileEmail || '미입력'}</td>
+                    <td style="color: var(--accent-color);">${user.email || user.googleEmail || '미입력'}</td>
+                    <td>${user.job || user.company || '미입력'}</td>
+                    <td style="color: var(--text-light); font-size: 0.85rem;">${user.googleEmail || '-'}</td>
                     <td>${new Date(user.created_at).toLocaleDateString('ko-KR')}</td>
                     <td>${user.last_login ? new Date(user.last_login).toLocaleDateString('ko-KR') : '없음'}</td>
                     <td>
@@ -888,9 +952,10 @@
                 return;
             }
 
-            filteredUsers = dashboardData.users.filter(user => 
+            filteredUsers = dashboardData.users.filter(user =>
                 (user.name && user.name.toLowerCase().includes(searchTerm)) ||
                 (user.email && user.email.toLowerCase().includes(searchTerm)) ||
+                (user.job && user.job.toLowerCase().includes(searchTerm)) ||
                 (user.company && user.company.toLowerCase().includes(searchTerm))
             );
 
@@ -905,14 +970,14 @@
                 return;
             }
 
-            const headers = ['이름', '계정 이메일', '연락처 이메일', '회사', '마케팅 동의', '가입일'];
+            const headers = ['이름/닉네임', '이메일', '구글 계정', '직업', '마케팅 동의', '가입일'];
             const csvData = [
                 headers.join(','),
                 ...users.map(user => [
                     `"${user.name || ''}"`,
-                    `"${user.email || ''}"`,
-                    `"${user.profileEmail || ''}"`,
-                    `"${user.company || ''}"`,
+                    `"${user.email || user.googleEmail || ''}"`,
+                    `"${user.googleEmail || ''}"`,
+                    `"${user.job || user.company || ''}"`,
                     `"${user.marketingAgreed ? '동의' : '비동의'}"`,
                     `"${new Date(user.created_at).toLocaleDateString('ko-KR')}"`
                 ].join(','))

@@ -22,5 +22,20 @@ service cloud.firestore {
       allow create, update, delete: if request.auth != null
         && request.auth.token.email == 'warmcomfortforyou@gmail.com';
     }
+
+    // 누적 방문자 카운터 — 누구나 읽기, 1씩 증가(증분)만 허용
+    match /stats/{docId} {
+      allow read: if true;
+      // 생성 시(resource == null) 또는 total을 정확히 1 증가시키는 요청만 허용
+      allow write: if request.resource.data.total is int
+        && (resource == null || request.resource.data.total == resource.data.total + 1);
+    }
+
+    // 오늘 방문자 카운터 (날짜별 문서) — 누구나 읽기, 1씩 증가(증분)만 허용
+    match /daily_visits/{dateId} {
+      allow read: if true;
+      allow write: if request.resource.data.count is int
+        && (resource == null || request.resource.data.count == resource.data.count + 1);
+    }
   }
 }
