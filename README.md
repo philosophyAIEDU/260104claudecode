@@ -10,9 +10,7 @@
 ├── auth-system.html              # 구글 로그인 회원 시스템 (이름/이메일/직업 수집)
 ├── admin-dashboard.html          # 관리자 대시보드 (방문 통계 + GA)
 ├── firebase-app.html             # Firebase 데모/유틸
-├── firestore.rules               # Firestore 보안 규칙 (방문자 카운터 포함)
-├── netlify.toml                  # Netlify 배포 + 서버리스 함수 설정
-├── netlify/functions/seoul-edu.js # 서울 교육 공공데이터 프록시 (환경변수 키 사용)
+├── firestore.rules               # Firestore 보안 규칙 (방문자 카운터·AI 툴 포함)
 ├── database-queries.sql          # 데이터베이스 쿼리 모음
 └── README.md
 ```
@@ -23,13 +21,8 @@
 2. **관리자 애널리틱스** — 관리자(`warmcomfortforyou@gmail.com`) 로그인 시 메인 페이지에
    "방문 통계 & 애널리틱스" 패널이 노출되며, Google Analytics(GA4 `G-KWCY47PZWB`) 바로가기 제공.
 3. **회원 가입 정보** — 가입 시 이름/닉네임, 이메일, 직업(드롭다운, '기타' 직접입력)을 받습니다.
-4. **서울 교육 공공데이터** — `data.seoul.go.kr` 교육청·학교 통계를 교육자가 보기 쉽게 표로 제공.
-   Netlify 서버리스 함수가 환경변수 키로 서버에서 호출(CORS/Mixed-content/키 노출 해결).
-
-### Netlify 환경변수 설정 (서울 공공데이터)
-Site settings → Environment variables 에 등록:
-- `SEOUL_API_KEY` : data.seoul.go.kr 인증키 (필수)
-- `SEOUL_SERVICE` : 교육 데이터셋 서비스명/ID (선택, 미설정 시 기본값 사용)
+4. **AI 툴 관리** — 관리자 로그인 시 "AI 툴" 섹션에 "AI 툴 추가" 버튼이 노출되어
+   이름·소개·설명·링크·태그·아이콘으로 새 AI 툴 카드를 추가/삭제할 수 있습니다(Firestore `ai_tools`).
 
 ## 메인 페이지 구성 (index.html)
 1. **Hero** — "AI 시대, 교육자의 나침반" 메시지와 CTA

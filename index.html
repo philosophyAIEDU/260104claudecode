@@ -471,48 +471,6 @@
             .community { padding: 70px 0; }
         }
 
-        /* ===== 서울 교육 공공데이터 섹션 ===== */
-        .seoul-section { background: var(--bg-soft); }
-        .seoul-toolbar {
-            display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;
-            justify-content: space-between; margin-bottom: 1.5rem;
-        }
-        .seoul-search {
-            flex: 1 1 240px; min-width: 200px; padding: 0.8rem 1rem;
-            border: 2px solid var(--line); border-radius: var(--radius);
-            font-family: inherit; font-size: 0.95rem; background: var(--white); color: var(--ink);
-        }
-        .seoul-search:focus { outline: none; border-color: var(--primary); }
-        .seoul-refresh {
-            display: inline-flex; align-items: center; gap: 0.5rem;
-            padding: 0.8rem 1.2rem; border: none; border-radius: var(--radius);
-            background: var(--gradient); color: #fff; font-weight: 600; cursor: pointer;
-            font-family: inherit; font-size: 0.9rem;
-        }
-        .seoul-refresh:hover { filter: brightness(1.05); }
-        .seoul-meta { font-size: 0.85rem; color: var(--text-soft); margin-bottom: 0.75rem; }
-        .seoul-table-wrap {
-            overflow-x: auto; background: var(--white);
-            border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow);
-        }
-        .seoul-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 640px; }
-        .seoul-table th {
-            position: sticky; top: 0; background: var(--bg-tint); color: var(--ink);
-            text-align: left; padding: 0.9rem 1rem; font-weight: 700; white-space: nowrap;
-            border-bottom: 2px solid var(--line);
-        }
-        .seoul-table td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--line); color: var(--text); vertical-align: top; }
-        .seoul-table tr:last-child td { border-bottom: none; }
-        .seoul-table tbody tr:hover { background: var(--bg-soft); }
-        .seoul-status {
-            padding: 2.5rem 1.5rem; text-align: center; color: var(--text-soft);
-            display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
-        }
-        .seoul-status i { font-size: 1.8rem; color: var(--primary-light); }
-        .seoul-status code {
-            background: var(--bg-tint); padding: 0.1rem 0.4rem; border-radius: 6px; font-size: 0.85em;
-        }
-
         /* ===== 관리자 통계/애널리틱스 패널 ===== */
         .admin-panel { display: none; background: var(--ink); color: #fff; }
         .admin-panel.visible { display: block; }
@@ -559,7 +517,6 @@
                 <li><a href="#tools">AI 툴</a></li>
                 <li><a href="#volunteer">봉사단 소식</a></li>
                 <li><a href="#gallery">교육 사진</a></li>
-                <li><a href="#seoul-edu">서울 교육데이터</a></li>
                 <li><a href="#community">커뮤니티</a></li>
                 <li><a href="#contact">문의</a></li>
                 <li><a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="nav-youtube"><i class="fab fa-youtube"></i> 필로소피 AI 교육 유튜브</a></li>
@@ -620,7 +577,7 @@
                     회원 가입 없이 클릭 한 번으로 수업과 학습에 바로 활용해 보세요.</p>
             </div>
 
-            <div class="tools-grid">
+            <div class="tools-grid" id="toolsGrid">
                 <!-- 1. 논문 학습 노트 -->
                 <article class="tool-card reveal">
                     <div class="tool-top">
@@ -685,6 +642,11 @@
                     </a>
                 </article>
             </div>
+            <div class="admin-bar" style="margin-top: 1.8rem;">
+                <button class="admin-add-btn" id="aiToolAddBtn">
+                    <i class="fas fa-plus"></i> AI 툴 추가
+                </button>
+            </div>
         </div>
     </section>
 
@@ -722,34 +684,6 @@
             </div>
             <div class="gallery-grid" id="educationGrid">
                 <div class="gallery-loading"><i class="fas fa-spinner"></i> 사진을 불러오는 중...</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== 서울 교육 공공데이터 ===== -->
-    <section id="seoul-edu" class="section-pad seoul-section">
-        <div class="container">
-            <div class="section-head reveal">
-                <span class="eyebrow"><i class="fas fa-building-columns"></i> Seoul Open Data</span>
-                <h2 class="section-title">서울 교육 공공데이터</h2>
-                <p class="section-sub">서울특별시 공공데이터(data.seoul.go.kr)의 교육청·학교 통계를
-                    교육자분들이 한눈에 보실 수 있도록 정리했습니다. 검색어로 원하는 항목을 빠르게 찾아보세요.</p>
-            </div>
-
-            <div class="reveal">
-                <div class="seoul-toolbar">
-                    <input type="text" id="seoulSearch" class="seoul-search" placeholder="🔍 학교명·지역·항목으로 검색">
-                    <button id="seoulRefresh" class="seoul-refresh"><i class="fas fa-rotate"></i> 새로고침</button>
-                </div>
-                <div class="seoul-meta" id="seoulMeta"></div>
-                <div class="seoul-table-wrap">
-                    <div id="seoulTableContainer">
-                        <div class="seoul-status">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <span>서울 교육 공공데이터를 불러오는 중입니다…</span>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -914,6 +848,58 @@
                     <span class="loading"><i class="fas fa-spinner"></i> 게시 중...</span>
                 </button>
                 <div class="modal-error" id="postError"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== 관리자 AI 툴 추가 모달 ===== -->
+    <div class="modal-backdrop" id="toolModal">
+        <div class="modal-panel">
+            <button class="modal-close" id="toolModalClose" aria-label="닫기"><i class="fas fa-times"></i></button>
+            <h3><i class="fas fa-wand-magic-sparkles"></i> AI 툴 추가</h3>
+            <form id="toolForm">
+                <div class="form-group">
+                    <label for="toolName">툴 이름</label>
+                    <input type="text" id="toolName" placeholder="예: 논문 학습 노트" required maxlength="40">
+                </div>
+                <div class="form-group">
+                    <label for="toolTagline">한 줄 소개</label>
+                    <input type="text" id="toolTagline" placeholder="예: 어려운 논문을 쉽게 읽고 정리" maxlength="60">
+                </div>
+                <div class="form-group">
+                    <label for="toolDesc">설명</label>
+                    <textarea id="toolDesc" placeholder="툴에 대한 설명을 적어주세요" rows="3" maxlength="300"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="toolUrl">링크 (URL)</label>
+                    <input type="url" id="toolUrl" placeholder="https://example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="toolTags">태그 (쉼표로 구분, 선택)</label>
+                    <input type="text" id="toolTags" placeholder="예: 논문 읽기, 요약·정리, 탐구 학습">
+                </div>
+                <div class="form-group">
+                    <label for="toolIcon">아이콘</label>
+                    <select id="toolIcon">
+                        <option value="fa-wand-magic-sparkles">✨ 마법봉 (기본)</option>
+                        <option value="fa-file-lines">📄 문서</option>
+                        <option value="fa-lightbulb">💡 전구</option>
+                        <option value="fa-book-open">📖 책</option>
+                        <option value="fa-dna">🧬 DNA</option>
+                        <option value="fa-robot">🤖 로봇</option>
+                        <option value="fa-comments">💬 대화</option>
+                        <option value="fa-pen-nib">✒️ 글쓰기</option>
+                        <option value="fa-calculator">🔢 계산</option>
+                        <option value="fa-language">🌐 언어</option>
+                        <option value="fa-flask">⚗️ 과학</option>
+                        <option value="fa-graduation-cap">🎓 학습</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <span class="text"><i class="fas fa-plus"></i> 툴 추가하기</span>
+                    <span class="loading"><i class="fas fa-spinner"></i> 추가 중...</span>
+                </button>
+                <div class="modal-error" id="toolError"></div>
             </form>
         </div>
     </div>
@@ -1094,6 +1080,7 @@
                         setupLogout();
                         loadBoard('volunteer');
                         loadBoard('education');
+                        loadAiTools();
                         recordVisit();
                     } catch (e) {
                         console.error('Firebase init 오류:', e);
@@ -1125,8 +1112,75 @@
             });
             document.getElementById('adminStats').classList.toggle('visible', isAdmin);
             if (isAdmin) loadAdminStats();
+            document.getElementById('aiToolAddBtn').classList.toggle('visible', isAdmin);
             renderBoard('volunteer');
             renderBoard('education');
+            renderAiTools();
+        }
+
+        // ===== 관리자 추가 AI 툴 (Firestore: ai_tools) =====
+        const AI_TOOL_COLLECTION = 'ai_tools';
+        let aiToolsCache = [];
+
+        async function loadAiTools() {
+            try {
+                const q = window.fsQuery(window.fsCollection(db, AI_TOOL_COLLECTION), window.fsOrderBy('createdAt', 'asc'));
+                const snap = await window.fsGetDocs(q);
+                aiToolsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderAiTools();
+            } catch (e) {
+                console.error('AI 툴 불러오기 오류:', e);
+            }
+        }
+
+        function renderAiTools() {
+            const grid = document.getElementById('toolsGrid');
+            if (!grid) return;
+            // 기존 동적 카드 제거 (정적 4개는 유지)
+            grid.querySelectorAll('.tool-card[data-dynamic]').forEach(el => el.remove());
+
+            aiToolsCache.forEach((tool, idx) => {
+                const num = String(5 + idx).padStart(2, '0');
+                const colorClass = 'c' + ((idx % 4) + 1);
+                const icon = tool.icon || 'fa-wand-magic-sparkles';
+                const url = tool.url && /^https?:\/\//i.test(tool.url) ? tool.url : ('https://' + (tool.url || ''));
+                const tags = Array.isArray(tool.tags) ? tool.tags : [];
+                const tagsHtml = tags.length
+                    ? `<div class="tool-tags">${tags.map(t => `<span>${escapeHtml(t)}</span>`).join('')}</div>` : '';
+
+                const article = document.createElement('article');
+                article.className = 'tool-card reveal visible';
+                article.setAttribute('data-dynamic', '1');
+                article.innerHTML = `
+                    <div class="tool-top">
+                        <div class="tool-icon ${colorClass}"><i class="fas ${escapeHtml(icon)}"></i></div>
+                        <span class="tool-num">${num}</span>
+                    </div>
+                    <h3>${escapeHtml(tool.name || '제목 없음')}</h3>
+                    ${tool.tagline ? `<div class="tool-tagline">${escapeHtml(tool.tagline)}</div>` : ''}
+                    ${tool.description ? `<p>${escapeHtml(tool.description)}</p>` : '<p></p>'}
+                    ${tagsHtml}
+                    <a href="${escapeHtml(url)}" target="_blank" rel="noopener" class="tool-link">
+                        바로 사용하기 <i class="fas fa-arrow-up-right-from-square"></i>
+                    </a>
+                    ${isAdmin ? `<button class="post-delete" data-tool-id="${tool.id}"><i class="fas fa-trash-can"></i> 삭제</button>` : ''}
+                `;
+                grid.appendChild(article);
+            });
+
+            grid.querySelectorAll('.post-delete[data-tool-id]').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    if (!confirm('이 AI 툴을 삭제하시겠습니까?')) return;
+                    try {
+                        await window.fsDeleteDoc(window.fsDoc(db, AI_TOOL_COLLECTION, btn.dataset.toolId));
+                        loadAiTools();
+                    } catch (err) {
+                        console.error('AI 툴 삭제 오류:', err);
+                        alert('삭제 중 오류가 발생했습니다.');
+                    }
+                });
+            });
         }
 
         // ===== 방문자 통계 (누적 / 오늘) =====
@@ -1395,6 +1449,73 @@
             }
         });
 
+        // ===== AI 툴 추가 모달 =====
+        const toolModal = document.getElementById('toolModal');
+        const toolForm = document.getElementById('toolForm');
+        const toolError = document.getElementById('toolError');
+        let isAddingTool = false;
+
+        function openToolModal() {
+            if (!isAdmin) return;
+            toolForm.reset();
+            toolError.classList.remove('show');
+            toolModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeToolModal() {
+            toolModal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        document.getElementById('aiToolAddBtn').addEventListener('click', openToolModal);
+        document.getElementById('toolModalClose').addEventListener('click', closeToolModal);
+        toolModal.addEventListener('click', (e) => { if (e.target === toolModal) closeToolModal(); });
+
+        function showToolError(msg) {
+            toolError.textContent = msg;
+            toolError.classList.add('show');
+        }
+
+        toolForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (isAddingTool) return;
+            if (!isAdmin) { showToolError('관리자만 추가할 수 있습니다.'); return; }
+
+            const name = document.getElementById('toolName').value.trim();
+            const url = document.getElementById('toolUrl').value.trim();
+            if (!name) { showToolError('툴 이름을 입력해 주세요.'); return; }
+            if (!url) { showToolError('링크(URL)를 입력해 주세요.'); return; }
+
+            const tags = document.getElementById('toolTags').value
+                .split(',').map(t => t.trim()).filter(Boolean).slice(0, 5);
+
+            isAddingTool = true;
+            const btn = toolForm.querySelector('.submit-btn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                await window.fsAddDoc(window.fsCollection(db, AI_TOOL_COLLECTION), {
+                    name,
+                    tagline: document.getElementById('toolTagline').value.trim(),
+                    description: document.getElementById('toolDesc').value.trim(),
+                    url,
+                    tags,
+                    icon: document.getElementById('toolIcon').value || 'fa-wand-magic-sparkles',
+                    authorEmail: ADMIN_EMAIL,
+                    createdAt: window.fsServerTimestamp(),
+                });
+                closeToolModal();
+                loadAiTools();
+            } catch (err) {
+                console.error('AI 툴 추가 오류:', err);
+                showToolError('추가 중 오류가 발생했습니다. 로그인 상태를 확인해 주세요.');
+            } finally {
+                isAddingTool = false;
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        });
+
         // ===== 라이트박스 =====
         const lightbox = document.getElementById('lightbox');
         function openLightbox(boardKey, idx) {
@@ -1416,99 +1537,10 @@
         document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
         lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') { closeLightbox(); closePostModal(); }
+            if (e.key === 'Escape') { closeLightbox(); closePostModal(); closeToolModal(); }
         });
 
-        // ===== 서울 교육 공공데이터 =====
-        // Netlify 서버리스 함수(/.netlify/functions/seoul-edu)가 환경변수 SEOUL_API_KEY로
-        // data.seoul.go.kr API를 서버에서 호출 → CORS/Mixed-content/키 노출 문제를 모두 해결합니다.
-        const SEOUL_ENDPOINT = '/.netlify/functions/seoul-edu';
-        // 서울시 학교기본정보(neisSchoolInfoIs) 스키마에 맞춘 컬럼
-        // 교육자에게 보기 쉽도록 자주 쓰는 컬럼만 우선 노출 (없으면 전체 컬럼 자동 표시)
-        const SEOUL_PREFERRED_COLS = ['SCHL_NM', 'SCHL_KND_NM', 'FNDN_SE', 'CMPTNC_OGNZ_NM', 'ROAD_NM_ADDR', 'TELNO', 'HMPG_ADDR', 'CEDU_SE_NM'];
-        const SEOUL_COL_LABELS = {
-            CTPV_EDUO_NM: '시도교육청', SCHL_NM: '학교명', ENG_SCHL_NM: '영문명',
-            SCHL_KND_NM: '학교종류', LCTN_NM: '소재지', CMPTNC_OGNZ_NM: '교육지원청',
-            FNDN_SE: '설립구분', ROAD_NM_ADDR: '주소', DADDR: '상세주소',
-            TELNO: '전화번호', HMPG_ADDR: '홈페이지', CEDU_SE_NM: '남녀공학',
-            FXNO: '팩스', HGSCHL_GNRL_UEM_SE_NM: '계열', DAYT_NGHT_SE_NM: '주야',
-            ETEX_SE_NM: '전후기', FNDN_YMD: '설립일자',
-        };
-        let seoulRows = [];
-
-        function colLabel(key) { return SEOUL_COL_LABELS[key] || key; }
-
-        function pickColumns(rows) {
-            if (!rows.length) return [];
-            const present = Object.keys(rows[0]);
-            const preferred = SEOUL_PREFERRED_COLS.filter(c => present.includes(c));
-            return preferred.length ? preferred : present.slice(0, 8);
-        }
-
-        function renderSeoulTable(rows) {
-            const container = document.getElementById('seoulTableContainer');
-            const meta = document.getElementById('seoulMeta');
-            if (!rows.length) {
-                container.innerHTML = `<div class="seoul-status"><i class="fas fa-circle-info"></i><span>검색 결과가 없습니다.</span></div>`;
-                meta.textContent = '';
-                return;
-            }
-            const cols = pickColumns(rows);
-            meta.textContent = `총 ${rows.length.toLocaleString('ko-KR')}건 · 출처: 서울특별시 공공데이터 (data.seoul.go.kr)`;
-            const thead = `<thead><tr>${cols.map(c => `<th>${escapeHtml(colLabel(c))}</th>`).join('')}</tr></thead>`;
-            const tbody = `<tbody>${rows.map(r => `<tr>${cols.map(c => {
-                const v = r[c] == null ? '' : String(r[c]);
-                if (c === 'HMPG_ADDR' && v.trim()) {
-                    const href = v.startsWith('http') ? v : 'http://' + v;
-                    return `<td><a href="${escapeHtml(href)}" target="_blank" rel="noopener">바로가기</a></td>`;
-                }
-                return `<td>${escapeHtml(v)}</td>`;
-            }).join('')}</tr>`).join('')}</tbody>`;
-            container.innerHTML = `<table class="seoul-table">${thead}${tbody}</table>`;
-        }
-
-        function filterSeoul(term) {
-            const q = (term || '').trim().toLowerCase();
-            if (!q) return renderSeoulTable(seoulRows);
-            const filtered = seoulRows.filter(r =>
-                Object.values(r).some(v => String(v ?? '').toLowerCase().includes(q)));
-            renderSeoulTable(filtered);
-        }
-
-        async function loadSeoulEdu() {
-            const container = document.getElementById('seoulTableContainer');
-            container.innerHTML = `<div class="seoul-status"><i class="fas fa-spinner fa-spin"></i><span>서울 교육 공공데이터를 불러오는 중입니다…</span></div>`;
-            try {
-                const res = await fetch(SEOUL_ENDPOINT);
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const data = await res.json();
-                seoulRows = Array.isArray(data.rows) ? data.rows : [];
-                renderSeoulTable(seoulRows);
-            } catch (e) {
-                console.error('서울 데이터 로드 오류:', e);
-                container.innerHTML = `<div class="seoul-status">
-                    <i class="fas fa-triangle-exclamation"></i>
-                    <span>데이터를 불러오지 못했습니다.<br>
-                    Netlify에 <code>SEOUL_API_KEY</code> 환경변수와 서버리스 함수가 배포되어 있는지 확인해 주세요.</span>
-                </div>`;
-                document.getElementById('seoulMeta').textContent = '';
-            }
-        }
-
-        function initSeoulEdu() {
-            const search = document.getElementById('seoulSearch');
-            const refresh = document.getElementById('seoulRefresh');
-            let t;
-            search?.addEventListener('input', (e) => {
-                clearTimeout(t);
-                t = setTimeout(() => filterSeoul(e.target.value), 200);
-            });
-            refresh?.addEventListener('click', loadSeoulEdu);
-            loadSeoulEdu();
-        }
-
         initFirebase();
-        initSeoulEdu();
     </script>
 </body>
 </html>

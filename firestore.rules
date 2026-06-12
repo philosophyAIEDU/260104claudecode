@@ -23,6 +23,13 @@ service cloud.firestore {
         && request.auth.token.email == 'warmcomfortforyou@gmail.com';
     }
 
+    // 교육자용 AI 툴 — 누구나 읽기, 관리자만 추가/삭제
+    match /ai_tools/{toolId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null
+        && request.auth.token.email == 'warmcomfortforyou@gmail.com';
+    }
+
     // 누적 방문자 카운터 — 누구나 읽기, 1씩 증가(증분)만 허용
     match /stats/{docId} {
       allow read: if true;
