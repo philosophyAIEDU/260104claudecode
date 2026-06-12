@@ -1423,12 +1423,16 @@
         // Netlify 서버리스 함수(/.netlify/functions/seoul-edu)가 환경변수 SEOUL_API_KEY로
         // data.seoul.go.kr API를 서버에서 호출 → CORS/Mixed-content/키 노출 문제를 모두 해결합니다.
         const SEOUL_ENDPOINT = '/.netlify/functions/seoul-edu';
+        // 서울시 학교기본정보(neisSchoolInfoIs) 스키마에 맞춘 컬럼
         // 교육자에게 보기 쉽도록 자주 쓰는 컬럼만 우선 노출 (없으면 전체 컬럼 자동 표시)
-        const SEOUL_PREFERRED_COLS = ['SCHUL_NM', 'SCHUL_KND_SC_NM', 'JU_ORG_NM', 'ADRES', 'FOND_SC_NM', 'TELNO', 'HMPG_ADRES', 'COEDU_SC_NM', 'ATPT_OFCDC_ORG_NM'];
+        const SEOUL_PREFERRED_COLS = ['SCHL_NM', 'SCHL_KND_NM', 'FNDN_SE', 'CMPTNC_OGNZ_NM', 'ROAD_NM_ADDR', 'TELNO', 'HMPG_ADDR', 'CEDU_SE_NM'];
         const SEOUL_COL_LABELS = {
-            SCHUL_NM: '학교명', SCHUL_KND_SC_NM: '학교종류', JU_ORG_NM: '관할 교육청',
-            ATPT_OFCDC_ORG_NM: '시도교육청', ADRES: '주소', FOND_SC_NM: '설립구분',
-            TELNO: '전화번호', HMPG_ADRES: '홈페이지', COEDU_SC_NM: '남녀공학',
+            CTPV_EDUO_NM: '시도교육청', SCHL_NM: '학교명', ENG_SCHL_NM: '영문명',
+            SCHL_KND_NM: '학교종류', LCTN_NM: '소재지', CMPTNC_OGNZ_NM: '교육지원청',
+            FNDN_SE: '설립구분', ROAD_NM_ADDR: '주소', DADDR: '상세주소',
+            TELNO: '전화번호', HMPG_ADDR: '홈페이지', CEDU_SE_NM: '남녀공학',
+            FXNO: '팩스', HGSCHL_GNRL_UEM_SE_NM: '계열', DAYT_NGHT_SE_NM: '주야',
+            ETEX_SE_NM: '전후기', FNDN_YMD: '설립일자',
         };
         let seoulRows = [];
 
@@ -1454,7 +1458,7 @@
             const thead = `<thead><tr>${cols.map(c => `<th>${escapeHtml(colLabel(c))}</th>`).join('')}</tr></thead>`;
             const tbody = `<tbody>${rows.map(r => `<tr>${cols.map(c => {
                 const v = r[c] == null ? '' : String(r[c]);
-                if (c === 'HMPG_ADRES' && v) {
+                if (c === 'HMPG_ADDR' && v.trim()) {
                     const href = v.startsWith('http') ? v : 'http://' + v;
                     return `<td><a href="${escapeHtml(href)}" target="_blank" rel="noopener">바로가기</a></td>`;
                 }

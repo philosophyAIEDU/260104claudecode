@@ -5,8 +5,8 @@
 //
 // Netlify 환경변수 설정 (Site settings → Environment variables):
 //   SEOUL_API_KEY  : data.seoul.go.kr 에서 발급받은 인증키 (필수)
-//   SEOUL_SERVICE  : 가져올 서비스명(데이터셋 ID). 교육청·학교 통계 데이터셋의
-//                    서비스명을 넣으세요. (선택, 기본값 neisSchoolInfo)
+//   SEOUL_SERVICE  : 가져올 서비스명. 기본값은 서울시 학교기본정보(neisSchoolInfoIs).
+//                    (선택 — 다른 교육 데이터셋으로 바꾸려면 설정)
 //
 // 호출 예: /.netlify/functions/seoul-edu?start=1&end=100
 
@@ -29,7 +29,8 @@ exports.handler = async (event) => {
     const start = Math.max(1, parseInt(params.start, 10) || 1);
     const end = Math.min(start + 999, parseInt(params.end, 10) || start + 99); // 1회 최대 1000건
     // 서비스명은 영숫자/언더스코어만 허용 (인젝션 방지)
-    const service = String(params.service || process.env.SEOUL_SERVICE || 'neisSchoolInfo')
+    // 기본값: 서울시 학교기본정보(neisSchoolInfoIs)
+    const service = String(params.service || process.env.SEOUL_SERVICE || 'neisSchoolInfoIs')
         .replace(/[^a-zA-Z0-9_]/g, '');
 
     const url = `http://openapi.seoul.go.kr:8088/${KEY}/json/${service}/${start}/${end}/`;
