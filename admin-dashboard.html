@@ -16,7 +16,8 @@
     <!-- Firebase JS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp, getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth as _getAuth, onAuthStateChanged as _onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         window.initializeApp = initializeApp;
         window.getFirestore = getFirestore;
@@ -24,6 +25,15 @@
         window.getDocs = getDocs;
         window.fsDoc = doc;
         window.fsGetDoc = getDoc;
+        window.fsAddDoc = addDoc;
+        window.fsUpdateDoc = updateDoc;
+        window.fsDeleteDoc = deleteDoc;
+        window.fsQuery = query;
+        window.fsOrderBy = orderBy;
+        window.fsServerTimestamp = serverTimestamp;
+        window.getAuth = _getAuth;
+        window.onAuthStateChanged = _onAuthStateChanged;
+        window.__adminReady = true;
     </script>
     <!-- Chart.js for visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -582,6 +592,64 @@
 
         </div>
 
+        <!-- AI 툴 관리 -->
+        <div class="tools-mgmt-section" style="margin-bottom:3rem;">
+            <div class="table-header" style="border-radius:15px 15px 0 0; display:flex; justify-content:space-between; align-items:center; padding:1.5rem;">
+                <span><i class="fas fa-robot"></i> AI 툴 관리</span>
+                <button id="addToolBtn" style="background:#fff; color:var(--primary-color); border:none; padding:.6rem 1.2rem; border-radius:8px; font-weight:700; cursor:pointer; font-size:.95rem; display:flex; align-items:center; gap:.4rem;">
+                    <i class="fas fa-plus"></i> 툴 추가
+                </button>
+            </div>
+            <div id="toolsListContainer" style="background:#fff; border-radius:0 0 15px 15px; box-shadow:0 5px 20px var(--shadow); min-height:80px; padding:1rem;">
+                <div class="loading"><div class="spinner"></div> 툴 목록 불러오는 중...</div>
+            </div>
+        </div>
+
+        <!-- AI 툴 추가/수정 모달 -->
+        <div id="toolModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000; align-items:center; justify-content:center;">
+            <div style="background:#fff; border-radius:16px; padding:2rem; width:min(520px,95vw); max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.3);">
+                <h3 id="toolModalTitle" style="font-size:1.4rem; font-weight:700; margin-bottom:1.5rem; color:var(--text-dark);"><i class="fas fa-robot"></i> AI 툴 추가</h3>
+                <form id="toolForm" autocomplete="off">
+                    <div style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; margin-bottom:.4rem; font-size:.9rem;">툴 이름 <span style="color:red">*</span></label>
+                        <input type="text" id="toolName" required style="width:100%; padding:.7rem; border:1.5px solid #ddd; border-radius:8px; font-size:.95rem;" placeholder="예: 논문 학습 노트">
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; margin-bottom:.4rem; font-size:.9rem;">한 줄 소개 <span style="color:red">*</span></label>
+                        <input type="text" id="toolTagline" required style="width:100%; padding:.7rem; border:1.5px solid #ddd; border-radius:8px; font-size:.95rem;" placeholder="예: 어려운 논문을 쉽게 읽고 정리">
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; margin-bottom:.4rem; font-size:.9rem;">설명</label>
+                        <textarea id="toolDescription" rows="3" style="width:100%; padding:.7rem; border:1.5px solid #ddd; border-radius:8px; font-size:.95rem; resize:vertical;" placeholder="툴에 대한 자세한 설명을 입력하세요."></textarea>
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; margin-bottom:.4rem; font-size:.9rem;">URL <span style="color:red">*</span></label>
+                        <input type="url" id="toolUrl" required style="width:100%; padding:.7rem; border:1.5px solid #ddd; border-radius:8px; font-size:.95rem;" placeholder="https://...">
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; margin-bottom:.4rem; font-size:.9rem;">아이콘 (Font Awesome 클래스)</label>
+                        <input type="text" id="toolIcon" style="width:100%; padding:.7rem; border:1.5px solid #ddd; border-radius:8px; font-size:.95rem;" placeholder="예: fas fa-robot">
+                        <div style="font-size:.8rem; color:var(--text-light); margin-top:.3rem;">
+                            Font Awesome 아이콘 클래스를 입력하세요. 예: fas fa-lightbulb, fas fa-book-open
+                        </div>
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; margin-bottom:.4rem; font-size:.9rem;">태그 (쉼표로 구분)</label>
+                        <input type="text" id="toolTags" style="width:100%; padding:.7rem; border:1.5px solid #ddd; border-radius:8px; font-size:.95rem;" placeholder="예: 논문 읽기, 요약·정리, 탐구 학습">
+                    </div>
+                    <div style="margin-bottom:1.5rem;">
+                        <label style="display:block; font-weight:600; margin-bottom:.4rem; font-size:.9rem;">순서 (숫자가 낮을수록 앞에 표시)</label>
+                        <input type="number" id="toolOrder" min="1" value="99" style="width:100%; padding:.7rem; border:1.5px solid #ddd; border-radius:8px; font-size:.95rem;">
+                    </div>
+                    <div id="toolFormError" style="display:none; background:rgba(231,76,60,.1); color:#e74c3c; padding:.75rem 1rem; border-radius:8px; margin-bottom:1rem; font-size:.9rem;"></div>
+                    <div style="display:flex; gap:.75rem; justify-content:flex-end;">
+                        <button type="button" id="toolModalClose" style="padding:.7rem 1.4rem; border:1.5px solid #ddd; border-radius:8px; background:#fff; cursor:pointer; font-weight:600;">취소</button>
+                        <button type="submit" id="toolSubmitBtn" style="padding:.7rem 1.6rem; border:none; border-radius:8px; background:var(--gradient); color:#fff; font-weight:700; cursor:pointer; font-size:.95rem;">저장</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- 사용자 관리 -->
         <div class="users-section">
             <div class="users-header">
@@ -668,13 +736,20 @@
         document.addEventListener('DOMContentLoaded', function() {
             let attempts = 0;
             const initInterval = setInterval(() => {
-                if (window.initializeApp) {
+                if (window.initializeApp && window.__adminReady) {
                     clearInterval(initInterval);
                     app = window.initializeApp(firebaseConfig);
                     db = window.getFirestore(app);
+                    const auth = window.getAuth(app);
+                    window.onAuthStateChanged(auth, (user) => {
+                        if (user && user.email === 'warmcomfortforyou@gmail.com') {
+                            initToolsManager();
+                        }
+                    });
                     setupEventListeners();
                     loadDashboardData();
                     loadVisitorStats();
+                    loadToolsList();
                     setInterval(() => { loadDashboardData(); loadVisitorStats(); }, 5 * 60 * 1000);
                 }
                 attempts++;
@@ -684,6 +759,157 @@
                 }
             }, 100);
         });
+
+        // ===== AI 툴 관리 =====
+        let editingToolId = null;
+
+        async function loadToolsList() {
+            const container = document.getElementById('toolsListContainer');
+            if (!container) return;
+            try {
+                const q = window.fsQuery(window.fsCollection(db, 'ai_tools'), window.fsOrderBy('order', 'asc'));
+                const snap = await window.getDocs(q);
+                const tools = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderToolsList(tools);
+            } catch (e) {
+                container.innerHTML = `<div class="error">툴 목록 불러오기 실패: ${e.message}</div>`;
+            }
+        }
+
+        function renderToolsList(tools) {
+            const container = document.getElementById('toolsListContainer');
+            if (!tools.length) {
+                container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-light);">등록된 AI 툴이 없습니다. 위 [툴 추가] 버튼을 눌러 추가하세요.</div>';
+                return;
+            }
+            container.innerHTML = tools.map(t => `
+                <div style="display:flex; align-items:center; gap:1rem; padding:1rem; border-bottom:1px solid #eee; flex-wrap:wrap;">
+                    <div style="font-size:1.4rem; width:2rem; text-align:center; color:var(--primary-color);">
+                        <i class="${escAdm(t.icon || 'fas fa-robot')}"></i>
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-weight:700; color:var(--text-dark);">${escAdm(t.name)} <span style="font-size:.8rem; color:var(--text-light); font-weight:400;">순서 ${t.order ?? '–'}</span></div>
+                        <div style="font-size:.88rem; color:var(--text-light);">${escAdm(t.tagline || '')}</div>
+                        <div style="font-size:.82rem; color:var(--accent-color); margin-top:.2rem; word-break:break-all;">${escAdm(t.url || '')}</div>
+                    </div>
+                    <div style="display:flex; gap:.5rem; flex-shrink:0;">
+                        <button onclick="openEditTool('${t.id}')" style="padding:.45rem .9rem; border:1.5px solid var(--primary-color); border-radius:7px; background:#fff; color:var(--primary-color); cursor:pointer; font-weight:600; font-size:.85rem;">
+                            <i class="fas fa-pen"></i> 수정
+                        </button>
+                        <button onclick="deleteTool('${t.id}', '${escAdm(t.name)}')" style="padding:.45rem .9rem; border:1.5px solid var(--error-color); border-radius:7px; background:#fff; color:var(--error-color); cursor:pointer; font-weight:600; font-size:.85rem;">
+                            <i class="fas fa-trash"></i> 삭제
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function escAdm(s) {
+            const d = document.createElement('div');
+            d.textContent = s ?? '';
+            return d.innerHTML;
+        }
+
+        function initToolsManager() {
+            document.getElementById('addToolBtn')?.addEventListener('click', openAddTool);
+            document.getElementById('toolModalClose')?.addEventListener('click', closeToolModal);
+            document.getElementById('toolModal')?.addEventListener('click', (e) => { if (e.target.id === 'toolModal') closeToolModal(); });
+            document.getElementById('toolForm')?.addEventListener('submit', submitToolForm);
+        }
+
+        function openAddTool() {
+            editingToolId = null;
+            document.getElementById('toolModalTitle').innerHTML = '<i class="fas fa-plus"></i> AI 툴 추가';
+            document.getElementById('toolForm').reset();
+            document.getElementById('toolOrder').value = 99;
+            hideToolFormError();
+            showToolModal();
+        }
+
+        async function openEditTool(id) {
+            try {
+                const snap = await window.fsGetDoc(window.fsDoc(db, 'ai_tools', id));
+                if (!snap.exists()) { alert('툴을 찾을 수 없습니다.'); return; }
+                const t = snap.data();
+                editingToolId = id;
+                document.getElementById('toolModalTitle').innerHTML = '<i class="fas fa-pen"></i> AI 툴 수정';
+                document.getElementById('toolName').value = t.name || '';
+                document.getElementById('toolTagline').value = t.tagline || '';
+                document.getElementById('toolDescription').value = t.description || '';
+                document.getElementById('toolUrl').value = t.url || '';
+                document.getElementById('toolIcon').value = t.icon || '';
+                document.getElementById('toolTags').value = (t.tags || []).join(', ');
+                document.getElementById('toolOrder').value = t.order ?? 99;
+                hideToolFormError();
+                showToolModal();
+            } catch (e) {
+                alert('툴 정보를 불러오지 못했습니다: ' + e.message);
+            }
+        }
+
+        async function deleteTool(id, name) {
+            if (!confirm(`"${name}" 툴을 삭제하시겠습니까?`)) return;
+            try {
+                await window.fsDeleteDoc(window.fsDoc(db, 'ai_tools', id));
+                loadToolsList();
+            } catch (e) {
+                alert('삭제 실패: ' + e.message);
+            }
+        }
+
+        async function submitToolForm(e) {
+            e.preventDefault();
+            const name = document.getElementById('toolName').value.trim();
+            const tagline = document.getElementById('toolTagline').value.trim();
+            const description = document.getElementById('toolDescription').value.trim();
+            const url = document.getElementById('toolUrl').value.trim();
+            const icon = document.getElementById('toolIcon').value.trim() || 'fas fa-robot';
+            const tagsRaw = document.getElementById('toolTags').value.trim();
+            const tags = tagsRaw ? tagsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+            const order = parseInt(document.getElementById('toolOrder').value) || 99;
+
+            if (!name || !tagline || !url) { showToolFormError('이름, 한 줄 소개, URL은 필수입니다.'); return; }
+
+            const btn = document.getElementById('toolSubmitBtn');
+            btn.disabled = true; btn.textContent = '저장 중...';
+
+            try {
+                const data = { name, tagline, description, url, icon, tags, order, updatedAt: window.fsServerTimestamp() };
+                if (editingToolId) {
+                    await window.fsUpdateDoc(window.fsDoc(db, 'ai_tools', editingToolId), data);
+                } else {
+                    data.createdAt = window.fsServerTimestamp();
+                    await window.fsAddDoc(window.fsCollection(db, 'ai_tools'), data);
+                }
+                closeToolModal();
+                loadToolsList();
+            } catch (err) {
+                showToolFormError('저장 실패: ' + err.message);
+            } finally {
+                btn.disabled = false; btn.textContent = '저장';
+            }
+        }
+
+        function showToolModal() {
+            const m = document.getElementById('toolModal');
+            m.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeToolModal() {
+            const m = document.getElementById('toolModal');
+            m.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        function showToolFormError(msg) {
+            const el = document.getElementById('toolFormError');
+            el.textContent = msg; el.style.display = 'block';
+        }
+
+        function hideToolFormError() {
+            document.getElementById('toolFormError').style.display = 'none';
+        }
 
         // 방문자 통계 (누적 / 오늘) 로드
         async function loadVisitorStats() {
