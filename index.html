@@ -266,6 +266,8 @@
         .tool-icon.c2 { background: linear-gradient(135deg, #d99812, #f4c430); }
         .tool-icon.c3 { background: linear-gradient(135deg, #c8890f, #eab308); }
         .tool-icon.c4 { background: linear-gradient(135deg, #a66f08, #d99812); }
+        .tool-icon.c5 { background: linear-gradient(135deg, #0a6b4b, #1ca878); }
+        .tool-icon.c6 { background: linear-gradient(135deg, #1a4fa0, #3b7de0); }
         .tool-num { font-size: 2.6rem; font-weight: 800; color: var(--bg-tint); line-height: 1; letter-spacing: -2px; }
         .tool-card h3 { font-size: 1.35rem; font-weight: 800; color: var(--ink); margin-bottom: 0.3rem; letter-spacing: -0.4px; }
         .tool-tagline { font-size: 0.92rem; font-weight: 600; color: var(--primary); margin-bottom: 0.9rem; }
@@ -620,70 +622,10 @@
                     회원 가입 없이 클릭 한 번으로 수업과 학습에 바로 활용해 보세요.</p>
             </div>
 
-            <div class="tools-grid">
-                <!-- 1. 논문 학습 노트 -->
-                <article class="tool-card reveal">
-                    <div class="tool-top">
-                        <div class="tool-icon c1"><i class="fas fa-file-lines"></i></div>
-                        <span class="tool-num">01</span>
-                    </div>
-                    <h3>논문 학습 노트</h3>
-                    <div class="tool-tagline">어려운 논문을 쉽게 읽고 정리</div>
-                    <p>AI의 도움으로 논문의 핵심을 파악하고 나만의 학습 노트로 정리합니다.
-                        탐구 수업과 자기주도 학습 자료 제작에 좋은 출발점이 됩니다.</p>
-                    <div class="tool-tags"><span>논문 읽기</span><span>요약·정리</span><span>탐구 학습</span></div>
-                    <a href="https://philoedu.netlify.app" target="_blank" rel="noopener" class="tool-link">
-                        바로 사용하기 <i class="fas fa-arrow-up-right-from-square"></i>
-                    </a>
-                </article>
-
-                <!-- 2. 사고력 코치 -->
-                <article class="tool-card reveal">
-                    <div class="tool-top">
-                        <div class="tool-icon c2"><i class="fas fa-lightbulb"></i></div>
-                        <span class="tool-num">02</span>
-                    </div>
-                    <h3>사고력 코치</h3>
-                    <div class="tool-tagline">질문으로 생각을 키우는 AI 코치</div>
-                    <p>정답을 알려주는 대신 좋은 질문을 던지는 코치입니다.
-                        학생 스스로 사고를 확장하도록 돕는 토론·글쓰기·논술 수업의 든든한 파트너입니다.</p>
-                    <div class="tool-tags"><span>비판적 사고</span><span>질문 기반</span><span>토론·논술</span></div>
-                    <a href="https://philofable5.netlify.app" target="_blank" rel="noopener" class="tool-link">
-                        바로 사용하기 <i class="fas fa-arrow-up-right-from-square"></i>
-                    </a>
-                </article>
-
-                <!-- 3. 영어 사전 -->
-                <article class="tool-card reveal">
-                    <div class="tool-top">
-                        <div class="tool-icon c3"><i class="fas fa-book-open"></i></div>
-                        <span class="tool-num">03</span>
-                    </div>
-                    <h3>영어 사전</h3>
-                    <div class="tool-tagline">맥락으로 익히는 똑똑한 영어 사전</div>
-                    <p>단어의 뜻만이 아니라 예문과 쓰임, 뉘앙스까지 함께 보여 줍니다.
-                        영어 수업과 어휘 학습, 독해 지도에 바로 활용할 수 있습니다.</p>
-                    <div class="tool-tags"><span>영어 어휘</span><span>예문·뉘앙스</span><span>독해 지도</span></div>
-                    <a href="https://philoenglishdictionary.netlify.app" target="_blank" rel="noopener" class="tool-link">
-                        바로 사용하기 <i class="fas fa-arrow-up-right-from-square"></i>
-                    </a>
-                </article>
-
-                <!-- 4. 알파폴드 학습 도우미 -->
-                <article class="tool-card reveal">
-                    <div class="tool-top">
-                        <div class="tool-icon c4"><i class="fas fa-dna"></i></div>
-                        <span class="tool-num">04</span>
-                    </div>
-                    <h3>알파폴드 학습 도우미</h3>
-                    <div class="tool-tagline">AI 과학을 직접 배우는 도우미</div>
-                    <p>단백질 구조 예측 AI '알파폴드'를 학생 눈높이로 풀어 줍니다.
-                        과학·생명·AI 융합 수업에서 첨단 기술을 친근하게 소개할 수 있습니다.</p>
-                    <div class="tool-tags"><span>생명과학</span><span>AI 융합</span><span>탐구 활동</span></div>
-                    <a href="https://philoalphafold.netlify.app" target="_blank" rel="noopener" class="tool-link">
-                        바로 사용하기 <i class="fas fa-arrow-up-right-from-square"></i>
-                    </a>
-                </article>
+            <div class="tools-grid" id="toolsGrid">
+                <div class="tools-loading" style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-soft);">
+                    <i class="fas fa-spinner fa-spin"></i> 툴을 불러오는 중...
+                </div>
             </div>
         </div>
     </section>
@@ -1095,6 +1037,7 @@
                         loadBoard('volunteer');
                         loadBoard('education');
                         recordVisit();
+                        loadAITools();
                     } catch (e) {
                         console.error('Firebase init 오류:', e);
                         showBoardError('volunteer');
@@ -1269,6 +1212,57 @@
                     }
                 });
             });
+        }
+
+        // ===== AI 툴 동적 로드 =====
+        const DEFAULT_TOOLS = [
+            { name: '논문 학습 노트', tagline: '어려운 논문을 쉽게 읽고 정리', description: 'AI의 도움으로 논문의 핵심을 파악하고 나만의 학습 노트로 정리합니다. 탐구 수업과 자기주도 학습 자료 제작에 좋은 출발점이 됩니다.', tags: ['논문 읽기', '요약·정리', '탐구 학습'], url: 'https://philoedu.netlify.app', icon: 'fas fa-file-lines', order: 1 },
+            { name: '사고력 코치', tagline: '질문으로 생각을 키우는 AI 코치', description: '정답을 알려주는 대신 좋은 질문을 던지는 코치입니다. 학생 스스로 사고를 확장하도록 돕는 토론·글쓰기·논술 수업의 든든한 파트너입니다.', tags: ['비판적 사고', '질문 기반', '토론·논술'], url: 'https://philofable5.netlify.app', icon: 'fas fa-lightbulb', order: 2 },
+            { name: '영어 사전', tagline: '맥락으로 익히는 똑똑한 영어 사전', description: '단어의 뜻만이 아니라 예문과 쓰임, 뉘앙스까지 함께 보여 줍니다. 영어 수업과 어휘 학습, 독해 지도에 바로 활용할 수 있습니다.', tags: ['영어 어휘', '예문·뉘앙스', '독해 지도'], url: 'https://philoenglishdictionary.netlify.app', icon: 'fas fa-book-open', order: 3 },
+            { name: '알파폴드 학습 도우미', tagline: 'AI 과학을 직접 배우는 도우미', description: "단백질 구조 예측 AI '알파폴드'를 학생 눈높이로 풀어 줍니다. 과학·생명·AI 융합 수업에서 첨단 기술을 친근하게 소개할 수 있습니다.", tags: ['생명과학', 'AI 융합', '탐구 활동'], url: 'https://philoalphafold.netlify.app', icon: 'fas fa-dna', order: 4 },
+        ];
+
+        const ICON_COLORS = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'];
+
+        async function loadAITools() {
+            const grid = document.getElementById('toolsGrid');
+            try {
+                const q = window.fsQuery(window.fsCollection(db, 'ai_tools'), window.fsOrderBy('order', 'asc'));
+                const snap = await window.fsGetDocs(q);
+                const tools = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderAITools(tools.length ? tools : DEFAULT_TOOLS);
+            } catch (e) {
+                console.error('AI 툴 로드 오류:', e);
+                renderAITools(DEFAULT_TOOLS);
+            }
+        }
+
+        function renderAITools(tools) {
+            const grid = document.getElementById('toolsGrid');
+            if (!tools.length) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-soft);">등록된 AI 툴이 없습니다.</div>';
+                return;
+            }
+            grid.innerHTML = tools.map((t, i) => `
+                <article class="tool-card reveal">
+                    <div class="tool-top">
+                        <div class="tool-icon ${ICON_COLORS[i % ICON_COLORS.length]}"><i class="${escapeHtml(t.icon || 'fas fa-robot')}"></i></div>
+                        <span class="tool-num">${String(i + 1).padStart(2, '0')}</span>
+                    </div>
+                    <h3>${escapeHtml(t.name)}</h3>
+                    <div class="tool-tagline">${escapeHtml(t.tagline || '')}</div>
+                    <p>${escapeHtml(t.description || '')}</p>
+                    <div class="tool-tags">${(t.tags || []).map(tag => `<span>${escapeHtml(tag)}</span>`).join('')}</div>
+                    <a href="${escapeHtml(t.url || '#')}" target="_blank" rel="noopener" class="tool-link">
+                        바로 사용하기 <i class="fas fa-arrow-up-right-from-square"></i>
+                    </a>
+                </article>
+            `).join('');
+
+            // reveal 애니메이션 재트리거
+            if (typeof revealObserver !== 'undefined') {
+                grid.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+            }
         }
 
         function formatDate(ts) {
