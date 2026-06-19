@@ -127,7 +127,7 @@
 
         .nav-menu { display: flex; align-items: center; gap: 0.25rem; }
         .nav-menu > li > a {
-            color: var(--text); font-weight: 500; font-size: 0.95rem;
+            color: var(--text); font-weight: 500; font-size: 0.85rem; white-space: nowrap;
             padding: 0.55rem 0.9rem; border-radius: 10px; transition: var(--transition);
         }
         .nav-menu > li > a:hover { color: var(--primary); background: rgba(200, 137, 15, 0.07); }
@@ -199,7 +199,7 @@
             padding: 0.5rem 1rem; border-radius: 50px; box-shadow: var(--shadow-sm); margin-bottom: 1.6rem;
         }
         .hero-badge i { color: var(--accent); }
-        .hero h1 { font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 900; line-height: 1.15; letter-spacing: -1.5px; color: var(--ink); margin-bottom: 1.3rem; }
+        .hero h1 { font-size: clamp(1.6rem, 3.8vw, 2.6rem); font-weight: 900; line-height: 1.2; letter-spacing: -1px; color: var(--ink); margin-bottom: 1.3rem; }
         .hero .lead { font-size: clamp(0.92rem, 1.7vw, 1.05rem); color: var(--text-soft); max-width: 620px; margin-bottom: 1rem; }
         .hero .lead strong { color: var(--text); font-weight: 700; }
         .hero-note {
@@ -561,7 +561,6 @@
                 <li><a href="#tools">AI 툴</a></li>
                 <li><a href="#volunteer">봉사단 소식</a></li>
                 <li><a href="#gallery">교육 사진</a></li>
-                <li><a href="#seoul-edu">서울 교육데이터</a></li>
                 <li><a href="#community">커뮤니티</a></li>
                 <li><a href="#contact">문의</a></li>
                 <li><a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="nav-youtube"><i class="fab fa-youtube"></i> 필로소피 AI 교육 유튜브</a></li>
@@ -668,33 +667,6 @@
         </div>
     </section>
 
-    <!-- ===== 서울 교육 공공데이터 ===== -->
-    <section id="seoul-edu" class="section-pad seoul-section">
-        <div class="container">
-            <div class="section-head reveal">
-                <span class="eyebrow"><i class="fas fa-building-columns"></i> Seoul Open Data</span>
-                <h2 class="section-title">서울 교육 공공데이터</h2>
-                <p class="section-sub">서울특별시 공공데이터(data.seoul.go.kr)의 교육청·학교 통계를
-                    교육자분들이 한눈에 보실 수 있도록 정리했습니다. 검색어로 원하는 항목을 빠르게 찾아보세요.</p>
-            </div>
-
-            <div class="reveal">
-                <div class="seoul-toolbar">
-                    <input type="text" id="seoulSearch" class="seoul-search" placeholder="🔍 학교명·지역·항목으로 검색">
-                    <button id="seoulRefresh" class="seoul-refresh"><i class="fas fa-rotate"></i> 새로고침</button>
-                </div>
-                <div class="seoul-meta" id="seoulMeta"></div>
-                <div class="seoul-table-wrap">
-                    <div id="seoulTableContainer">
-                        <div class="seoul-status">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <span>서울 교육 공공데이터를 불러오는 중입니다…</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- ===== 관리자 전용: 방문 통계 & 애널리틱스 ===== -->
     <section id="adminStats" class="section-pad admin-panel">
