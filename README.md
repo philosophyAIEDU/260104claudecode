@@ -33,11 +33,16 @@ Site settings → Environment variables 에 등록:
 
 ## 메인 페이지 구성 (index.html)
 1. **Hero** — "AI 시대, 교육자의 나침반" 메시지와 CTA
-2. **교육자분들을 위한 AI 툴** — 직접 만든 4개의 AI 학습 도구
+2. **교육자분들을 위한 AI 툴** — 직접 만든 AI 학습 도구
    - 논문 학습 노트 — https://philoedu.netlify.app
    - 사고력 코치 — https://philofable5.netlify.app
    - 영어 사전 — https://philoenglishdictionary.netlify.app
    - 알파폴드 학습 도우미 — https://philoalphafold.netlify.app
+   - 미분적분 학습 도우미 — https://philomath77.netlify.app
+   - 단종 이야기 — https://philohistory.netlify.app
+   - AI 토론 메이트 — https://philodiscussion.netlify.app/
+   - AI 독서 코치 — https://philoreading.netlify.app/
+   - AI 뉴턴 역학 학습 도우미 — https://philophysics1.netlify.app/
 3. **교육자를 위한 AI 나침반** — 교육 현장에 유용한 외부 AI 도구 큐레이션
 4. **우리가 지키는 방향** — 도구보다 사람 / 비판적 활용 / 함께 배우기
 5. **커뮤니티** — AI에 관심 있는 교육자들이 모이는 공간, 스터디 자료 안내
