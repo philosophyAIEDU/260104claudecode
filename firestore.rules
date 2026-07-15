@@ -1,8 +1,18 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // 관리자 확인 — 이메일 검증까지 요구해 다른 로그인 방식으로 이메일을 사칭하는 것을 방지
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'warmcomfortforyou@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // 본인 또는 관리자(가입자 관리 대시보드)만 읽기
+      allow read: if isAdmin()
+        || (request.auth != null && request.auth.uid == userId);
+      allow write: if request.auth != null && request.auth.uid == userId;
 
       match /{document=**} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
@@ -12,37 +22,37 @@ service cloud.firestore {
     // 필로소피 AI 봉사단 소식 — 누구나 읽기, 관리자만 쓰기
     match /volunteer_posts/{postId} {
       allow read: if true;
-      allow create, update, delete: if request.auth != null
-        && request.auth.token.email == 'warmcomfortforyou@gmail.com';
+      allow create, update, delete: if isAdmin();
     }
 
     // 필로소피 AI 교육 사진 — 누구나 읽기, 관리자만 쓰기
     match /education_posts/{postId} {
       allow read: if true;
-      allow create, update, delete: if request.auth != null
-        && request.auth.token.email == 'warmcomfortforyou@gmail.com';
+      allow create, update, delete: if isAdmin();
     }
 
-    // 누적 방문자 카운터 — 누구나 읽기, 1씩 증가(증분)만 허용
+    // 누적 방문자 카운터 — 누구나 읽기, 1에서 시작해 1씩 증가만 허용
     match /stats/{docId} {
       allow read: if true;
-      // 생성 시(resource == null) 또는 total을 정확히 1 증가시키는 요청만 허용
-      allow write: if request.resource.data.total is int
-        && (resource == null || request.resource.data.total == resource.data.total + 1);
+      allow create: if request.resource.data.total == 1;
+      allow update: if request.resource.data.total is int
+        && request.resource.data.total == resource.data.total + 1;
+      allow delete: if isAdmin();
     }
 
-    // 오늘 방문자 카운터 (날짜별 문서) — 누구나 읽기, 1씩 증가(증분)만 허용
+    // 오늘 방문자 카운터 (날짜별 문서) — 누구나 읽기, 1에서 시작해 1씩 증가만 허용
     match /daily_visits/{dateId} {
       allow read: if true;
-      allow write: if request.resource.data.count is int
-        && (resource == null || request.resource.data.count == resource.data.count + 1);
+      allow create: if request.resource.data.count == 1;
+      allow update: if request.resource.data.count is int
+        && request.resource.data.count == resource.data.count + 1;
+      allow delete: if isAdmin();
     }
 
     // AI 툴 목록 — 누구나 읽기, 관리자만 쓰기
     match /ai_tools/{toolId} {
       allow read: if true;
-      allow create, update, delete: if request.auth != null
-        && request.auth.token.email == 'warmcomfortforyou@gmail.com';
+      allow create, update, delete: if isAdmin();
     }
   }
 }

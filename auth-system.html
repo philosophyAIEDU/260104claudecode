@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Philosophy AI Education - 구글 로그인 시스템</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Firebase JS (모듈형) -->
     <script type="module">
@@ -626,6 +627,13 @@
             return ADMIN_EMAILS.includes((email || '').toLowerCase());
         }
 
+        // HTML/속성 컨텍스트 모두에서 안전하도록 이스케이프 (저장형 XSS 방지)
+        function esc(s) {
+            return String(s ?? '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
         function setupEventListeners() {
             document.getElementById('googleLogin')?.addEventListener('click', handleGoogleLogin);
             document.getElementById('googleLoginBtn')?.addEventListener('click', handleGoogleLogin);
@@ -823,11 +831,11 @@
             usersList.innerHTML = users.map(user => `
                 <div class="user-item">
                     <div>
-                        <div style="font-weight: 600; color: var(--text-dark);">${user.name || '이름 없음'}</div>
-                        <div class="user-email">${user.email || user.googleEmail || '이메일 없음'}</div>
+                        <div style="font-weight: 600; color: var(--text-dark);">${esc(user.name || '이름 없음')}</div>
+                        <div class="user-email">${esc(user.email || user.googleEmail || '이메일 없음')}</div>
                     </div>
                     <div>
-                        <div class="user-company"><i class="fas fa-briefcase" style="margin-right:0.4rem;color:var(--primary-color);"></i>${user.job || user.company || '미입력'}</div>
+                        <div class="user-company"><i class="fas fa-briefcase" style="margin-right:0.4rem;color:var(--primary-color);"></i>${esc(user.job || user.company || '미입력')}</div>
                     </div>
                     <div class="user-date">${user.createdAt ? new Date(user.createdAt.toDate ? user.createdAt.toDate() : user.createdAt).toLocaleDateString('ko-KR') : '날짜 없음'}</div>
                     <div style="text-align: right;">
@@ -862,7 +870,7 @@
             hideAllScreens();
             authSection.style.display = 'block';
             authSection.innerHTML = `
-                <h1 class="auth-title">환영합니다, ${profile.name}님!</h1>
+                <h1 class="auth-title">환영합니다, ${esc(profile.name)}님!</h1>
                 <p class="auth-subtitle">로그인이 완료되었습니다.<br>곧 Philosophy AI Education의 최신 소식을 받아보실 수 있습니다.</p>
                 <div style="margin-top: 2rem;">
                     <a href="/" style="color: var(--primary-color); text-decoration: none;">← 메인 페이지로 돌아가기</a>

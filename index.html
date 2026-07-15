@@ -8,6 +8,7 @@
     <meta property="og:title" content="Philosophy AI Education — 교육자를 위한 AI 연구 채널">
     <meta property="og:description" content="AI 사용법 너머의 질문을 함께 고민합니다. 학생에게 AI를 어떻게 가르칠지 고민하는 교육자를 위한 AI 연구 채널.">
     <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1206,8 +1207,8 @@
             grid.innerHTML = posts.map((p, idx) => `
                 <article class="post-card" data-board="${boardKey}" data-idx="${idx}">
                     <div class="post-photo">
-                        ${p.imageData
-                            ? `<img src="${p.imageData}" alt="${escapeHtml(p.title)}" loading="lazy">`
+                        ${safeImageData(p.imageData)
+                            ? `<img src="${escapeHtml(safeImageData(p.imageData))}" alt="${escapeHtml(p.title)}" loading="lazy">`
                             : `<span class="no-photo"><i class="fas fa-image"></i></span>`}
                     </div>
                     <div class="post-body">
@@ -1374,10 +1375,16 @@
             } catch { return ''; }
         }
 
+        // HTML/속성 컨텍스트 모두에서 안전하도록 따옴표까지 이스케이프
         function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text ?? '';
-            return div.innerHTML;
+            return String(text ?? '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // 게시물 이미지는 업로더가 생성하는 data:image/ 형식만 허용
+        function safeImageData(v) {
+            return (typeof v === 'string' && v.startsWith('data:image/')) ? v : '';
         }
 
         // ===== 글쓰기 모달 =====
@@ -1497,7 +1504,8 @@
             const p = boardCache[boardKey]?.[idx];
             if (!p) return;
             const img = document.getElementById('lightboxImg');
-            if (p.imageData) { img.src = p.imageData; img.style.display = 'block'; }
+            const imgData = safeImageData(p.imageData);
+            if (imgData) { img.src = imgData; img.style.display = 'block'; }
             else { img.style.display = 'none'; }
             document.getElementById('lightboxDate').textContent = formatDate(p.createdAt);
             document.getElementById('lightboxTitle').textContent = p.title || '';
@@ -1551,7 +1559,7 @@
             const tbody = `<tbody>${rows.map(r => `<tr>${cols.map(c => {
                 const v = r[c] == null ? '' : String(r[c]);
                 if (c === 'HMPG_ADRES' && v) {
-                    const href = v.startsWith('http') ? v : 'http://' + v;
+                    const href = /^https?:\/\//i.test(v) ? v : 'http://' + v.replace(/^[a-z][a-z0-9+.-]*:/i, '');
                     return `<td><a href="${escapeHtml(href)}" target="_blank" rel="noopener">바로가기</a></td>`;
                 }
                 return `<td>${escapeHtml(v)}</td>`;
@@ -1588,6 +1596,8 @@
         }
 
         function initSeoulEdu() {
+            // 서울 공공데이터 섹션이 페이지에 없으면 아무것도 하지 않음
+            if (!document.getElementById('seoulTableContainer')) return;
             const search = document.getElementById('seoulSearch');
             const refresh = document.getElementById('seoulRefresh');
             let t;
