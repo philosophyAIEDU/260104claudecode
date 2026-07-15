@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교육자 커뮤니티 — Philosophy AI Education</title>
+    <meta name="description" content="AI에 관심 있는 교육자들이 수업 사례와 질문, 자료를 나누는 커뮤니티 게시판입니다.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Firebase (모듈형) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        window.initializeApp = initializeApp;
+        window.getAuth = getAuth;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signInWithPopup = signInWithPopup;
+        window.GoogleAuthProvider = GoogleAuthProvider;
+        window.signOut = signOut;
+        window.getFirestore = getFirestore;
+        window.fsCollection = collection;
+        window.fsAddDoc = addDoc;
+        window.fsGetDocs = getDocs;
+        window.fsQuery = query;
+        window.fsOrderBy = orderBy;
+        window.fsLimit = limit;
+        window.fsDeleteDoc = deleteDoc;
+        window.fsDoc = doc;
+        window.fsServerTimestamp = serverTimestamp;
+        window.__firebaseReady = true;
+    </script>
+
+    <style>
+        :root {
+            --primary: #c8890f;
+            --primary-dark: #a06d08;
+            --accent: #f4b424;
+            --ink: #2b2317;
+            --text: #5a4f3c;
+            --text-soft: #8c7e66;
+            --line: #ece2cf;
+            --bg: #fffdf8;
+            --bg-soft: #fdf8ec;
+            --bg-tint: #f7eed9;
+            --shadow-sm: 0 1px 2px rgba(67, 47, 7, 0.06);
+            --shadow: 0 4px 12px -2px rgba(67, 47, 7, 0.12);
+            --shadow-lg: 0 18px 40px -12px rgba(67, 47, 7, 0.20);
+            --gradient: linear-gradient(135deg, #d99812 0%, #f4c430 100%);
+            --radius: 16px;
+            --radius-lg: 24px;
+            --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7; color: var(--text); background: var(--bg);
+            -webkit-font-smoothing: antialiased;
+        }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+        /* ===== Header ===== */
+        header {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--line);
+        }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 24px; max-width: 900px; margin: 0 auto; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 0.6rem; font-size: 1.05rem; font-weight: 800; color: var(--ink); letter-spacing: -0.4px; white-space: nowrap; }
+        .logo-mark {
+            width: 34px; height: 34px; border-radius: 10px; background: var(--gradient);
+            display: grid; place-items: center; color: #fff; font-size: 0.95rem; flex-shrink: 0;
+        }
+        .nav-right { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+        .login-btn, .user-chip {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.45rem 1rem; border-radius: 50px; font-weight: 600; font-size: 0.88rem;
+        }
+        .login-btn { background: var(--ink); color: #fff; cursor: pointer; border: none; font-family: inherit; }
+        .login-btn:hover { background: var(--primary); }
+        .user-chip { background: var(--bg-tint); color: var(--ink); max-width: 220px; }
+        .user-chip img { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; }
+        .user-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .logout-btn { border: none; background: none; color: var(--text-soft); cursor: pointer; font-size: 0.9rem; padding: 0.3rem; }
+        .logout-btn:hover { color: var(--primary); }
+
+        /* ===== Hero ===== */
+        .board-hero { padding: 110px 0 40px; background: var(--bg-soft); border-bottom: 1px solid var(--line); }
+        .board-hero .eyebrow {
+            display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 700;
+            color: var(--primary); background: var(--bg-tint); padding: 0.35rem 0.9rem; border-radius: 50px; margin-bottom: 0.9rem;
+        }
+        .board-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 800; color: var(--ink); letter-spacing: -0.8px; line-height: 1.25; }
+        .board-hero p { margin-top: 0.6rem; color: var(--text-soft); font-size: 1rem; }
+        .back-link { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1.1rem; font-size: 0.88rem; font-weight: 600; color: var(--text-soft); }
+        .back-link:hover { color: var(--primary); }
+
+        /* ===== Toolbar ===== */
+        .board-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.7rem; margin: 1.8rem 0 1.2rem; }
+        .cat-tabs { display: flex; flex-wrap: wrap; gap: 0.45rem; flex: 1; }
+        .cat-tab {
+            display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.42rem 0.95rem;
+            border: 1.5px solid var(--line); border-radius: 50px; background: #fff;
+            color: var(--text-soft); font-family: inherit; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition);
+        }
+        .cat-tab:hover { border-color: var(--primary); color: var(--primary); }
+        .cat-tab.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+        .board-search {
+            flex: 0 1 220px; min-width: 160px; padding: 0.55rem 0.9rem;
+            border: 1.5px solid var(--line); border-radius: 10px; font-family: inherit; font-size: 0.88rem;
+            background: #fff; color: var(--ink);
+        }
+        .board-search:focus { outline: none; border-color: var(--primary); }
+        .write-btn {
+            display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem;
+            border: none; border-radius: 10px; background: var(--gradient); color: #fff;
+            font-family: inherit; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+            box-shadow: var(--shadow-sm); transition: var(--transition);
+        }
+        .write-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+
+        /* ===== Post list ===== */
+        .board-main { padding-bottom: 80px; }
+        .post-list { display: flex; flex-direction: column; gap: 0.8rem; }
+        .b-post {
+            background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+            padding: 1.15rem 1.3rem; cursor: pointer; transition: var(--transition);
+        }
+        .b-post:hover { border-color: var(--primary); box-shadow: var(--shadow); transform: translateY(-2px); }
+        .b-post-top { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.35rem; flex-wrap: wrap; }
+        .b-cat {
+            font-size: 0.72rem; font-weight: 700; padding: 0.14rem 0.6rem; border-radius: 50px;
+            background: var(--bg-tint); color: var(--primary-dark);
+        }
+        .b-post h3 { font-size: 1.05rem; font-weight: 700; color: var(--ink); letter-spacing: -0.3px; flex: 1; min-width: 0; }
+        .b-preview {
+            color: var(--text-soft); font-size: 0.88rem; margin-bottom: 0.55rem;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .b-meta { display: flex; align-items: center; gap: 0.8rem; font-size: 0.79rem; color: var(--text-soft); }
+        .b-meta i { margin-right: 0.25rem; }
+        .board-empty {
+            text-align: center; padding: 4rem 1rem; color: var(--text-soft);
+            background: var(--bg-soft); border-radius: var(--radius); border: 1px dashed var(--line);
+        }
+        .board-empty i { font-size: 2rem; display: block; margin-bottom: 0.8rem; color: var(--accent); }
+
+        /* ===== Modals ===== */
+        .modal-backdrop {
+            display: none; position: fixed; inset: 0; z-index: 2000;
+            background: rgba(43, 35, 23, 0.55); backdrop-filter: blur(4px);
+            align-items: flex-start; justify-content: center; padding: 4.5rem 1rem 2rem; overflow-y: auto;
+        }
+        .modal-backdrop.open { display: flex; }
+        .modal-panel {
+            background: #fff; border-radius: var(--radius-lg); width: min(640px, 100%);
+            padding: 1.9rem; position: relative; box-shadow: var(--shadow-lg);
+        }
+        .modal-close {
+            position: absolute; top: 1rem; right: 1rem; width: 34px; height: 34px;
+            border: none; border-radius: 50%; background: var(--bg-tint); color: var(--text-soft);
+            cursor: pointer; font-size: 0.9rem;
+        }
+        .modal-close:hover { background: var(--line); color: var(--ink); }
+        .modal-panel h3 { font-size: 1.25rem; font-weight: 800; color: var(--ink); margin-bottom: 1.2rem; letter-spacing: -0.4px; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 600; font-size: 0.88rem; color: var(--ink); margin-bottom: 0.4rem; }
+        .form-group input[type="text"], .form-group textarea, .form-group select {
+            width: 100%; padding: 0.7rem 0.9rem; border: 1.5px solid var(--line); border-radius: 10px;
+            font-family: inherit; font-size: 0.93rem; color: var(--ink); background: #fff;
+        }
+        .form-group textarea { min-height: 160px; resize: vertical; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
+        .form-hint { font-size: 0.78rem; color: var(--text-soft); margin-top: 0.3rem; }
+        .form-error {
+            display: none; background: rgba(214, 69, 69, 0.08); color: #c0392b;
+            padding: 0.7rem 1rem; border-radius: 10px; font-size: 0.87rem; margin-bottom: 1rem;
+        }
+        .form-error.show { display: block; }
+        .modal-actions { display: flex; gap: 0.7rem; justify-content: flex-end; }
+        .btn-ghost {
+            padding: 0.65rem 1.3rem; border: 1.5px solid var(--line); border-radius: 10px;
+            background: #fff; color: var(--text); font-family: inherit; font-weight: 600; font-size: 0.9rem; cursor: pointer;
+        }
+        .btn-solid {
+            padding: 0.65rem 1.5rem; border: none; border-radius: 10px;
+            background: var(--gradient); color: #fff; font-family: inherit; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+        }
+        .btn-solid:disabled { opacity: 0.6; cursor: default; }
+
+        /* Detail modal */
+        .d-top { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+        .d-title { font-size: 1.3rem; font-weight: 800; color: var(--ink); letter-spacing: -0.4px; line-height: 1.35; margin-bottom: 0.4rem; padding-right: 2rem; }
+        .d-meta { font-size: 0.82rem; color: var(--text-soft); margin-bottom: 1.2rem; display: flex; gap: 0.9rem; flex-wrap: wrap; }
+        .d-content { color: var(--text); font-size: 0.95rem; white-space: pre-wrap; word-break: break-word; padding-bottom: 1.3rem; border-bottom: 1px solid var(--line); margin-bottom: 1.2rem; }
+        .d-del {
+            border: none; background: none; color: #c0392b; font-family: inherit; font-size: 0.8rem;
+            font-weight: 600; cursor: pointer; padding: 0.2rem 0.4rem;
+        }
+        .d-del:hover { text-decoration: underline; }
+        .comments-title { font-size: 0.95rem; font-weight: 700; color: var(--ink); margin-bottom: 0.8rem; }
+        .comment-list { display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 1.1rem; }
+        .comment {
+            background: var(--bg-soft); border-radius: 12px; padding: 0.75rem 0.95rem; font-size: 0.88rem;
+        }
+        .comment-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.2rem; }
+        .comment-head strong { font-size: 0.84rem; color: var(--ink); }
+        .comment-head time { font-size: 0.74rem; color: var(--text-soft); }
+        .comment-body { color: var(--text); white-space: pre-wrap; word-break: break-word; }
+        .comment-form { display: flex; gap: 0.6rem; }
+        .comment-form input {
+            flex: 1; padding: 0.65rem 0.9rem; border: 1.5px solid var(--line); border-radius: 10px;
+            font-family: inherit; font-size: 0.9rem;
+        }
+        .comment-form input:focus { outline: none; border-color: var(--primary); }
+        .comment-login-note { font-size: 0.85rem; color: var(--text-soft); background: var(--bg-tint); padding: 0.7rem 1rem; border-radius: 10px; }
+        .comment-login-note button { border: none; background: none; color: var(--primary); font-weight: 700; cursor: pointer; font-family: inherit; font-size: 0.85rem; }
+
+        /* ===== Footer ===== */
+        footer { border-top: 1px solid var(--line); padding: 1.6rem 0; text-align: center; font-size: 0.83rem; color: var(--text-soft); background: var(--bg-soft); }
+
+        .loading-note { text-align: center; padding: 3rem; color: var(--text-soft); }
+
+        @media (max-width: 620px) {
+            .board-toolbar { flex-direction: column; align-items: stretch; }
+            .board-search { flex: 1; }
+            .write-btn { justify-content: center; }
+            .logo span.logo-text { display: none; }
+            .modal-panel { padding: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">
+                <span class="logo-mark"><i class="fas fa-compass"></i></span>
+                <span class="logo-text">Philosophy AI Education</span>
+            </a>
+            <div class="nav-right">
+                <button class="login-btn" id="navLoginBtn"><i class="fab fa-google"></i> 로그인</button>
+                <div class="user-chip" id="navUserChip" style="display:none;">
+                    <img id="navUserAvatar" src="" alt="프로필">
+                    <span id="navUserName"></span>
+                    <button class="logout-btn" id="navLogoutBtn" title="로그아웃"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="board-hero">
+        <div class="container">
+            <span class="eyebrow"><i class="fas fa-users"></i> Community</span>
+            <h1>교육자 커뮤니티</h1>
+            <p>AI에 관심 있는 교육자들이 수업 사례와 질문, 자료를 나누는 공간입니다.
+                서로의 경험이 서로의 나침반이 됩니다.</p>
+            <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> 메인 페이지로</a>
+        </div>
+    </section>
+
+    <main class="board-main">
+        <div class="container">
+            <div class="board-toolbar">
+                <div class="cat-tabs" id="catTabs"></div>
+                <input type="search" class="board-search" id="boardSearch" placeholder="제목·내용 검색">
+                <button class="write-btn" id="writeBtn"><i class="fas fa-pen"></i> 글쓰기</button>
+            </div>
+            <div class="post-list" id="postList">
+                <div class="loading-note"><i class="fas fa-spinner fa-spin"></i> 게시글을 불러오는 중...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">&copy; 2026 Philosophy AI Education · AI 시대, 교육자의 나침반</div>
+    </footer>
+
+    <!-- 글쓰기 모달 -->
+    <div class="modal-backdrop" id="writeModal">
+        <div class="modal-panel">
+            <button class="modal-close" id="writeModalClose" aria-label="닫기"><i class="fas fa-times"></i></button>
+            <h3><i class="fas fa-pen-to-square"></i> 글쓰기</h3>
+            <form id="writeForm">
+                <div class="form-group">
+                    <label for="postCategory">분류</label>
+                    <select id="postCategory" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="postTitle">제목</label>
+                    <input type="text" id="postTitle" maxlength="120" placeholder="제목을 입력해 주세요 (2자 이상)" required>
+                </div>
+                <div class="form-group">
+                    <label for="postContent">내용</label>
+                    <textarea id="postContent" maxlength="5000" placeholder="수업 사례, 질문, 나누고 싶은 자료 등을 자유롭게 적어 주세요." required></textarea>
+                    <div class="form-hint">최대 5,000자 · 게시글은 모든 방문자에게 공개됩니다. 학생 개인정보는 적지 말아 주세요.</div>
+                </div>
+                <div class="form-error" id="writeError"></div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-ghost" id="writeCancelBtn">취소</button>
+                    <button type="submit" class="btn-solid" id="writeSubmitBtn">게시하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 상세보기 모달 -->
+    <div class="modal-backdrop" id="detailModal">
+        <div class="modal-panel">
+            <button class="modal-close" id="detailModalClose" aria-label="닫기"><i class="fas fa-times"></i></button>
+            <div id="detailBody"></div>
+            <div class="comments-title"><i class="fas fa-comments"></i> 댓글 <span id="commentCount"></span></div>
+            <div class="comment-list" id="commentList"></div>
+            <div id="commentFormWrap"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 설정 =====
+        const firebaseConfig = {
+            projectId: "philosophyaiedumain",
+            appId: "1:791707583638:web:b86d59d52a20330baaaeb7",
+            storageBucket: "philosophyaiedumain.firebasestorage.app",
+            apiKey: "AIzaSyBylDxamogm1_g2URVxGQFz_c05pOWqjEI",
+            authDomain: "philosophyaiedumain.firebaseapp.com",
+            messagingSenderId: "791707583638",
+            measurementId: "G-KWCY47PZWB"
+        };
+        const ADMIN_EMAIL = 'warmcomfortforyou@gmail.com';
+        const CATEGORIES = [
+            { id: '수업 사례', icon: 'fas fa-chalkboard-user' },
+            { id: '질문·고민', icon: 'fas fa-circle-question' },
+            { id: '자료 공유', icon: 'fas fa-folder-open' },
+            { id: '자유', icon: 'fas fa-mug-hot' },
+        ];
+
+        let auth = null, db = null;
+        let currentUser = null;
+        let isAdmin = false;
+        let posts = [];
+        let activeCategory = '전체';
+        let searchTerm = '';
+        let openPostId = null;
+
+        // ===== 헬퍼 =====
+        // HTML/속성 컨텍스트 모두에서 안전하도록 이스케이프
+        function esc(s) {
+            return String(s ?? '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        function fmtDate(ts) {
+            try {
+                const d = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+                if (!d) return '';
+                return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
+                    + ' ' + d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+            } catch { return ''; }
+        }
+        function catIcon(id) {
+            return (CATEGORIES.find(c => c.id === id) || { icon: 'fas fa-message' }).icon;
+        }
+        function canDelete(item) {
+            return isAdmin || (currentUser && item.authorUid === currentUser.uid);
+        }
+
+        // ===== 초기화 =====
+        function init() {
+            let attempts = 0;
+            const t = setInterval(() => {
+                if (window.__firebaseReady && window.initializeApp) {
+                    clearInterval(t);
+                    try {
+                        const app = window.initializeApp(firebaseConfig);
+                        auth = window.getAuth(app);
+                        db = window.getFirestore(app);
+                        window.onAuthStateChanged(auth, onAuth);
+                        loadPosts();
+                    } catch (e) {
+                        console.error('Firebase init 오류:', e);
+                        showListError();
+                    }
+                }
+                if (++attempts > 50) {
+                    clearInterval(t);
+                    showListError();
+                }
+            }, 100);
+            renderTabs();
+            setupUI();
+        }
+
+        function onAuth(user) {
+            currentUser = user || null;
+            isAdmin = !!user && user.email === ADMIN_EMAIL;
+            document.getElementById('navLoginBtn').style.display = user ? 'none' : 'inline-flex';
+            document.getElementById('navUserChip').style.display = user ? 'inline-flex' : 'none';
+            if (user) {
+                const avatar = document.getElementById('navUserAvatar');
+                avatar.src = (typeof user.photoURL === 'string' && /^https:\/\//i.test(user.photoURL))
+                    ? user.photoURL
+                    : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23d99812'/%3E%3Ccircle cx='16' cy='12' r='5.5' fill='%23fff'/%3E%3Cpath d='M5 30a11 8.5 0 0 1 22 0z' fill='%23fff'/%3E%3C/svg%3E";
+                document.getElementById('navUserName').textContent = user.displayName || (user.email || '').split('@')[0];
+            }
+            // 로그인 상태가 바뀌면 삭제 버튼/댓글 입력 표시가 달라지므로 다시 렌더
+            renderList();
+            if (openPostId) renderDetail(openPostId);
+        }
+
+        async function login() {
+            if (!auth) return;
+            try { await window.signInWithPopup(auth, new window.GoogleAuthProvider()); }
+            catch (e) { console.error('로그인 오류:', e); }
+        }
+
+        // ===== 게시글 =====
+        async function loadPosts() {
+            try {
+                const q = window.fsQuery(
+                    window.fsCollection(db, 'community_posts'),
+                    window.fsOrderBy('createdAt', 'desc'),
+                    window.fsLimit(100)
+                );
+                const snap = await window.fsGetDocs(q);
+                posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderTabs();
+                renderList();
+            } catch (e) {
+                console.error('게시글 로드 오류:', e);
+                showListError();
+            }
+        }
+
+        function showListError() {
+            document.getElementById('postList').innerHTML =
+                '<div class="board-empty"><i class="fas fa-triangle-exclamation"></i>게시글을 불러오지 못했습니다.<br>잠시 후 새로고침해 주세요.</div>';
+        }
+
+        function visiblePosts() {
+            let list = posts;
+            if (activeCategory !== '전체') list = list.filter(p => p.category === activeCategory);
+            if (searchTerm) {
+                const q = searchTerm.toLowerCase();
+                list = list.filter(p =>
+                    (p.title || '').toLowerCase().includes(q) ||
+                    (p.content || '').toLowerCase().includes(q) ||
+                    (p.authorName || '').toLowerCase().includes(q));
+            }
+            return list;
+        }
+
+        function renderTabs() {
+            const wrap = document.getElementById('catTabs');
+            const counts = {};
+            posts.forEach(p => { counts[p.category] = (counts[p.category] || 0) + 1; });
+            const items = [{ id: '전체', icon: 'fas fa-border-all', count: posts.length },
+                ...CATEGORIES.map(c => ({ ...c, count: counts[c.id] || 0 }))];
+            wrap.innerHTML = items.map(c => `
+                <button type="button" class="cat-tab${c.id === activeCategory ? ' active' : ''}" data-cat="${esc(c.id)}">
+                    <i class="${esc(c.icon)}"></i> ${esc(c.id)}${c.count ? ` (${c.count})` : ''}
+                </button>
+            `).join('');
+            wrap.querySelectorAll('.cat-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeCategory = btn.dataset.cat;
+                    renderTabs();
+                    renderList();
+                });
+            });
+        }
+
+        function renderList() {
+            const wrap = document.getElementById('postList');
+            const list = visiblePosts();
+            if (!posts.length) {
+                wrap.innerHTML = `
+                    <div class="board-empty">
+                        <i class="fas fa-seedling"></i>
+                        아직 게시글이 없습니다.<br>첫 번째 이야기를 남겨 주세요!
+                    </div>`;
+                return;
+            }
+            if (!list.length) {
+                wrap.innerHTML = '<div class="board-empty"><i class="fas fa-magnifying-glass"></i>조건에 맞는 게시글이 없습니다.</div>';
+                return;
+            }
+            wrap.innerHTML = list.map(p => `
+                <article class="b-post" data-id="${esc(p.id)}">
+                    <div class="b-post-top">
+                        <span class="b-cat"><i class="${esc(catIcon(p.category))}"></i> ${esc(p.category || '자유')}</span>
+                        <h3>${esc(p.title)}</h3>
+                    </div>
+                    <p class="b-preview">${esc(p.content || '')}</p>
+                    <div class="b-meta">
+                        <span><i class="fas fa-user"></i>${esc(p.authorName || '익명')}</span>
+                        <span><i class="fas fa-clock"></i>${esc(fmtDate(p.createdAt))}</span>
+                    </div>
+                </article>
+            `).join('');
+            wrap.querySelectorAll('.b-post').forEach(card => {
+                card.addEventListener('click', () => openDetail(card.dataset.id));
+            });
+        }
+
+        // ===== 글쓰기 =====
+        function setupUI() {
+            // 분류 셀렉트
+            document.getElementById('postCategory').innerHTML =
+                CATEGORIES.map(c => `<option value="${esc(c.id)}">${esc(c.id)}</option>`).join('');
+
+            document.getElementById('navLoginBtn').addEventListener('click', login);
+            document.getElementById('navLogoutBtn').addEventListener('click', async () => {
+                try { await window.signOut(auth); } catch (e) { console.error(e); }
+            });
+
+            document.getElementById('writeBtn').addEventListener('click', () => {
+                if (!currentUser) {
+                    if (confirm('글을 쓰려면 Google 로그인이 필요합니다. 로그인할까요?')) login();
+                    return;
+                }
+                document.getElementById('writeForm').reset();
+                hideWriteError();
+                openModal('writeModal');
+            });
+            document.getElementById('writeModalClose').addEventListener('click', () => closeModal('writeModal'));
+            document.getElementById('writeCancelBtn').addEventListener('click', () => closeModal('writeModal'));
+            document.getElementById('writeForm').addEventListener('submit', submitPost);
+
+            document.getElementById('detailModalClose').addEventListener('click', () => closeModal('detailModal'));
+            ['writeModal', 'detailModal'].forEach(id => {
+                document.getElementById(id).addEventListener('click', (e) => {
+                    if (e.target.id === id) closeModal(id);
+                });
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') { closeModal('writeModal'); closeModal('detailModal'); }
+            });
+
+            let st;
+            document.getElementById('boardSearch').addEventListener('input', (e) => {
+                clearTimeout(st);
+                st = setTimeout(() => { searchTerm = e.target.value.trim(); renderList(); }, 200);
+            });
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+            if (!document.querySelector('.modal-backdrop.open')) document.body.style.overflow = '';
+            if (id === 'detailModal') openPostId = null;
+        }
+        function showWriteError(msg) {
+            const el = document.getElementById('writeError');
+            el.textContent = msg; el.classList.add('show');
+        }
+        function hideWriteError() { document.getElementById('writeError').classList.remove('show'); }
+
+        async function submitPost(e) {
+            e.preventDefault();
+            if (!currentUser) { showWriteError('로그인이 필요합니다.'); return; }
+            const category = document.getElementById('postCategory').value;
+            const title = document.getElementById('postTitle').value.trim();
+            const content = document.getElementById('postContent').value.trim();
+            if (title.length < 2) { showWriteError('제목을 2자 이상 입력해 주세요.'); return; }
+            if (!content) { showWriteError('내용을 입력해 주세요.'); return; }
+
+            const btn = document.getElementById('writeSubmitBtn');
+            btn.disabled = true; btn.textContent = '게시 중...';
+            try {
+                await window.fsAddDoc(window.fsCollection(db, 'community_posts'), {
+                    category, title, content,
+                    authorUid: currentUser.uid,
+                    authorName: currentUser.displayName || (currentUser.email || '').split('@')[0] || '교육자',
+                    createdAt: window.fsServerTimestamp(),
+                });
+                closeModal('writeModal');
+                await loadPosts();
+            } catch (err) {
+                console.error('게시 오류:', err);
+                showWriteError('게시 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+            } finally {
+                btn.disabled = false; btn.textContent = '게시하기';
+            }
+        }
+
+        // ===== 상세보기 + 댓글 =====
+        function openDetail(id) {
+            openPostId = id;
+            renderDetail(id);
+            openModal('detailModal');
+            loadComments(id);
+        }
+
+        function renderDetail(id) {
+            const p = posts.find(x => x.id === id);
+            if (!p) return;
+            document.getElementById('detailBody').innerHTML = `
+                <div class="d-top">
+                    <span class="b-cat"><i class="${esc(catIcon(p.category))}"></i> ${esc(p.category || '자유')}</span>
+                    ${canDelete(p) ? `<button class="d-del" id="postDelBtn"><i class="fas fa-trash-can"></i> 글 삭제</button>` : ''}
+                </div>
+                <div class="d-title">${esc(p.title)}</div>
+                <div class="d-meta">
+                    <span><i class="fas fa-user"></i> ${esc(p.authorName || '익명')}</span>
+                    <span><i class="fas fa-clock"></i> ${esc(fmtDate(p.createdAt))}</span>
+                </div>
+                <div class="d-content">${esc(p.content || '')}</div>
+            `;
+            document.getElementById('postDelBtn')?.addEventListener('click', async () => {
+                if (!confirm('이 게시글을 삭제하시겠습니까?')) return;
+                try {
+                    await window.fsDeleteDoc(window.fsDoc(db, 'community_posts', id));
+                    closeModal('detailModal');
+                    await loadPosts();
+                } catch (err) {
+                    console.error('삭제 오류:', err);
+                    alert('삭제 중 오류가 발생했습니다.');
+                }
+            });
+            renderCommentForm(id);
+        }
+
+        async function loadComments(postId) {
+            const wrap = document.getElementById('commentList');
+            wrap.innerHTML = '<div style="color:var(--text-soft);font-size:0.85rem;"><i class="fas fa-spinner fa-spin"></i> 댓글을 불러오는 중...</div>';
+            try {
+                const q = window.fsQuery(
+                    window.fsCollection(db, 'community_posts', postId, 'comments'),
+                    window.fsOrderBy('createdAt', 'asc'),
+                    window.fsLimit(200)
+                );
+                const snap = await window.fsGetDocs(q);
+                const comments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                document.getElementById('commentCount').textContent = comments.length ? `(${comments.length})` : '';
+                if (!comments.length) {
+                    wrap.innerHTML = '<div style="color:var(--text-soft);font-size:0.85rem;">첫 댓글을 남겨 보세요.</div>';
+                    return;
+                }
+                wrap.innerHTML = comments.map(c => `
+                    <div class="comment">
+                        <div class="comment-head">
+                            <strong>${esc(c.authorName || '익명')}</strong>
+                            <time>${esc(fmtDate(c.createdAt))}</time>
+                            ${canDelete(c) ? `<button class="d-del" data-cid="${esc(c.id)}"><i class="fas fa-trash-can"></i></button>` : ''}
+                        </div>
+                        <div class="comment-body">${esc(c.content || '')}</div>
+                    </div>
+                `).join('');
+                wrap.querySelectorAll('.d-del[data-cid]').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        if (!confirm('이 댓글을 삭제하시겠습니까?')) return;
+                        try {
+                            await window.fsDeleteDoc(window.fsDoc(db, 'community_posts', postId, 'comments', btn.dataset.cid));
+                            loadComments(postId);
+                        } catch (err) {
+                            console.error('댓글 삭제 오류:', err);
+                            alert('삭제 중 오류가 발생했습니다.');
+                        }
+                    });
+                });
+            } catch (e) {
+                console.error('댓글 로드 오류:', e);
+                wrap.innerHTML = '<div style="color:var(--text-soft);font-size:0.85rem;">댓글을 불러오지 못했습니다.</div>';
+            }
+        }
+
+        function renderCommentForm(postId) {
+            const wrap = document.getElementById('commentFormWrap');
+            if (!currentUser) {
+                wrap.innerHTML = `<div class="comment-login-note">댓글을 쓰려면 <button type="button" id="commentLoginBtn">Google 로그인</button>이 필요합니다.</div>`;
+                document.getElementById('commentLoginBtn')?.addEventListener('click', login);
+                return;
+            }
+            wrap.innerHTML = `
+                <form class="comment-form" id="commentForm">
+                    <input type="text" id="commentInput" maxlength="2000" placeholder="따뜻한 댓글을 남겨 주세요" autocomplete="off">
+                    <button type="submit" class="btn-solid">등록</button>
+                </form>
+            `;
+            document.getElementById('commentForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const input = document.getElementById('commentInput');
+                const content = input.value.trim();
+                if (!content) return;
+                const btn = e.target.querySelector('button');
+                btn.disabled = true;
+                try {
+                    await window.fsAddDoc(window.fsCollection(db, 'community_posts', postId, 'comments'), {
+                        content,
+                        authorUid: currentUser.uid,
+                        authorName: currentUser.displayName || (currentUser.email || '').split('@')[0] || '교육자',
+                        createdAt: window.fsServerTimestamp(),
+                    });
+                    input.value = '';
+                    loadComments(postId);
+                } catch (err) {
+                    console.error('댓글 등록 오류:', err);
+                    alert('댓글 등록 중 오류가 발생했습니다.');
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
