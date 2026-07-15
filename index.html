@@ -246,21 +246,43 @@
 
         /* ===== Educator Tools ===== */
         .tools { background: var(--bg-soft); }
-        .tools-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+        .tools-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin-bottom: 2rem; }
+        .tools-tab {
+            display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 1.05rem;
+            border: 1.5px solid var(--line); border-radius: 50px; background: #fff;
+            color: var(--text-soft); font-family: inherit; font-size: 0.88rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition);
+        }
+        .tools-tab:hover { border-color: var(--primary); color: var(--primary); }
+        .tools-tab.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+        .tools-tab .cnt {
+            font-size: 0.72rem; font-weight: 700; background: var(--bg-tint); color: var(--text-soft);
+            border-radius: 50px; padding: 0.08rem 0.5rem;
+        }
+        .tools-tab.active .cnt { background: rgba(255, 255, 255, 0.18); color: #fff; }
+        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
+        .tool-cat-head {
+            grid-column: 1 / -1; display: flex; align-items: center; gap: 0.6rem;
+            margin: 1.1rem 0 0.1rem; font-size: 1rem; font-weight: 800; color: var(--ink); letter-spacing: -0.3px;
+        }
+        .tool-cat-head:first-child { margin-top: 0; }
+        .tool-cat-head i { color: var(--primary); font-size: 0.92rem; }
+        .tool-cat-head .cnt { font-size: 0.78rem; font-weight: 600; color: var(--text-soft); }
+        .tool-cat-head .line { flex: 1; height: 1px; background: var(--line); }
         .tool-card {
             position: relative; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg);
-            padding: 2.2rem; display: flex; flex-direction: column; overflow: hidden; transition: var(--transition);
+            padding: 1.25rem 1.35rem; display: flex; flex-direction: column; overflow: hidden; transition: var(--transition);
         }
         .tool-card::before {
             content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--gradient);
             opacity: 0; transition: var(--transition);
         }
-        .tool-card:hover { transform: translateY(-6px); border-color: transparent; box-shadow: var(--shadow-lg); }
+        .tool-card:hover { transform: translateY(-4px); border-color: transparent; box-shadow: var(--shadow-lg); }
         .tool-card:hover::before { opacity: 1; }
-        .tool-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.4rem; }
+        .tool-top { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.85rem; }
         .tool-icon {
-            width: 60px; height: 60px; border-radius: 16px; display: grid; place-items: center;
-            font-size: 1.5rem; color: #fff; box-shadow: var(--shadow);
+            width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+            font-size: 1.1rem; color: #fff; box-shadow: var(--shadow); flex-shrink: 0;
         }
         .tool-icon.c1 { background: linear-gradient(135deg, #b8730a, #e0951c); }
         .tool-icon.c2 { background: linear-gradient(135deg, #d99812, #f4c430); }
@@ -268,18 +290,21 @@
         .tool-icon.c4 { background: linear-gradient(135deg, #a66f08, #d99812); }
         .tool-icon.c5 { background: linear-gradient(135deg, #0a6b4b, #1ca878); }
         .tool-icon.c6 { background: linear-gradient(135deg, #1a4fa0, #3b7de0); }
-        .tool-num { font-size: 2.6rem; font-weight: 800; color: var(--bg-tint); line-height: 1; letter-spacing: -2px; }
-        .tool-card h3 { font-size: 1.35rem; font-weight: 800; color: var(--ink); margin-bottom: 0.3rem; letter-spacing: -0.4px; }
-        .tool-tagline { font-size: 0.92rem; font-weight: 600; color: var(--primary); margin-bottom: 0.9rem; }
-        .tool-card p { color: var(--text-soft); font-size: 0.97rem; flex: 1; margin-bottom: 1.5rem; }
-        .tool-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.6rem; }
-        .tool-tags span { font-size: 0.78rem; font-weight: 600; color: var(--text-soft); background: var(--bg-tint); padding: 0.3rem 0.75rem; border-radius: 50px; }
-        .tool-link {
-            display: inline-flex; align-items: center; justify-content: center; gap: 0.55rem;
-            background: var(--ink); color: #fff; font-weight: 600; font-size: 0.95rem;
-            padding: 0.8rem 1.4rem; border-radius: 12px; transition: var(--transition); margin-top: auto;
+        .tool-head { min-width: 0; }
+        .tool-card h3 { font-size: 1.02rem; font-weight: 800; color: var(--ink); margin-bottom: 0.15rem; letter-spacing: -0.3px; }
+        .tool-tagline { font-size: 0.82rem; font-weight: 600; color: var(--primary); }
+        .tool-card p {
+            color: var(--text-soft); font-size: 0.87rem; flex: 1; margin-bottom: 0.9rem;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
-        .tool-link:hover { background: var(--primary); gap: 0.85rem; }
+        .tool-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+        .tool-tags span { font-size: 0.72rem; font-weight: 600; color: var(--text-soft); background: var(--bg-tint); padding: 0.22rem 0.6rem; border-radius: 50px; }
+        .tool-link {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            background: var(--ink); color: #fff; font-weight: 600; font-size: 0.85rem;
+            padding: 0.55rem 1rem; border-radius: 10px; transition: var(--transition); margin-top: auto;
+        }
+        .tool-link:hover { background: var(--primary); gap: 0.8rem; }
 
         /* ===== Photo Galleries (봉사단 소식 / 교육 사진) ===== */
         .gallery-section.alt { background: var(--bg-soft); }
@@ -436,6 +461,7 @@
         .footer-col h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 1rem; }
         .footer-col a { display: block; font-size: 0.92rem; color: #cbd5e1; padding: 0.3rem 0; transition: var(--transition); }
         .footer-col a:hover { color: #fff; }
+        .footer-col .footer-links-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2rem; }
         .footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; padding-top: 1.6rem; font-size: 0.85rem; color: #94a3b8; }
 
         /* ===== Reveal animation ===== */
@@ -447,7 +473,7 @@
             .hero-layout { grid-template-columns: 1fr; gap: 2rem; }
             .hero-figure { order: -1; }
             .hero-figure img { max-width: 230px; }
-            .tools-grid { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
             .gallery-grid { grid-template-columns: 1fr 1fr; }
             .contact-wrap { grid-template-columns: 1fr; gap: 2.5rem; }
             .community-inner { padding: 2.6rem; }
@@ -469,6 +495,7 @@
             .section-pad { padding: 70px 0; }
             .hero { padding: 130px 0 70px; }
             .hero-stats { gap: 1.8rem; }
+            .tools-grid { grid-template-columns: 1fr; }
             .gallery-grid { grid-template-columns: 1fr; }
             .community { padding: 70px 0; }
         }
@@ -597,7 +624,7 @@
                         <a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener" class="btn btn-naver">☕ 필로소피 AI 교육 네이버 카페</a>
                     </div>
                     <div class="hero-stats">
-                        <div class="hero-stat"><div class="num"><span>4</span>+</div><div class="label">직접 만든 학습 도구</div></div>
+                        <div class="hero-stat"><div class="num"><span>18</span>+</div><div class="label">직접 만든 학습 도구</div></div>
                         <div class="hero-stat"><div class="num"><span>100%</span></div><div class="label">교육 현장 중심</div></div>
                         <div class="hero-stat"><div class="num"><span>무료</span></div><div class="label">누구나 바로 사용</div></div>
                     </div>
@@ -620,6 +647,8 @@
                 <p class="section-sub">교육 현장의 고민에서 출발해 직접 만든 AI 학습 도구입니다.
                     회원 가입 없이 클릭 한 번으로 수업과 학습에 바로 활용해 보세요.</p>
             </div>
+
+            <div class="tools-tabs reveal" id="toolsTabs" role="tablist" aria-label="AI 툴 분류"></div>
 
             <div class="tools-grid" id="toolsGrid">
                 <div class="tools-loading" style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-soft);">
@@ -776,14 +805,26 @@
                 <div class="footer-cols">
                     <div class="footer-col">
                         <h4>AI 툴</h4>
-                        <a href="https://philoedu.netlify.app" target="_blank" rel="noopener">논문 학습 노트</a>
-                        <a href="https://philofable5.netlify.app" target="_blank" rel="noopener">사고력 코치</a>
-                        <a href="https://philoenglishdictionary.netlify.app" target="_blank" rel="noopener">영어 사전</a>
-                        <a href="https://philoalphafold.netlify.app" target="_blank" rel="noopener">알파폴드 학습 도우미</a>
-                        <a href="https://philohistory.netlify.app" target="_blank" rel="noopener">단종 이야기</a>
-                        <a href="https://philodiscussion.netlify.app/" target="_blank" rel="noopener">AI 토론 메이트</a>
-                        <a href="https://philoreading.netlify.app/" target="_blank" rel="noopener">AI 독서 코치</a>
-                        <a href="https://philophysics1.netlify.app/" target="_blank" rel="noopener">AI 뉴턴 역학 학습 도우미</a>
+                        <div class="footer-links-cols">
+                            <a href="https://philoenglishdictionary.netlify.app" target="_blank" rel="noopener">영어 사전</a>
+                            <a href="https://philoreading.netlify.app/" target="_blank" rel="noopener">AI 독서 코치</a>
+                            <a href="https://philolang.netlify.app/" target="_blank" rel="noopener">문장나무</a>
+                            <a href="https://philomath77.netlify.app" target="_blank" rel="noopener">미분적분 학습 도우미</a>
+                            <a href="https://philophysics1.netlify.app/" target="_blank" rel="noopener">AI 뉴턴 역학 학습 도우미</a>
+                            <a href="https://philophysics2.netlify.app/" target="_blank" rel="noopener">역학 물리 샌드박스</a>
+                            <a href="https://philoalphafold.netlify.app" target="_blank" rel="noopener">알파폴드 학습 도우미</a>
+                            <a href="https://philoanatomy.netlify.app/" target="_blank" rel="noopener">신체 해부 레이어 뷰어</a>
+                            <a href="https://philoatom.netlify.app/" target="_blank" rel="noopener">원소 배틀 아레나</a>
+                            <a href="https://philoearth.netlify.app/" target="_blank" rel="noopener">지구 속 탐험대</a>
+                            <a href="https://philoeco.netlify.app/" target="_blank" rel="noopener">먹이사슬 라이브</a>
+                            <a href="https://philoedu.netlify.app" target="_blank" rel="noopener">논문 학습 노트</a>
+                            <a href="https://philofable5.netlify.app" target="_blank" rel="noopener">사고력 코치</a>
+                            <a href="https://philodiscussion.netlify.app/" target="_blank" rel="noopener">AI 토론 메이트</a>
+                            <a href="https://philohistory.netlify.app" target="_blank" rel="noopener">단종 이야기</a>
+                            <a href="https://philocareer.netlify.app/" target="_blank" rel="noopener">AI 커리어 코치</a>
+                            <a href="https://philoailab.netlify.app/" target="_blank" rel="noopener">AI 확률 프롬프트 실험실</a>
+                            <a href="https://philogo1.netlify.app/" target="_blank" rel="noopener">바둑·장기·체스 게임</a>
+                        </div>
                     </div>
                     <div class="footer-col">
                         <h4>둘러보기</h4>
@@ -1020,7 +1061,13 @@
                         showBoardError('education');
                     }
                 }
-                if (++attempts > 50) clearInterval(t);
+                if (++attempts > 50) {
+                    clearInterval(t);
+                    // Firebase 로드 실패 시에도 기본 AI 툴 목록은 표시
+                    allTools = DEFAULT_TOOLS;
+                    renderToolsTabs();
+                    renderAITools();
+                }
             }, 100);
         }
 
@@ -1191,54 +1238,128 @@
         }
 
         // ===== AI 툴 동적 로드 =====
+        const TOOL_CATEGORIES = [
+            { id: '언어·독서', icon: 'fas fa-book-open' },
+            { id: '수학·물리', icon: 'fas fa-square-root-variable' },
+            { id: '과학·자연', icon: 'fas fa-flask' },
+            { id: '인문·사고력', icon: 'fas fa-landmark' },
+            { id: '진로·AI·게임', icon: 'fas fa-gamepad' },
+        ];
+        const ETC_CATEGORY = { id: '기타', icon: 'fas fa-shapes' };
+
         const DEFAULT_TOOLS = [
-            { name: '논문 학습 노트', tagline: '어려운 논문을 쉽게 읽고 정리', description: 'AI의 도움으로 논문의 핵심을 파악하고 나만의 학습 노트로 정리합니다. 탐구 수업과 자기주도 학습 자료 제작에 좋은 출발점이 됩니다.', tags: ['논문 읽기', '요약·정리', '탐구 학습'], url: 'https://philoedu.netlify.app', icon: 'fas fa-file-lines', order: 1 },
-            { name: '사고력 코치', tagline: '질문으로 생각을 키우는 AI 코치', description: '정답을 알려주는 대신 좋은 질문을 던지는 코치입니다. 학생 스스로 사고를 확장하도록 돕는 토론·글쓰기·논술 수업의 든든한 파트너입니다.', tags: ['비판적 사고', '질문 기반', '토론·논술'], url: 'https://philofable5.netlify.app', icon: 'fas fa-lightbulb', order: 2 },
-            { name: '영어 사전', tagline: '맥락으로 익히는 똑똑한 영어 사전', description: '단어의 뜻만이 아니라 예문과 쓰임, 뉘앙스까지 함께 보여 줍니다. 영어 수업과 어휘 학습, 독해 지도에 바로 활용할 수 있습니다.', tags: ['영어 어휘', '예문·뉘앙스', '독해 지도'], url: 'https://philoenglishdictionary.netlify.app', icon: 'fas fa-book-open', order: 3 },
-            { name: '알파폴드 학습 도우미', tagline: 'AI 과학을 직접 배우는 도우미', description: "단백질 구조 예측 AI '알파폴드'를 학생 눈높이로 풀어 줍니다. 과학·생명·AI 융합 수업에서 첨단 기술을 친근하게 소개할 수 있습니다.", tags: ['생명과학', 'AI 융합', '탐구 활동'], url: 'https://philoalphafold.netlify.app', icon: 'fas fa-dna', order: 4 },
-            { name: '미분적분 학습 도우미', tagline: 'AI와 함께하는 미분·적분 완전 정복', description: '미분과 적분의 개념부터 풀이 과정까지 AI가 단계별로 안내합니다. 수학 수업의 보충·심화 자료로, 개념 이해부터 문제 풀이까지 폭넓게 활용할 수 있습니다.', tags: ['미분·적분', '수학', '개념 학습'], url: 'https://philomath77.netlify.app', icon: 'fas fa-square-root-variable', order: 5 },
-            { name: '단종 이야기', tagline: 'AI와 함께하는 역사 학습', description: '조선 단종의 이야기를 통해 역사를 생동감 있게 배웁니다. AI를 활용해 역사적 맥락과 인물을 깊이 이해하는 역사 수업의 훌륭한 보조 도구입니다.', tags: ['한국사', '역사 학습', '스토리텔링'], url: 'https://philohistory.netlify.app', icon: 'fas fa-landmark', order: 6 },
-            { name: 'AI 토론 메이트', tagline: '함께 토론하며 생각을 넓히는 AI', description: 'AI와 주제를 두고 토론하며 다양한 관점을 경험합니다. 토론 수업 준비와 논제 탐구에 활용하기 좋은 도구입니다.', tags: ['토론', '논제 탐구', '다양한 관점'], url: 'https://philodiscussion.netlify.app/', icon: 'fas fa-comments', order: 7 },
-            { name: 'AI 독서 코치', tagline: '책 읽기를 도와주는 AI 코치', description: '책을 읽는 과정에서 질문과 안내를 통해 이해를 돕는 코치입니다. 독서 수업과 자기주도 독서 활동에 활용할 수 있습니다.', tags: ['독서', '읽기 지도', '자기주도 학습'], url: 'https://philoreading.netlify.app/', icon: 'fas fa-book-reader', order: 8 },
-            { name: 'AI 뉴턴 역학 학습 도우미', tagline: 'AI와 함께 배우는 뉴턴 역학', description: '뉴턴의 운동 법칙과 역학 개념을 AI가 단계별로 안내합니다. 물리 수업의 개념 이해와 문제 풀이에 도움을 줍니다.', tags: ['물리', '뉴턴 역학', '개념 학습'], url: 'https://philophysics1.netlify.app/', icon: 'fas fa-atom', order: 9 },
+            { name: '영어 사전', category: '언어·독서', tagline: '맥락으로 익히는 똑똑한 영어 사전', description: '단어의 뜻만이 아니라 예문과 쓰임, 뉘앙스까지 함께 보여 줍니다. 영어 수업과 어휘 학습, 독해 지도에 바로 활용할 수 있습니다.', tags: ['영어 어휘', '예문·뉘앙스', '독해 지도'], url: 'https://philoenglishdictionary.netlify.app', icon: 'fas fa-book-open', order: 1 },
+            { name: 'AI 독서 코치', category: '언어·독서', tagline: '책 읽기를 도와주는 AI 코치', description: '책을 읽는 과정에서 질문과 안내를 통해 이해를 돕는 코치입니다. 독서 수업과 자기주도 독서 활동에 활용할 수 있습니다.', tags: ['독서', '읽기 지도', '자기주도 학습'], url: 'https://philoreading.netlify.app/', icon: 'fas fa-book-reader', order: 2 },
+            { name: '문장나무', category: '언어·독서', tagline: '문장 구조를 나무처럼 분석하는 학습 앱', description: '문장을 성분별로 나누어 나무 구조로 시각화하며 익힙니다. 국어·영어 문법 수업에서 문장 구조 이해를 돕는 학습 도구입니다.', tags: ['문장 분석', '문법', '언어 학습'], url: 'https://philolang.netlify.app/', icon: 'fas fa-tree', order: 3 },
+            { name: '미분적분 학습 도우미', category: '수학·물리', tagline: 'AI와 함께하는 미분·적분 완전 정복', description: '미분과 적분의 개념부터 풀이 과정까지 AI가 단계별로 안내합니다. 수학 수업의 보충·심화 자료로, 개념 이해부터 문제 풀이까지 폭넓게 활용할 수 있습니다.', tags: ['미분·적분', '수학', '개념 학습'], url: 'https://philomath77.netlify.app', icon: 'fas fa-square-root-variable', order: 4 },
+            { name: 'AI 뉴턴 역학 학습 도우미', category: '수학·물리', tagline: 'AI와 함께 배우는 뉴턴 역학', description: '뉴턴의 운동 법칙과 역학 개념을 AI가 단계별로 안내합니다. 물리 수업의 개념 이해와 문제 풀이에 도움을 줍니다.', tags: ['물리', '뉴턴 역학', '개념 학습'], url: 'https://philophysics1.netlify.app/', icon: 'fas fa-atom', order: 5 },
+            { name: '역학 물리 샌드박스', category: '수학·물리', tagline: '직접 조작하며 배우는 역학 시뮬레이션', description: '힘과 운동을 자유롭게 조작하며 실험하는 물리 샌드박스입니다. 역학 개념을 눈으로 확인하는 물리 탐구 수업에 활용해 보세요.', tags: ['물리', '시뮬레이션', '탐구 실험'], url: 'https://philophysics2.netlify.app/', icon: 'fas fa-cubes', order: 6 },
+            { name: '알파폴드 학습 도우미', category: '과학·자연', tagline: 'AI 과학을 직접 배우는 도우미', description: "단백질 구조 예측 AI '알파폴드'를 학생 눈높이로 풀어 줍니다. 과학·생명·AI 융합 수업에서 첨단 기술을 친근하게 소개할 수 있습니다.", tags: ['생명과학', 'AI 융합', '탐구 활동'], url: 'https://philoalphafold.netlify.app', icon: 'fas fa-dna', order: 7 },
+            { name: '신체 해부 레이어 뷰어', category: '과학·자연', tagline: '층층이 살펴보는 우리 몸의 구조', description: '피부부터 뼈까지 인체를 레이어별로 살펴봅니다. 생명과학 수업에서 신체 구조를 직관적으로 이해하도록 돕습니다.', tags: ['인체 구조', '생명과학', '시각 학습'], url: 'https://philoanatomy.netlify.app/', icon: 'fas fa-heart-pulse', order: 8 },
+            { name: '원소 배틀 아레나', category: '과학·자연', tagline: '배틀 게임으로 익히는 주기율표', description: '원소들의 성질을 카드 배틀로 겨루며 주기율표를 익힙니다. 화학 수업에서 원소 학습을 게임처럼 즐길 수 있습니다.', tags: ['주기율표', '화학', '게임 학습'], url: 'https://philoatom.netlify.app/', icon: 'fas fa-vial', order: 9 },
+            { name: '지구 속 탐험대', category: '과학·자연', tagline: '지구 내부를 층별로 탐험하는 여행', description: '지각부터 내핵까지 지구 내부 구조를 탐험하듯 배웁니다. 지구과학 수업에서 지구의 층상 구조를 생생하게 전달합니다.', tags: ['지구과학', '지구 내부', '탐험 학습'], url: 'https://philoearth.netlify.app/', icon: 'fas fa-earth-asia', order: 10 },
+            { name: '먹이사슬 라이브', category: '과학·자연', tagline: '살아 움직이는 생태계 먹이사슬', description: '생산자부터 최상위 포식자까지 먹이사슬을 시뮬레이션으로 관찰합니다. 생태계와 환경 수업에 활용하기 좋은 도구입니다.', tags: ['생태계', '먹이사슬', '환경 교육'], url: 'https://philoeco.netlify.app/', icon: 'fas fa-leaf', order: 11 },
+            { name: '논문 학습 노트', category: '인문·사고력', tagline: '어려운 논문을 쉽게 읽고 정리', description: 'AI의 도움으로 논문의 핵심을 파악하고 나만의 학습 노트로 정리합니다. 탐구 수업과 자기주도 학습 자료 제작에 좋은 출발점이 됩니다.', tags: ['논문 읽기', '요약·정리', '탐구 학습'], url: 'https://philoedu.netlify.app', icon: 'fas fa-file-lines', order: 12 },
+            { name: '사고력 코치', category: '인문·사고력', tagline: '질문으로 생각을 키우는 AI 코치', description: '정답을 알려주는 대신 좋은 질문을 던지는 코치입니다. 학생 스스로 사고를 확장하도록 돕는 토론·글쓰기·논술 수업의 든든한 파트너입니다.', tags: ['비판적 사고', '질문 기반', '토론·논술'], url: 'https://philofable5.netlify.app', icon: 'fas fa-lightbulb', order: 13 },
+            { name: 'AI 토론 메이트', category: '인문·사고력', tagline: '함께 토론하며 생각을 넓히는 AI', description: 'AI와 주제를 두고 토론하며 다양한 관점을 경험합니다. 토론 수업 준비와 논제 탐구에 활용하기 좋은 도구입니다.', tags: ['토론', '논제 탐구', '다양한 관점'], url: 'https://philodiscussion.netlify.app/', icon: 'fas fa-comments', order: 14 },
+            { name: '단종 이야기', category: '인문·사고력', tagline: 'AI와 함께하는 역사 학습', description: '조선 단종의 이야기를 통해 역사를 생동감 있게 배웁니다. AI를 활용해 역사적 맥락과 인물을 깊이 이해하는 역사 수업의 훌륭한 보조 도구입니다.', tags: ['한국사', '역사 학습', '스토리텔링'], url: 'https://philohistory.netlify.app', icon: 'fas fa-landmark', order: 15 },
+            { name: 'AI 커리어 코치', category: '진로·AI·게임', tagline: 'AI와 함께하는 커리어 상담', description: '적성과 관심사를 바탕으로 AI와 대화하며 진로를 탐색합니다. 진로 상담과 자기 이해 활동에 활용할 수 있습니다.', tags: ['진로 탐색', '커리어 상담', '자기 이해'], url: 'https://philocareer.netlify.app/', icon: 'fas fa-compass', order: 16 },
+            { name: 'AI 확률 프롬프트 실험실', category: '진로·AI·게임', tagline: '실험으로 이해하는 AI의 작동 원리', description: 'AI가 확률적으로 답을 만들어 내는 원리를 프롬프트 실험으로 체험합니다. AI 리터러시 교육의 실습 도구로 활용할 수 있습니다.', tags: ['AI 리터러시', '확률', '프롬프트'], url: 'https://philoailab.netlify.app/', icon: 'fas fa-flask-vial', order: 17 },
+            { name: '바둑·장기·체스 게임', category: '진로·AI·게임', tagline: 'AI와 함께 두는 전략 보드게임', description: '바둑, 장기, 체스를 한곳에서 즐기며 전략적 사고를 기릅니다. 두뇌 활동과 전략적 사고력 훈련에 좋은 게임 도구입니다.', tags: ['보드게임', '전략적 사고', '두뇌 훈련'], url: 'https://philogo1.netlify.app/', icon: 'fas fa-chess', order: 18 },
         ];
 
         const ICON_COLORS = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'];
+        let allTools = [];
+        let activeToolCategory = '전체';
+
+        function getToolCategory(t) {
+            return TOOL_CATEGORIES.some(c => c.id === t.category) ? t.category : ETC_CATEGORY.id;
+        }
 
         async function loadAITools() {
-            const grid = document.getElementById('toolsGrid');
             try {
                 const q = window.fsQuery(window.fsCollection(db, 'ai_tools'), window.fsOrderBy('order', 'asc'));
                 const snap = await window.fsGetDocs(q);
                 const tools = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                renderAITools(tools.length ? tools : DEFAULT_TOOLS);
+                allTools = tools.length ? tools : DEFAULT_TOOLS;
             } catch (e) {
                 console.error('AI 툴 로드 오류:', e);
-                renderAITools(DEFAULT_TOOLS);
+                allTools = DEFAULT_TOOLS;
             }
+            renderToolsTabs();
+            renderAITools();
         }
 
-        function renderAITools(tools) {
-            const grid = document.getElementById('toolsGrid');
-            if (!tools.length) {
-                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-soft);">등록된 AI 툴이 없습니다.</div>';
-                return;
-            }
-            grid.innerHTML = tools.map((t, i) => `
+        function renderToolsTabs() {
+            const tabs = document.getElementById('toolsTabs');
+            if (!tabs) return;
+            const counts = {};
+            allTools.forEach(t => { const c = getToolCategory(t); counts[c] = (counts[c] || 0) + 1; });
+            const cats = [...TOOL_CATEGORIES, ETC_CATEGORY].filter(c => counts[c.id]);
+            const items = [
+                { id: '전체', icon: 'fas fa-border-all', count: allTools.length },
+                ...cats.map(c => ({ ...c, count: counts[c.id] })),
+            ];
+            tabs.innerHTML = items.map(c => `
+                <button type="button" role="tab" aria-selected="${c.id === activeToolCategory}"
+                        class="tools-tab${c.id === activeToolCategory ? ' active' : ''}" data-cat="${escapeHtml(c.id)}">
+                    <i class="${escapeHtml(c.icon)}"></i> ${escapeHtml(c.id)} <span class="cnt">${c.count}</span>
+                </button>
+            `).join('');
+            tabs.querySelectorAll('.tools-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeToolCategory = btn.dataset.cat;
+                    renderToolsTabs();
+                    renderAITools();
+                });
+            });
+        }
+
+        function toolCardHtml(t, i) {
+            return `
                 <article class="tool-card reveal">
                     <div class="tool-top">
                         <div class="tool-icon ${ICON_COLORS[i % ICON_COLORS.length]}"><i class="${escapeHtml(t.icon || 'fas fa-robot')}"></i></div>
-                        <span class="tool-num">${String(i + 1).padStart(2, '0')}</span>
+                        <div class="tool-head">
+                            <h3>${escapeHtml(t.name)}</h3>
+                            <div class="tool-tagline">${escapeHtml(t.tagline || '')}</div>
+                        </div>
                     </div>
-                    <h3>${escapeHtml(t.name)}</h3>
-                    <div class="tool-tagline">${escapeHtml(t.tagline || '')}</div>
-                    <p>${escapeHtml(t.description || '')}</p>
+                    <p title="${escapeHtml(t.description || '')}">${escapeHtml(t.description || '')}</p>
                     <div class="tool-tags">${(t.tags || []).map(tag => `<span>${escapeHtml(tag)}</span>`).join('')}</div>
                     <a href="${escapeHtml(t.url || '#')}" target="_blank" rel="noopener" class="tool-link">
                         바로 사용하기 <i class="fas fa-arrow-up-right-from-square"></i>
                     </a>
                 </article>
-            `).join('');
+            `;
+        }
+
+        function renderAITools() {
+            const grid = document.getElementById('toolsGrid');
+            if (!allTools.length) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-soft);">등록된 AI 툴이 없습니다.</div>';
+                return;
+            }
+            const cats = [...TOOL_CATEGORIES, ETC_CATEGORY];
+            let html = '';
+            let cardIdx = 0;
+            if (activeToolCategory === '전체') {
+                cats.forEach(cat => {
+                    const group = allTools.filter(t => getToolCategory(t) === cat.id);
+                    if (!group.length) return;
+                    html += `
+                        <div class="tool-cat-head reveal">
+                            <i class="${escapeHtml(cat.icon)}"></i> ${escapeHtml(cat.id)}
+                            <span class="cnt">${group.length}개</span><span class="line"></span>
+                        </div>
+                    `;
+                    html += group.map(t => toolCardHtml(t, cardIdx++)).join('');
+                });
+            } else {
+                const group = allTools.filter(t => getToolCategory(t) === activeToolCategory);
+                html = group.map(t => toolCardHtml(t, cardIdx++)).join('');
+            }
+            grid.innerHTML = html || '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-soft);">이 분류에 등록된 AI 툴이 없습니다.</div>';
 
             // reveal 애니메이션 재트리거
             if (typeof revealObserver !== 'undefined') {
