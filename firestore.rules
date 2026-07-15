@@ -71,16 +71,19 @@ service cloud.firestore {
         && request.resource.data.content.size() >= 1
         && request.resource.data.content.size() <= 5000
         && request.resource.data.category in ['수업 사례', '질문·고민', '자료 공유', '자유']
-        // 첨부파일은 선택 사항 — 있다면 Storage 다운로드 URL 형식·길이를 검증
-        && (!('attachmentUrl' in request.resource.data) || (
-          request.resource.data.attachmentUrl is string
-          && request.resource.data.attachmentUrl.size() <= 1000
+        // 텍스트 첨부는 선택 사항 — Storage 없이 문서 안에 직접 저장하므로 길이를 엄격히 제한
+        && (!('attachmentText' in request.resource.data) || (
+          request.resource.data.attachmentText is string
+          && request.resource.data.attachmentText.size() <= 100000
           && request.resource.data.attachmentName is string
           && request.resource.data.attachmentName.size() >= 1
           && request.resource.data.attachmentName.size() <= 255
-          && request.resource.data.attachmentSize is int
-          && request.resource.data.attachmentSize > 0
-          && request.resource.data.attachmentSize <= 26214400
+        ))
+        // 자료 링크도 선택 사항 — http(s) URL 형식만 허용
+        && (!('attachmentLink' in request.resource.data) || (
+          request.resource.data.attachmentLink is string
+          && request.resource.data.attachmentLink.size() <= 500
+          && request.resource.data.attachmentLink.matches('https?://.+')
         ));
       // 본문 수정은 불가. 좋아요/댓글 수 카운터 한 개만 ±1 변경하는 것은 허용
       allow update: if request.auth != null

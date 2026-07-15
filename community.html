@@ -16,7 +16,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, where, deleteDoc, doc, getDoc, updateDoc, writeBatch, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
         window.initializeApp = initializeApp;
         window.getAuth = getAuth;
@@ -39,10 +38,6 @@
         window.fsWriteBatch = writeBatch;
         window.fsIncrement = increment;
         window.fsServerTimestamp = serverTimestamp;
-        window.getStorage = getStorage;
-        window.fsStorageRef = ref;
-        window.fsUploadBytes = uploadBytes;
-        window.fsGetDownloadURL = getDownloadURL;
         window.__firebaseReady = true;
     </script>
 
@@ -229,11 +224,12 @@
         .d-title { font-size: 1.3rem; font-weight: 800; color: var(--ink); letter-spacing: -0.4px; line-height: 1.35; margin-bottom: 0.4rem; padding-right: 2rem; }
         .d-meta { font-size: 0.82rem; color: var(--text-soft); margin-bottom: 1.2rem; display: flex; gap: 0.9rem; flex-wrap: wrap; }
         .d-content { color: var(--text); font-size: 0.95rem; white-space: pre-wrap; word-break: break-word; padding-bottom: 1.3rem; border-bottom: 1px solid var(--line); margin-bottom: 1.2rem; }
-        .d-attachment { margin: -0.6rem 0 1.2rem; }
+        .d-attachment { display: flex; gap: 0.6rem; flex-wrap: wrap; margin: -0.6rem 0 1.2rem; }
         .attach-link {
             display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem;
             border: 1.5px solid var(--line); border-radius: 10px; background: var(--bg-soft);
             color: var(--primary-dark); font-weight: 600; font-size: 0.88rem; text-decoration: none; max-width: 100%;
+            font-family: inherit; cursor: pointer;
         }
         .attach-link:hover { border-color: var(--primary); }
         .attach-link span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -378,9 +374,14 @@
                     <div class="form-hint">최대 5,000자 · 게시글은 모든 방문자에게 공개됩니다. 학생 개인정보는 적지 말아 주세요.</div>
                 </div>
                 <div class="form-group">
-                    <label for="postFile">첨부파일 <span style="font-weight:400;color:var(--text-soft);">(선택)</span></label>
-                    <input type="file" id="postFile" accept=".txt,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.hwp,.zip,.png,.jpg,.jpeg,.gif,.webp">
-                    <div class="form-hint">txt·pdf·doc·ppt·xls·hwp·zip·이미지 파일, 최대 25MB까지 첨부할 수 있습니다. 유튜브 영상은 링크를 복사해 내용란에 붙여넣어 주세요.</div>
+                    <label for="postFile">텍스트 자료(.txt) 첨부 <span style="font-weight:400;color:var(--text-soft);">(선택)</span></label>
+                    <input type="file" id="postFile" accept=".txt,text/plain">
+                    <div class="form-hint">txt 파일 내용이 게시글에 그대로 저장됩니다. 최대 100KB.</div>
+                </div>
+                <div class="form-group">
+                    <label for="postLink">자료 링크 <span style="font-weight:400;color:var(--text-soft);">(선택)</span></label>
+                    <input type="text" id="postLink" maxlength="500" placeholder="https://drive.google.com/... (유튜브 영상, 구글 드라이브 등)">
+                    <div class="form-hint">pdf·hwp·ppt 등 다른 형식의 자료나 유튜브 영상은 구글 드라이브 등에 올린 뒤 공유 링크를 붙여넣어 주세요.</div>
                 </div>
                 <div class="form-error" id="writeError"></div>
                 <div class="modal-actions">
@@ -484,7 +485,7 @@
             { id: '자유', icon: 'fas fa-mug-hot' },
         ];
 
-        let auth = null, db = null, storage = null;
+        let auth = null, db = null;
         let currentUser = null;
         let isAdmin = false;
         let posts = [];
@@ -540,7 +541,6 @@
                         const app = window.initializeApp(firebaseConfig);
                         auth = window.getAuth(app);
                         db = window.getFirestore(app);
-                        storage = window.getStorage(app);
                         window.onAuthStateChanged(auth, onAuth);
                         loadPosts();
                     } catch (e) {
@@ -701,7 +701,7 @@
                     <div class="b-post-top">
                         <span class="b-cat"><i class="${esc(catIcon(p.category))}"></i> ${esc(p.category || '자유')}</span>
                         <h3>${esc(p.title)}</h3>
-                        ${p.attachmentUrl ? '<span class="b-attach"><i class="fas fa-paperclip"></i></span>' : ''}
+                        ${(p.attachmentText || p.attachmentLink) ? '<span class="b-attach"><i class="fas fa-paperclip"></i></span>' : ''}
                     </div>
                     <p class="b-preview">${esc(p.content || '')}</p>
                     <div class="b-meta">
@@ -804,8 +804,17 @@
         }
         function hideWriteError() { document.getElementById('writeError').classList.remove('show'); }
 
-        const ATTACHMENT_EXT_RE = /\.(txt|pdf|doc|docx|ppt|pptx|xls|xlsx|hwp|zip|png|jpe?g|gif|webp)$/i;
-        const ATTACHMENT_MAX_BYTES = 25 * 1024 * 1024;
+        const ATTACHMENT_TEXT_MAX_BYTES = 100 * 1024;
+        const LINK_RE = /^https?:\/\/.+/i;
+
+        function readTextFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(reader.error);
+                reader.readAsText(file);
+            });
+        }
 
         async function submitPost(e) {
             e.preventDefault();
@@ -815,12 +824,14 @@
             const content = document.getElementById('postContent').value.trim();
             const fileInput = document.getElementById('postFile');
             const file = fileInput.files[0] || null;
+            const link = document.getElementById('postLink').value.trim();
             if (title.length < 2) { showWriteError('제목을 2자 이상 입력해 주세요.'); return; }
             if (!content) { showWriteError('내용을 입력해 주세요.'); return; }
             if (file) {
-                if (!ATTACHMENT_EXT_RE.test(file.name)) { showWriteError('지원하지 않는 파일 형식입니다. (txt·pdf·doc·ppt·xls·hwp·zip·이미지만 가능)'); return; }
-                if (file.size > ATTACHMENT_MAX_BYTES) { showWriteError('파일 크기는 25MB 이하만 첨부할 수 있습니다.'); return; }
+                if (!/\.txt$/i.test(file.name)) { showWriteError('txt 파일만 첨부할 수 있습니다.'); return; }
+                if (file.size > ATTACHMENT_TEXT_MAX_BYTES) { showWriteError('txt 파일 용량은 100KB 이하만 가능합니다.'); return; }
             }
+            if (link && !LINK_RE.test(link)) { showWriteError('자료 링크는 http:// 또는 https://로 시작해야 합니다.'); return; }
 
             const btn = document.getElementById('writeSubmitBtn');
             btn.disabled = true; btn.textContent = '게시 중...';
@@ -834,18 +845,16 @@
                     createdAt: window.fsServerTimestamp(),
                 };
                 if (file) {
-                    btn.textContent = '파일 업로드 중...';
-                    const path = `community_attachments/${currentUser.uid}/${Date.now()}_${file.name}`;
-                    const fileRef = window.fsStorageRef(storage, path);
-                    await window.fsUploadBytes(fileRef, file);
-                    postData.attachmentUrl = await window.fsGetDownloadURL(fileRef);
+                    postData.attachmentText = await readTextFile(file);
                     postData.attachmentName = file.name;
-                    postData.attachmentSize = file.size;
-                    btn.textContent = '게시 중...';
+                }
+                if (link) {
+                    postData.attachmentLink = link;
                 }
                 await window.fsAddDoc(window.fsCollection(db, 'community_posts'), postData);
                 closeModal('writeModal');
                 fileInput.value = '';
+                document.getElementById('postLink').value = '';
                 await loadPosts();
             } catch (err) {
                 console.error('게시 오류:', err);
@@ -879,11 +888,16 @@
                     <span><i class="fas fa-clock"></i> ${esc(fmtDate(p.createdAt))}</span>
                 </div>
                 <div class="d-content">${esc(p.content || '')}</div>
-                ${p.attachmentUrl ? `
+                ${(p.attachmentText || p.attachmentLink) ? `
                 <div class="d-attachment">
-                    <a href="${esc(p.attachmentUrl)}" target="_blank" rel="noopener noreferrer" class="attach-link">
-                        <i class="fas fa-paperclip"></i> <span>${esc(p.attachmentName || '첨부파일')}</span>
-                    </a>
+                    ${p.attachmentText ? `
+                    <button type="button" class="attach-link" id="attachDownloadBtn">
+                        <i class="fas fa-file-lines"></i> <span>${esc(p.attachmentName || '첨부 텍스트')} 다운로드</span>
+                    </button>` : ''}
+                    ${p.attachmentLink ? `
+                    <a href="${esc(p.attachmentLink)}" target="_blank" rel="noopener noreferrer" class="attach-link">
+                        <i class="fas fa-link"></i> <span>자료 링크 열기</span>
+                    </a>` : ''}
                 </div>` : ''}
                 <div class="d-actions">
                     <button type="button" class="like-btn${detailLiked ? ' liked' : ''}" id="likeBtn">
@@ -906,6 +920,15 @@
             document.getElementById('likeBtn').addEventListener('click', () => toggleLike(id));
             document.getElementById('postReportBtn').addEventListener('click', () => {
                 openReport({ targetType: 'post', postId: id, commentId: '', preview: (p.title || '').slice(0, 200) });
+            });
+            document.getElementById('attachDownloadBtn')?.addEventListener('click', () => {
+                const blob = new Blob([p.attachmentText || ''], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = p.attachmentName || 'attachment.txt';
+                a.click();
+                URL.revokeObjectURL(url);
             });
             renderCommentForm(id);
         }
