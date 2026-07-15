@@ -54,5 +54,42 @@ service cloud.firestore {
       allow read: if true;
       allow create, update, delete: if isAdmin();
     }
+
+    // 교육자 커뮤니티 게시판 — 누구나 읽기, 로그인 사용자 글쓰기,
+    // 본인 글 또는 관리자만 삭제. 필드 형식·길이를 서버에서 강제.
+    match /community_posts/{postId} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorName is string
+        && request.resource.data.authorName.size() >= 1
+        && request.resource.data.authorName.size() <= 50
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 2
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.content is string
+        && request.resource.data.content.size() >= 1
+        && request.resource.data.content.size() <= 5000
+        && request.resource.data.category in ['수업 사례', '질문·고민', '자료 공유', '자유'];
+      allow update: if false;
+      allow delete: if isAdmin()
+        || (request.auth != null && resource.data.authorUid == request.auth.uid);
+
+      // 댓글 — 누구나 읽기, 로그인 사용자 작성, 본인 또는 관리자만 삭제
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if request.auth != null
+          && request.resource.data.authorUid == request.auth.uid
+          && request.resource.data.authorName is string
+          && request.resource.data.authorName.size() >= 1
+          && request.resource.data.authorName.size() <= 50
+          && request.resource.data.content is string
+          && request.resource.data.content.size() >= 1
+          && request.resource.data.content.size() <= 2000;
+        allow update: if false;
+        allow delete: if isAdmin()
+          || (request.auth != null && resource.data.authorUid == request.auth.uid);
+      }
+    }
   }
 }
