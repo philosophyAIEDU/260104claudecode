@@ -11,3 +11,16 @@
 # 서울 공공데이터 API 키는 코드에 넣지 말고 Netlify 환경변수로 설정하세요:
 #   Site settings → Environment variables → SEOUL_API_KEY (필수)
 #                                          → SEOUL_SERVICE (선택: 교육 데이터셋 서비스명)
+
+# ===== 보안 헤더 =====
+# CSP: Firebase(gstatic/googleapis/firebaseapp), Google 로그인(accounts.google.com),
+#      GA(googletagmanager/google-analytics), 폰트/아이콘(fonts.googleapis/gstatic, cdnjs)만 허용
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.googletagmanager.com https://apis.google.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://*.googletagmanager.com https://*.google.com; frame-src https://philosophyaiedumain.firebaseapp.com https://accounts.google.com; object-src 'none'; base-uri 'self'"

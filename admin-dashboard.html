@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Philosophy AI Education - 관리자 대시보드</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Analytics (GA4) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-KWCY47PZWB"></script>
@@ -16,8 +17,8 @@
     <!-- Firebase JS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp, getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getAuth as _getAuth, onAuthStateChanged as _onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         window.initializeApp = initializeApp;
         window.getFirestore = getFirestore;
@@ -31,8 +32,11 @@
         window.fsQuery = query;
         window.fsOrderBy = orderBy;
         window.fsServerTimestamp = serverTimestamp;
-        window.getAuth = _getAuth;
-        window.onAuthStateChanged = _onAuthStateChanged;
+        window.getAuth = getAuth;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signInWithPopup = signInWithPopup;
+        window.GoogleAuthProvider = GoogleAuthProvider;
+        window.signOut = signOut;
         window.__adminReady = true;
     </script>
     <!-- Chart.js for visualizations -->
@@ -506,6 +510,23 @@
     </style>
 </head>
 <body>
+    <!-- 관리자 로그인 게이트 -->
+    <div id="adminGate" style="display:flex; position:fixed; inset:0; z-index:3000; background:#f4f6f9; align-items:center; justify-content:center; padding:1.5rem;">
+        <div style="background:#fff; border-radius:16px; padding:2.5rem 2rem; width:min(420px,100%); text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.12);">
+            <i class="fas fa-shield-halved" style="font-size:2.6rem; color:#e67e22; margin-bottom:1rem;"></i>
+            <h2 style="font-size:1.4rem; color:#2c3e50; margin-bottom:.6rem;">관리자 전용 페이지</h2>
+            <p style="color:#7f8c8d; font-size:.95rem; margin-bottom:1.5rem;">가입자 개인정보 보호를 위해<br>관리자 계정으로 로그인해야 볼 수 있습니다.</p>
+            <button id="gateLoginBtn" style="display:inline-flex; align-items:center; gap:.6rem; padding:.85rem 1.6rem; border:none; border-radius:10px; background:linear-gradient(135deg,#e67e22,#f39c12); color:#fff; font-weight:700; font-size:1rem; cursor:pointer;">
+                <i class="fab fa-google"></i> Google 계정으로 로그인
+            </button>
+            <div id="gateDenied" style="display:none; margin-top:1.2rem; color:#e74c3c; font-size:.9rem;">
+                이 계정에는 접근 권한이 없습니다.<br>
+                <button id="gateSwitchBtn" style="margin-top:.6rem; padding:.5rem 1rem; border:1.5px solid #e74c3c; border-radius:8px; background:#fff; color:#e74c3c; font-weight:600; cursor:pointer;">다른 계정으로 로그인</button>
+            </div>
+            <div style="margin-top:1.5rem;"><a href="/" style="color:#7f8c8d; text-decoration:none; font-size:.9rem;">&larr; 메인 페이지로 돌아가기</a></div>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="header">
         <nav class="nav container">
@@ -745,7 +766,12 @@
         let searchTerm = '';
         let filteredUsers = [];
 
-        // 초기화
+        // 초기화 — 관리자 계정으로 로그인해야만 데이터 로드
+        const ADMIN_EMAIL = 'warmcomfortforyou@gmail.com';
+        let auth = null;
+        let adminInitDone = false;
+        let refreshTimer = null;
+
         document.addEventListener('DOMContentLoaded', function() {
             let attempts = 0;
             const initInterval = setInterval(() => {
@@ -753,17 +779,10 @@
                     clearInterval(initInterval);
                     app = window.initializeApp(firebaseConfig);
                     db = window.getFirestore(app);
-                    const auth = window.getAuth(app);
-                    window.onAuthStateChanged(auth, (user) => {
-                        if (user && user.email === 'warmcomfortforyou@gmail.com') {
-                            initToolsManager();
-                        }
-                    });
+                    auth = window.getAuth(app);
                     setupEventListeners();
-                    loadDashboardData();
-                    loadVisitorStats();
-                    loadToolsList();
-                    setInterval(() => { loadDashboardData(); loadVisitorStats(); }, 5 * 60 * 1000);
+                    setupGate();
+                    window.onAuthStateChanged(auth, handleAuthState);
                 }
                 attempts++;
                 if (attempts > 50) {
@@ -772,6 +791,43 @@
                 }
             }, 100);
         });
+
+        function handleAuthState(user) {
+            const isAdminUser = !!user && user.email === ADMIN_EMAIL;
+            const gate = document.getElementById('adminGate');
+            const loginBtn = document.getElementById('gateLoginBtn');
+            const denied = document.getElementById('gateDenied');
+            if (gate) gate.style.display = isAdminUser ? 'none' : 'flex';
+            if (loginBtn) loginBtn.style.display = user ? 'none' : 'inline-flex';
+            if (denied) denied.style.display = (user && !isAdminUser) ? 'block' : 'none';
+
+            if (isAdminUser && !adminInitDone) {
+                adminInitDone = true;
+                initToolsManager();
+                loadDashboardData();
+                loadVisitorStats();
+                loadToolsList();
+                refreshTimer = setInterval(() => { loadDashboardData(); loadVisitorStats(); }, 5 * 60 * 1000);
+            }
+            if (!isAdminUser && refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+                adminInitDone = false;
+            }
+        }
+
+        function setupGate() {
+            document.getElementById('gateLoginBtn')?.addEventListener('click', async () => {
+                try { await window.signInWithPopup(auth, new window.GoogleAuthProvider()); }
+                catch (e) { console.error('로그인 오류:', e); }
+            });
+            document.getElementById('gateSwitchBtn')?.addEventListener('click', async () => {
+                try {
+                    await window.signOut(auth);
+                    await window.signInWithPopup(auth, new window.GoogleAuthProvider());
+                } catch (e) { console.error('계정 전환 오류:', e); }
+            });
+        }
 
         // ===== AI 툴 관리 =====
         let editingToolId = null;
@@ -785,7 +841,7 @@
                 const tools = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderToolsList(tools);
             } catch (e) {
-                container.innerHTML = `<div class="error">툴 목록 불러오기 실패: ${e.message}</div>`;
+                container.innerHTML = `<div class="error">툴 목록 불러오기 실패: ${escAdm(e.message)}</div>`;
             }
         }
 
@@ -820,10 +876,17 @@
             `).join('');
         }
 
+        // HTML/속성 컨텍스트 모두에서 안전하도록 따옴표까지 이스케이프
         function escAdm(s) {
-            const d = document.createElement('div');
-            d.textContent = s ?? '';
-            return d.innerHTML;
+            return String(s ?? '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // 프로필 이미지 URL은 https만 허용 (javascript: 등 차단), 아니면 기본 아바타
+        const AVATAR_FALLBACK = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23d99812'/%3E%3Ccircle cx='16' cy='12' r='5.5' fill='%23fff'/%3E%3Cpath d='M5 30a11 8.5 0 0 1 22 0z' fill='%23fff'/%3E%3C/svg%3E";
+        function safeAvatarUrl(u) {
+            return (typeof u === 'string' && /^https:\/\//i.test(u)) ? u : AVATAR_FALLBACK;
         }
 
         function initToolsManager() {
@@ -1137,7 +1200,7 @@
                 companyTable.innerHTML = companies.map((company, index) => `
                     <div class="table-item">
                         <div>
-                            <strong>#${index + 1} ${company.company_name}</strong>
+                            <strong>#${index + 1} ${escAdm(company.company_name)}</strong>
                             <div style="font-size: 0.9rem; color: var(--text-light);">
                                 마케팅 동의율: ${company.marketing_rate}%
                             </div>
@@ -1169,13 +1232,13 @@
             tbody.innerHTML = users.map(user => `
                 <tr>
                     <td>
-                        <img src="${user.profile_image_url || 'https://via.placeholder.com/32'}" 
-                             alt="${user.name}" class="user-avatar">
+                        <img src="${escAdm(safeAvatarUrl(user.profile_image_url))}"
+                             alt="${escAdm(user.name || '')}" class="user-avatar">
                     </td>
-                    <td><strong>${user.name || '이름 없음'}</strong></td>
-                    <td style="color: var(--accent-color);">${user.email || user.googleEmail || '미입력'}</td>
-                    <td>${user.job || user.company || '미입력'}</td>
-                    <td style="color: var(--text-light); font-size: 0.85rem;">${user.googleEmail || '-'}</td>
+                    <td><strong>${escAdm(user.name || '이름 없음')}</strong></td>
+                    <td style="color: var(--accent-color);">${escAdm(user.email || user.googleEmail || '미입력')}</td>
+                    <td>${escAdm(user.job || user.company || '미입력')}</td>
+                    <td style="color: var(--text-light); font-size: 0.85rem;">${escAdm(user.googleEmail || '-')}</td>
                     <td>${new Date(user.created_at).toLocaleDateString('ko-KR')}</td>
                     <td>${user.last_login ? new Date(user.last_login).toLocaleDateString('ko-KR') : '없음'}</td>
                     <td>
@@ -1214,16 +1277,22 @@
                 return;
             }
 
+            // 셀 안의 따옴표 이스케이프 + 수식 문자(=,+,-,@)로 시작하는 값 무력화 (CSV 인젝션 방지)
+            const csvField = (v) => {
+                let s = String(v ?? '').replace(/"/g, '""');
+                if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+                return `"${s}"`;
+            };
             const headers = ['이름/닉네임', '이메일', '구글 계정', '직업', '마케팅 동의', '가입일'];
             const csvData = [
                 headers.join(','),
                 ...users.map(user => [
-                    `"${user.name || ''}"`,
-                    `"${user.email || user.googleEmail || ''}"`,
-                    `"${user.googleEmail || ''}"`,
-                    `"${user.job || user.company || ''}"`,
-                    `"${user.marketingAgreed ? '동의' : '비동의'}"`,
-                    `"${new Date(user.created_at).toLocaleDateString('ko-KR')}"`
+                    csvField(user.name),
+                    csvField(user.email || user.googleEmail),
+                    csvField(user.googleEmail),
+                    csvField(user.job || user.company),
+                    csvField(user.marketingAgreed ? '동의' : '비동의'),
+                    csvField(new Date(user.created_at).toLocaleDateString('ko-KR'))
                 ].join(','))
             ].join('\n');
 
