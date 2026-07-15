@@ -70,7 +70,18 @@ service cloud.firestore {
         && request.resource.data.content is string
         && request.resource.data.content.size() >= 1
         && request.resource.data.content.size() <= 5000
-        && request.resource.data.category in ['수업 사례', '질문·고민', '자료 공유', '자유'];
+        && request.resource.data.category in ['수업 사례', '질문·고민', '자료 공유', '자유']
+        // 첨부파일은 선택 사항 — 있다면 Storage 다운로드 URL 형식·길이를 검증
+        && (!('attachmentUrl' in request.resource.data) || (
+          request.resource.data.attachmentUrl is string
+          && request.resource.data.attachmentUrl.size() <= 1000
+          && request.resource.data.attachmentName is string
+          && request.resource.data.attachmentName.size() >= 1
+          && request.resource.data.attachmentName.size() <= 255
+          && request.resource.data.attachmentSize is int
+          && request.resource.data.attachmentSize > 0
+          && request.resource.data.attachmentSize <= 26214400
+        ));
       // 본문 수정은 불가. 좋아요/댓글 수 카운터 한 개만 ±1 변경하는 것은 허용
       allow update: if request.auth != null
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount', 'commentCount'])
