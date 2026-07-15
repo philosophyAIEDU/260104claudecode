@@ -626,6 +626,19 @@
             </div>
         </div>
 
+        <!-- 커뮤니티 신고 관리 -->
+        <div class="reports-section" style="margin-bottom:3rem;">
+            <div class="table-header" style="border-radius:15px 15px 0 0; display:flex; justify-content:space-between; align-items:center; padding:1.5rem;">
+                <span><i class="fas fa-flag"></i> 커뮤니티 신고 관리 <span id="reportsCount" style="font-size:.85rem; font-weight:400;"></span></span>
+                <button id="reportsRefreshBtn" style="background:#fff; color:var(--primary-color); border:none; padding:.6rem 1.2rem; border-radius:8px; font-weight:700; cursor:pointer; font-size:.95rem; display:flex; align-items:center; gap:.4rem;">
+                    <i class="fas fa-rotate"></i> 새로고침
+                </button>
+            </div>
+            <div id="reportsListContainer" style="background:#fff; border-radius:0 0 15px 15px; box-shadow:0 5px 20px var(--shadow); min-height:80px; padding:1rem;">
+                <div class="loading"><div class="spinner"></div> 신고 목록 불러오는 중...</div>
+            </div>
+        </div>
+
         <!-- AI 툴 추가/수정 모달 -->
         <div id="toolModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000; align-items:center; justify-content:center;">
             <div style="background:#fff; border-radius:16px; padding:2rem; width:min(520px,95vw); max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.3);">
@@ -807,7 +820,9 @@
                 loadDashboardData();
                 loadVisitorStats();
                 loadToolsList();
-                refreshTimer = setInterval(() => { loadDashboardData(); loadVisitorStats(); }, 5 * 60 * 1000);
+                loadReportsList();
+                document.getElementById('reportsRefreshBtn')?.addEventListener('click', loadReportsList);
+                refreshTimer = setInterval(() => { loadDashboardData(); loadVisitorStats(); loadReportsList(); }, 5 * 60 * 1000);
             }
             if (!isAdminUser && refreshTimer) {
                 clearInterval(refreshTimer);
@@ -990,6 +1005,68 @@
 
         function hideToolFormError() {
             document.getElementById('toolFormError').style.display = 'none';
+        }
+
+        // ===== 커뮤니티 신고 관리 =====
+        async function loadReportsList() {
+            const container = document.getElementById('reportsListContainer');
+            if (!container || !db) return;
+            try {
+                const q = window.fsQuery(window.fsCollection(db, 'reports'), window.fsOrderBy('createdAt', 'desc'));
+                const snap = await window.getDocs(q);
+                const reports = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderReportsList(reports);
+            } catch (e) {
+                container.innerHTML = `<div class="error">신고 목록 불러오기 실패: ${escAdm(e.message)}</div>`;
+            }
+        }
+
+        function renderReportsList(reports) {
+            const container = document.getElementById('reportsListContainer');
+            const countEl = document.getElementById('reportsCount');
+            if (countEl) countEl.textContent = reports.length ? `(미처리 ${reports.length}건)` : '';
+            if (!reports.length) {
+                container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-light);">접수된 신고가 없습니다. 🎉</div>';
+                return;
+            }
+            container.innerHTML = reports.map(r => {
+                const d = r.createdAt?.toDate ? r.createdAt.toDate() : null;
+                const dateStr = d ? d.toLocaleString('ko-KR') : '';
+                return `
+                <div style="display:flex; align-items:center; gap:1rem; padding:1rem; border-bottom:1px solid #eee; flex-wrap:wrap;">
+                    <div style="font-size:1.2rem; width:2rem; text-align:center; color:#e74c3c;">
+                        <i class="fas ${r.targetType === 'comment' ? 'fa-comment-slash' : 'fa-file-circle-exclamation'}"></i>
+                    </div>
+                    <div style="flex:1; min-width:200px;">
+                        <div style="font-weight:700; color:var(--text-dark);">
+                            ${r.targetType === 'comment' ? '댓글 신고' : '게시글 신고'}
+                            <span style="font-size:.8rem; color:var(--text-light); font-weight:400;">${escAdm(dateStr)} · 신고자 ${escAdm(r.reporterName || '-')}</span>
+                        </div>
+                        <div style="font-size:.88rem; color:var(--text-dark); margin-top:.2rem;">${escAdm(r.reason || '')}</div>
+                        <div style="font-size:.82rem; color:var(--text-light); margin-top:.2rem;">대상: "${escAdm(r.preview || '')}"</div>
+                    </div>
+                    <div style="display:flex; gap:.5rem; flex-shrink:0;">
+                        <a href="community.html?post=${encodeURIComponent(r.postId || '')}" target="_blank" rel="noopener"
+                           style="padding:.45rem .9rem; border:1.5px solid var(--primary-color); border-radius:7px; background:#fff; color:var(--primary-color); font-weight:600; font-size:.85rem; text-decoration:none;">
+                            <i class="fas fa-up-right-from-square"></i> 게시글 보기
+                        </a>
+                        <button onclick="resolveReport('${escAdm(r.id)}')"
+                                style="padding:.45rem .9rem; border:1.5px solid #27ae60; border-radius:7px; background:#fff; color:#27ae60; cursor:pointer; font-weight:600; font-size:.85rem;">
+                            <i class="fas fa-check"></i> 처리 완료
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function resolveReport(id) {
+            if (!confirm('이 신고를 처리 완료로 표시하고 목록에서 제거할까요?\n(문제가 있는 글은 게시글 보기에서 직접 삭제해 주세요)')) return;
+            try {
+                await window.fsDeleteDoc(window.fsDoc(db, 'reports', id));
+                loadReportsList();
+            } catch (e) {
+                alert('처리 실패: ' + e.message);
+            }
         }
 
         // 방문자 통계 (누적 / 오늘) 로드
