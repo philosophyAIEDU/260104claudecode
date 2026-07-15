@@ -33,16 +33,30 @@ Site settings → Environment variables 에 등록:
 
 ## 메인 페이지 구성 (index.html)
 1. **Hero** — "AI 시대, 교육자의 나침반" 메시지와 CTA
-2. **교육자분들을 위한 AI 툴** — 직접 만든 AI 학습 도구
-   - 논문 학습 노트 — https://philoedu.netlify.app
-   - 사고력 코치 — https://philofable5.netlify.app
-   - 영어 사전 — https://philoenglishdictionary.netlify.app
-   - 알파폴드 학습 도우미 — https://philoalphafold.netlify.app
-   - 미분적분 학습 도우미 — https://philomath77.netlify.app
-   - 단종 이야기 — https://philohistory.netlify.app
-   - AI 토론 메이트 — https://philodiscussion.netlify.app/
-   - AI 독서 코치 — https://philoreading.netlify.app/
-   - AI 뉴턴 역학 학습 도우미 — https://philophysics1.netlify.app/
+2. **교육자분들을 위한 AI 툴** — 직접 만든 AI 학습 도구 (카테고리 탭으로 분류 표시)
+   - 언어·독서
+     - 영어 사전 — https://philoenglishdictionary.netlify.app
+     - AI 독서 코치 — https://philoreading.netlify.app/
+     - 문장나무 (문장 분석 학습 앱) — https://philolang.netlify.app/
+   - 수학·물리
+     - 미분적분 학습 도우미 — https://philomath77.netlify.app
+     - AI 뉴턴 역학 학습 도우미 — https://philophysics1.netlify.app/
+     - 역학 물리 샌드박스 — https://philophysics2.netlify.app/
+   - 과학·자연
+     - 알파폴드 학습 도우미 — https://philoalphafold.netlify.app
+     - 신체 해부 레이어 뷰어 — https://philoanatomy.netlify.app/
+     - 원소 배틀 아레나 (주기율표 학습) — https://philoatom.netlify.app/
+     - 지구 속 탐험대 (지구 내부 탐험) — https://philoearth.netlify.app/
+     - 먹이사슬 라이브 (생태계 학습) — https://philoeco.netlify.app/
+   - 인문·사고력
+     - 논문 학습 노트 — https://philoedu.netlify.app
+     - 사고력 코치 — https://philofable5.netlify.app
+     - AI 토론 메이트 — https://philodiscussion.netlify.app/
+     - 단종 이야기 — https://philohistory.netlify.app
+   - 진로·AI·게임
+     - AI 커리어 코치 — https://philocareer.netlify.app/
+     - AI 확률 프롬프트 실험실 — https://philoailab.netlify.app/
+     - 바둑·장기·체스 게임 — https://philogo1.netlify.app/
 3. **교육자를 위한 AI 나침반** — 교육 현장에 유용한 외부 AI 도구 큐레이션
 4. **우리가 지키는 방향** — 도구보다 사람 / 비판적 활용 / 함께 배우기
 5. **커뮤니티** — AI에 관심 있는 교육자들이 모이는 공간, 스터디 자료 안내
@@ -64,7 +78,7 @@ Site settings → Environment variables 에 등록:
 - 메인 페이지 헤더의 로그인 상태와 연동
 
 ## 수정 방법
-- AI 툴 추가/변경: `index.html`의 `#tools` 섹션 `.tool-card` 편집
+- AI 툴 추가/변경: `index.html`의 `DEFAULT_TOOLS` 배열 편집 (또는 관리자 대시보드에서 Firestore `ai_tools`로 관리, `category` 필드로 분류)
 - 큐레이션 추가: `#compass` 섹션 `.curate-card` 편집
 - 컬러 변경: `<style>` 상단 `:root` CSS 변수 수정
 

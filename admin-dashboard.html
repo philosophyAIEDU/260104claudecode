@@ -619,6 +619,19 @@
                         <input type="text" id="toolTagline" required style="width:100%; padding:.7rem; border:1.5px solid #ddd; border-radius:8px; font-size:.95rem;" placeholder="예: 어려운 논문을 쉽게 읽고 정리">
                     </div>
                     <div style="margin-bottom:1rem;">
+                        <label style="display:block; font-weight:600; margin-bottom:.4rem; font-size:.9rem;">분류 (카테고리) <span style="color:red">*</span></label>
+                        <select id="toolCategory" style="width:100%; padding:.7rem; border:1.5px solid #ddd; border-radius:8px; font-size:.95rem; background:#fff;">
+                            <option value="언어·독서">언어·독서</option>
+                            <option value="수학·물리">수학·물리</option>
+                            <option value="과학·자연">과학·자연</option>
+                            <option value="인문·사고력">인문·사고력</option>
+                            <option value="진로·AI·게임">진로·AI·게임</option>
+                        </select>
+                        <div style="font-size:.8rem; color:var(--text-light); margin-top:.3rem;">
+                            홈페이지 AI 툴 섹션에서 이 분류별로 묶여 표시됩니다.
+                        </div>
+                    </div>
+                    <div style="margin-bottom:1rem;">
                         <label style="display:block; font-weight:600; margin-bottom:.4rem; font-size:.9rem;">설명</label>
                         <textarea id="toolDescription" rows="3" style="width:100%; padding:.7rem; border:1.5px solid #ddd; border-radius:8px; font-size:.95rem; resize:vertical;" placeholder="툴에 대한 자세한 설명을 입력하세요."></textarea>
                     </div>
@@ -788,7 +801,10 @@
                         <i class="${escAdm(t.icon || 'fas fa-robot')}"></i>
                     </div>
                     <div style="flex:1; min-width:0;">
-                        <div style="font-weight:700; color:var(--text-dark);">${escAdm(t.name)} <span style="font-size:.8rem; color:var(--text-light); font-weight:400;">순서 ${t.order ?? '–'}</span></div>
+                        <div style="font-weight:700; color:var(--text-dark);">${escAdm(t.name)}
+                            <span style="font-size:.75rem; font-weight:600; color:var(--primary-color); background:rgba(52,152,219,.1); padding:.1rem .5rem; border-radius:50px; margin-left:.3rem;">${escAdm(t.category || '분류 없음')}</span>
+                            <span style="font-size:.8rem; color:var(--text-light); font-weight:400;">순서 ${t.order ?? '–'}</span>
+                        </div>
                         <div style="font-size:.88rem; color:var(--text-light);">${escAdm(t.tagline || '')}</div>
                         <div style="font-size:.82rem; color:var(--accent-color); margin-top:.2rem; word-break:break-all;">${escAdm(t.url || '')}</div>
                     </div>
@@ -835,6 +851,7 @@
                 document.getElementById('toolModalTitle').innerHTML = '<i class="fas fa-pen"></i> AI 툴 수정';
                 document.getElementById('toolName').value = t.name || '';
                 document.getElementById('toolTagline').value = t.tagline || '';
+                document.getElementById('toolCategory').value = t.category || '언어·독서';
                 document.getElementById('toolDescription').value = t.description || '';
                 document.getElementById('toolUrl').value = t.url || '';
                 document.getElementById('toolIcon').value = t.icon || '';
@@ -861,6 +878,7 @@
             e.preventDefault();
             const name = document.getElementById('toolName').value.trim();
             const tagline = document.getElementById('toolTagline').value.trim();
+            const category = document.getElementById('toolCategory').value || '언어·독서';
             const description = document.getElementById('toolDescription').value.trim();
             const url = document.getElementById('toolUrl').value.trim();
             const icon = document.getElementById('toolIcon').value.trim() || 'fas fa-robot';
@@ -874,7 +892,7 @@
             btn.disabled = true; btn.textContent = '저장 중...';
 
             try {
-                const data = { name, tagline, description, url, icon, tags, order, updatedAt: window.fsServerTimestamp() };
+                const data = { name, tagline, category, description, url, icon, tags, order, updatedAt: window.fsServerTimestamp() };
                 if (editingToolId) {
                     await window.fsUpdateDoc(window.fsDoc(db, 'ai_tools', editingToolId), data);
                 } else {
