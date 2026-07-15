@@ -306,6 +306,12 @@
             padding: 0.55rem 1rem; border-radius: 10px; transition: var(--transition); margin-top: auto;
         }
         .tool-link:hover { background: var(--primary); gap: 0.8rem; }
+        .tool-review-link {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+            margin-top: 0.55rem; font-size: 0.78rem; font-weight: 600; color: var(--text-soft);
+            transition: var(--transition);
+        }
+        .tool-review-link:hover { color: var(--primary); }
 
         /* ===== Photo Galleries (봉사단 소식 / 교육 사진) ===== */
         .gallery-section.alt { background: var(--bg-soft); }
@@ -1333,6 +1339,9 @@
                     <div class="tool-tags">${(t.tags || []).map(tag => `<span>${escapeHtml(tag)}</span>`).join('')}</div>
                     <a href="${escapeHtml(t.url || '#')}" target="_blank" rel="noopener" class="tool-link">
                         바로 사용하기 <i class="fas fa-arrow-up-right-from-square"></i>
+                    </a>
+                    <a href="community.html?tool=${encodeURIComponent(t.name || '')}" class="tool-review-link">
+                        <i class="fas fa-comment-dots"></i> 이 툴 수업 후기 나누기
                     </a>
                 </article>
             `;

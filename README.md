@@ -61,6 +61,7 @@ Site settings → Environment variables 에 등록:
 4. **우리가 지키는 방향** — 도구보다 사람 / 비판적 활용 / 함께 배우기
 5. **커뮤니티** — AI에 관심 있는 교육자들이 모이는 공간, 스터디 자료 안내
    - **교육자 커뮤니티 게시판** (`community.html`) — Google 로그인 후 수업 사례·질문·자료 공유 글 작성, 댓글, 분류 탭·검색. 본인 글/댓글 및 관리자만 삭제 가능 (Firestore `community_posts` + `comments` 하위 컬렉션)
+   - 게시판 부가 기능: 좋아요(`likes` 하위 컬렉션)·인기순 정렬, 내 글 댓글 알림(`notifications`), 게시글/댓글 신고(`reports`, 관리자 대시보드에서 처리), 커뮤니티 규칙 안내, AI 툴 카드 → `community.html?tool=툴이름` 후기 연동, `?post=ID` 딥링크
 6. **문의** — 실시간 검증 문의 폼 (localStorage 저장)
 7. **Footer**
 

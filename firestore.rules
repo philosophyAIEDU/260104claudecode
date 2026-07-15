@@ -71,7 +71,13 @@ service cloud.firestore {
         && request.resource.data.content.size() >= 1
         && request.resource.data.content.size() <= 5000
         && request.resource.data.category in ['수업 사례', '질문·고민', '자료 공유', '자유'];
-      allow update: if false;
+      // 본문 수정은 불가. 좋아요/댓글 수 카운터 한 개만 ±1 변경하는 것은 허용
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount', 'commentCount'])
+        && request.resource.data.get('likeCount', 0) >= 0
+        && request.resource.data.get('commentCount', 0) >= 0
+        && ((request.resource.data.get('likeCount', 0) - resource.data.get('likeCount', 0))
+          + (request.resource.data.get('commentCount', 0) - resource.data.get('commentCount', 0))) in [1, -1];
       allow delete: if isAdmin()
         || (request.auth != null && resource.data.authorUid == request.auth.uid);
 
@@ -90,6 +96,50 @@ service cloud.firestore {
         allow delete: if isAdmin()
           || (request.auth != null && resource.data.authorUid == request.auth.uid);
       }
+
+      // 좋아요 — 문서 ID = 누른 사람의 uid (1인 1개), 본인만 등록/취소
+      match /likes/{likeUid} {
+        allow read: if true;
+        allow create: if request.auth != null && request.auth.uid == likeUid;
+        allow delete: if isAdmin()
+          || (request.auth != null && request.auth.uid == likeUid);
+      }
+    }
+
+    // 사이트 내 알림 (내 글에 새 댓글) — 수신자 본인만 읽기/읽음 처리/삭제
+    match /notifications/{noteId} {
+      allow read: if request.auth != null && resource.data.toUid == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.fromUid == request.auth.uid
+        && request.resource.data.toUid is string
+        && request.resource.data.toUid != request.auth.uid
+        && request.resource.data.type in ['comment']
+        && request.resource.data.postId is string
+        && request.resource.data.postTitle is string
+        && request.resource.data.postTitle.size() <= 120
+        && request.resource.data.fromName is string
+        && request.resource.data.fromName.size() <= 50
+        && request.resource.data.read == false;
+      allow update: if request.auth != null
+        && resource.data.toUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow delete: if isAdmin()
+        || (request.auth != null && resource.data.toUid == request.auth.uid);
+    }
+
+    // 신고 — 로그인 사용자만 접수, 관리자만 열람/처리
+    match /reports/{reportId} {
+      allow read, delete: if isAdmin();
+      allow create: if request.auth != null
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.targetType in ['post', 'comment']
+        && request.resource.data.postId is string
+        && request.resource.data.reason is string
+        && request.resource.data.reason.size() >= 1
+        && request.resource.data.reason.size() <= 500
+        && request.resource.data.preview is string
+        && request.resource.data.preview.size() <= 200;
+      allow update: if false;
     }
   }
 }

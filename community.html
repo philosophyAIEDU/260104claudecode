@@ -15,7 +15,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, where, deleteDoc, doc, getDoc, updateDoc, writeBatch, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         window.initializeApp = initializeApp;
         window.getAuth = getAuth;
@@ -32,6 +32,11 @@
         window.fsLimit = limit;
         window.fsDeleteDoc = deleteDoc;
         window.fsDoc = doc;
+        window.fsGetDoc = getDoc;
+        window.fsUpdateDoc = updateDoc;
+        window.fsWhere = where;
+        window.fsWriteBatch = writeBatch;
+        window.fsIncrement = increment;
         window.fsServerTimestamp = serverTimestamp;
         window.__firebaseReady = true;
     </script>
@@ -92,6 +97,16 @@
         .user-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .logout-btn { border: none; background: none; color: var(--text-soft); cursor: pointer; font-size: 0.9rem; padding: 0.3rem; }
         .logout-btn:hover { color: var(--primary); }
+        .bell-btn {
+            position: relative; width: 38px; height: 38px; border: 1.5px solid var(--line); border-radius: 50%;
+            background: #fff; color: var(--text-soft); cursor: pointer; font-size: 0.95rem; flex-shrink: 0;
+        }
+        .bell-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .bell-badge {
+            position: absolute; top: -4px; right: -4px; min-width: 17px; height: 17px; padding: 0 4px;
+            border-radius: 50px; background: #d64545; color: #fff; font-size: 0.66rem; font-weight: 700;
+            display: inline-flex; align-items: center; justify-content: center; line-height: 1;
+        }
 
         /* ===== Hero ===== */
         .board-hero { padding: 110px 0 40px; background: var(--bg-soft); border-bottom: 1px solid var(--line); }
@@ -128,6 +143,12 @@
             box-shadow: var(--shadow-sm); transition: var(--transition);
         }
         .write-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        .sort-toggle { display: inline-flex; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+        .sort-toggle button {
+            border: none; background: none; padding: 0.5rem 0.9rem; font-family: inherit;
+            font-size: 0.83rem; font-weight: 600; color: var(--text-soft); cursor: pointer;
+        }
+        .sort-toggle button.active { background: var(--ink); color: #fff; }
 
         /* ===== Post list ===== */
         .board-main { padding-bottom: 80px; }
@@ -208,6 +229,36 @@
             font-weight: 600; cursor: pointer; padding: 0.2rem 0.4rem;
         }
         .d-del:hover { text-decoration: underline; }
+        .d-actions { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.2rem; }
+        .like-btn {
+            display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 1.1rem;
+            border: 1.5px solid var(--line); border-radius: 50px; background: #fff;
+            color: var(--text-soft); font-family: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer;
+            transition: var(--transition);
+        }
+        .like-btn:hover { border-color: #d64545; color: #d64545; }
+        .like-btn.liked { background: #d64545; border-color: #d64545; color: #fff; }
+        .report-btn {
+            border: none; background: none; color: var(--text-soft); font-family: inherit;
+            font-size: 0.8rem; font-weight: 600; cursor: pointer; padding: 0.3rem 0.5rem;
+        }
+        .report-btn:hover { color: #c0392b; }
+        .rules-btn { border: none; background: none; cursor: pointer; font: inherit; padding: 0; margin-left: 1.2rem; }
+        .rules-list { margin: 0.4rem 0 1rem 1.1rem; color: var(--text); font-size: 0.92rem; }
+        .rules-list li { list-style: disc; margin-bottom: 0.45rem; }
+        .notif-item {
+            display: block; width: 100%; text-align: left; border: none; background: var(--bg-soft);
+            border-radius: 12px; padding: 0.8rem 1rem; font-family: inherit; font-size: 0.88rem;
+            color: var(--text); cursor: pointer; transition: var(--transition);
+        }
+        .notif-item:hover { background: var(--bg-tint); }
+        .notif-item.unread { border-left: 3px solid var(--primary); background: var(--bg-tint); }
+        .notif-item time { display: block; font-size: 0.74rem; color: var(--text-soft); margin-top: 0.15rem; }
+        .notif-list { display: flex; flex-direction: column; gap: 0.55rem; max-height: 55vh; overflow-y: auto; }
+        .notif-head-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+        .notif-head-row h3 { margin-bottom: 0; }
+        .notif-clear { border: none; background: none; color: var(--text-soft); font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+        .notif-clear:hover { color: var(--primary); }
         .comments-title { font-size: 0.95rem; font-weight: 700; color: var(--ink); margin-bottom: 0.8rem; }
         .comment-list { display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 1.1rem; }
         .comment {
@@ -248,6 +299,9 @@
                 <span class="logo-text">Philosophy AI Education</span>
             </a>
             <div class="nav-right">
+                <button class="bell-btn" id="notifBtn" style="display:none;" title="알림">
+                    <i class="fas fa-bell"></i><span class="bell-badge" id="notifBadge" style="display:none;">0</span>
+                </button>
                 <button class="login-btn" id="navLoginBtn"><i class="fab fa-google"></i> 로그인</button>
                 <div class="user-chip" id="navUserChip" style="display:none;">
                     <img id="navUserAvatar" src="" alt="프로필">
@@ -265,6 +319,7 @@
             <p>AI에 관심 있는 교육자들이 수업 사례와 질문, 자료를 나누는 공간입니다.
                 서로의 경험이 서로의 나침반이 됩니다.</p>
             <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> 메인 페이지로</a>
+            <button type="button" class="back-link rules-btn" id="rulesBtn"><i class="fas fa-scroll"></i> 커뮤니티 규칙</button>
         </div>
     </section>
 
@@ -272,6 +327,10 @@
         <div class="container">
             <div class="board-toolbar">
                 <div class="cat-tabs" id="catTabs"></div>
+                <div class="sort-toggle" id="sortToggle">
+                    <button type="button" data-sort="latest" class="active">최신순</button>
+                    <button type="button" data-sort="popular">인기순</button>
+                </div>
                 <input type="search" class="board-search" id="boardSearch" placeholder="제목·내용 검색">
                 <button class="write-btn" id="writeBtn"><i class="fas fa-pen"></i> 글쓰기</button>
             </div>
@@ -324,6 +383,69 @@
         </div>
     </div>
 
+    <!-- 알림 모달 -->
+    <div class="modal-backdrop" id="notifModal">
+        <div class="modal-panel">
+            <button class="modal-close" id="notifModalClose" aria-label="닫기"><i class="fas fa-times"></i></button>
+            <div class="notif-head-row">
+                <h3><i class="fas fa-bell"></i> 알림</h3>
+                <button type="button" class="notif-clear" id="notifClearBtn"><i class="fas fa-check-double"></i> 모두 읽음</button>
+            </div>
+            <div class="notif-list" id="notifList"></div>
+        </div>
+    </div>
+
+    <!-- 신고 모달 -->
+    <div class="modal-backdrop" id="reportModal">
+        <div class="modal-panel">
+            <button class="modal-close" id="reportModalClose" aria-label="닫기"><i class="fas fa-times"></i></button>
+            <h3><i class="fas fa-flag"></i> 신고하기</h3>
+            <form id="reportForm">
+                <div class="form-group">
+                    <label for="reportReason">신고 사유</label>
+                    <select id="reportReason">
+                        <option value="스팸·광고">스팸·광고</option>
+                        <option value="비방·모욕">비방·모욕</option>
+                        <option value="개인정보 노출">개인정보 노출</option>
+                        <option value="주제와 무관">주제와 무관</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="reportDetail">상세 내용 (선택)</label>
+                    <textarea id="reportDetail" maxlength="400" style="min-height:90px;" placeholder="신고 사유를 자세히 적어 주시면 처리에 도움이 됩니다."></textarea>
+                </div>
+                <div class="form-error" id="reportError"></div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-ghost" id="reportCancelBtn">취소</button>
+                    <button type="submit" class="btn-solid" id="reportSubmitBtn">신고 접수</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 커뮤니티 규칙 모달 -->
+    <div class="modal-backdrop" id="rulesModal">
+        <div class="modal-panel">
+            <button class="modal-close" id="rulesModalClose" aria-label="닫기"><i class="fas fa-times"></i></button>
+            <h3><i class="fas fa-scroll"></i> 커뮤니티 규칙</h3>
+            <p style="font-size:0.9rem; color:var(--text-soft); margin-bottom:0.8rem;">
+                교육자들이 서로에게 나침반이 되는 공간을 함께 지켜 주세요.</p>
+            <ul class="rules-list">
+                <li><strong>학생 개인정보 보호</strong> — 학생의 이름, 사진, 학교·학급 정보 등 개인을 특정할 수 있는 내용은 올리지 않습니다.</li>
+                <li><strong>존중하는 대화</strong> — 서로 다른 교육관과 AI에 대한 관점을 존중합니다. 비방·모욕·차별 표현은 삭제될 수 있습니다.</li>
+                <li><strong>광고 금지</strong> — 상업적 광고, 홍보성 게시물은 예고 없이 삭제됩니다.</li>
+                <li><strong>저작권 존중</strong> — 자료를 공유할 때는 출처를 밝히고, 공유 가능한 자료인지 확인해 주세요.</li>
+                <li><strong>신고 기능 활용</strong> — 규칙에 어긋나는 글을 발견하면 신고 버튼으로 알려 주세요. 관리자가 확인 후 조치합니다.</li>
+            </ul>
+            <p style="font-size:0.82rem; color:var(--text-soft);">
+                게시글은 모든 방문자에게 공개되며, 규칙 위반 시 관리자가 사전 안내 없이 삭제할 수 있습니다.</p>
+            <div class="modal-actions" style="margin-top:1.2rem;">
+                <button type="button" class="btn-solid" id="rulesOkBtn">확인</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ===== 설정 =====
         const firebaseConfig = {
@@ -350,6 +472,13 @@
         let activeCategory = '전체';
         let searchTerm = '';
         let openPostId = null;
+        let sortMode = 'latest';           // latest | popular
+        let notifs = [];                   // 내 알림 캐시
+        let pendingTool = '';              // ?tool= 파라미터로 넘어온 툴 이름 (글쓰기 프리필)
+        let paramsHandled = false;
+        let detailLiked = false;           // 열려 있는 글에 내가 좋아요를 눌렀는지
+        let likeBusy = false;
+        let reportTarget = null;           // { targetType, postId, commentId, preview }
 
         // ===== 헬퍼 =====
         // HTML/속성 컨텍스트 모두에서 안전하도록 이스케이프
@@ -368,6 +497,15 @@
         }
         function catIcon(id) {
             return (CATEGORIES.find(c => c.id === id) || { icon: 'fas fa-message' }).icon;
+        }
+        function tsMs(ts) {
+            try {
+                const d = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+                return d ? d.getTime() : 0;
+            } catch { return 0; }
+        }
+        function myName() {
+            return currentUser ? (currentUser.displayName || (currentUser.email || '').split('@')[0] || '교육자') : '';
         }
         function canDelete(item) {
             return isAdmin || (currentUser && item.authorUid === currentUser.uid);
@@ -411,6 +549,10 @@
                     : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23d99812'/%3E%3Ccircle cx='16' cy='12' r='5.5' fill='%23fff'/%3E%3Cpath d='M5 30a11 8.5 0 0 1 22 0z' fill='%23fff'/%3E%3C/svg%3E";
                 document.getElementById('navUserName').textContent = user.displayName || (user.email || '').split('@')[0];
             }
+            // 알림 벨은 로그인 시에만 표시
+            document.getElementById('notifBtn').style.display = user ? 'inline-block' : 'none';
+            if (user) loadNotifications();
+            else { notifs = []; renderNotifBadge(); }
             // 로그인 상태가 바뀌면 삭제 버튼/댓글 입력 표시가 달라지므로 다시 렌더
             renderList();
             if (openPostId) renderDetail(openPostId);
@@ -434,9 +576,45 @@
                 posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderTabs();
                 renderList();
+                handleUrlParams();
             } catch (e) {
                 console.error('게시글 로드 오류:', e);
                 showListError();
+                handleUrlParams();
+            }
+        }
+
+        // ?tool=툴이름 → 해당 툴 검색 + 글쓰기 프리필 / ?post=ID → 글 바로 열기
+        async function handleUrlParams() {
+            if (paramsHandled) return;
+            paramsHandled = true;
+            const params = new URLSearchParams(location.search);
+            const tool = (params.get('tool') || '').trim().slice(0, 60);
+            const postId = (params.get('post') || '').trim();
+            if (tool) {
+                pendingTool = tool;
+                searchTerm = tool;
+                const box = document.getElementById('boardSearch');
+                box.value = tool;
+                renderList();
+            }
+            if (postId) {
+                const found = await fetchSinglePost(postId);
+                if (found) openDetail(postId);
+            }
+        }
+
+        // 목록(최근 100개)에 없는 글도 단건 조회로 가져와 캐시에 추가
+        async function fetchSinglePost(id) {
+            if (posts.some(p => p.id === id)) return true;
+            try {
+                const snap = await window.fsGetDoc(window.fsDoc(db, 'community_posts', id));
+                if (!snap.exists()) return false;
+                posts.push({ id: snap.id, ...snap.data() });
+                return true;
+            } catch (e) {
+                console.error('게시글 조회 오류:', e);
+                return false;
             }
         }
 
@@ -446,7 +624,7 @@
         }
 
         function visiblePosts() {
-            let list = posts;
+            let list = posts.slice();
             if (activeCategory !== '전체') list = list.filter(p => p.category === activeCategory);
             if (searchTerm) {
                 const q = searchTerm.toLowerCase();
@@ -454,6 +632,11 @@
                     (p.title || '').toLowerCase().includes(q) ||
                     (p.content || '').toLowerCase().includes(q) ||
                     (p.authorName || '').toLowerCase().includes(q));
+            }
+            if (sortMode === 'popular') {
+                list.sort((a, b) => (Number(b.likeCount) || 0) - (Number(a.likeCount) || 0) || tsMs(b.createdAt) - tsMs(a.createdAt));
+            } else {
+                list.sort((a, b) => tsMs(b.createdAt) - tsMs(a.createdAt));
             }
             return list;
         }
@@ -503,6 +686,8 @@
                     <div class="b-meta">
                         <span><i class="fas fa-user"></i>${esc(p.authorName || '익명')}</span>
                         <span><i class="fas fa-clock"></i>${esc(fmtDate(p.createdAt))}</span>
+                        <span><i class="fas fa-heart" style="color:#d64545;"></i>${Number(p.likeCount) || 0}</span>
+                        <span><i class="fas fa-comment"></i>${Number(p.commentCount) || 0}</span>
                     </div>
                 </article>
             `).join('');
@@ -528,6 +713,11 @@
                     return;
                 }
                 document.getElementById('writeForm').reset();
+                // 툴 페이지에서 넘어온 경우: 수업 사례 + 툴 이름 프리필
+                if (pendingTool) {
+                    document.getElementById('postCategory').value = '수업 사례';
+                    document.getElementById('postTitle').value = `[${pendingTool}] `;
+                }
                 hideWriteError();
                 openModal('writeModal');
             });
@@ -536,13 +726,42 @@
             document.getElementById('writeForm').addEventListener('submit', submitPost);
 
             document.getElementById('detailModalClose').addEventListener('click', () => closeModal('detailModal'));
-            ['writeModal', 'detailModal'].forEach(id => {
+
+            // 정렬 토글 (최신순/인기순)
+            document.querySelectorAll('#sortToggle button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    sortMode = btn.dataset.sort;
+                    document.querySelectorAll('#sortToggle button').forEach(b => b.classList.toggle('active', b === btn));
+                    renderList();
+                });
+            });
+
+            // 알림
+            document.getElementById('notifBtn').addEventListener('click', () => {
+                renderNotifList();
+                openModal('notifModal');
+            });
+            document.getElementById('notifModalClose').addEventListener('click', () => closeModal('notifModal'));
+            document.getElementById('notifClearBtn').addEventListener('click', markAllNotifsRead);
+
+            // 커뮤니티 규칙
+            document.getElementById('rulesBtn').addEventListener('click', () => openModal('rulesModal'));
+            document.getElementById('rulesModalClose').addEventListener('click', () => closeModal('rulesModal'));
+            document.getElementById('rulesOkBtn').addEventListener('click', () => closeModal('rulesModal'));
+
+            // 신고
+            document.getElementById('reportModalClose').addEventListener('click', () => closeModal('reportModal'));
+            document.getElementById('reportCancelBtn').addEventListener('click', () => closeModal('reportModal'));
+            document.getElementById('reportForm').addEventListener('submit', submitReport);
+
+            const ALL_MODALS = ['writeModal', 'detailModal', 'notifModal', 'reportModal', 'rulesModal'];
+            ALL_MODALS.forEach(id => {
                 document.getElementById(id).addEventListener('click', (e) => {
                     if (e.target.id === id) closeModal(id);
                 });
             });
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') { closeModal('writeModal'); closeModal('detailModal'); }
+                if (e.key === 'Escape') ALL_MODALS.forEach(closeModal);
             });
 
             let st;
@@ -579,7 +798,9 @@
                 await window.fsAddDoc(window.fsCollection(db, 'community_posts'), {
                     category, title, content,
                     authorUid: currentUser.uid,
-                    authorName: currentUser.displayName || (currentUser.email || '').split('@')[0] || '교육자',
+                    authorName: myName(),
+                    likeCount: 0,
+                    commentCount: 0,
                     createdAt: window.fsServerTimestamp(),
                 });
                 closeModal('writeModal');
@@ -595,9 +816,11 @@
         // ===== 상세보기 + 댓글 =====
         function openDetail(id) {
             openPostId = id;
+            detailLiked = false;
             renderDetail(id);
             openModal('detailModal');
             loadComments(id);
+            refreshMyLike(id);
         }
 
         function renderDetail(id) {
@@ -614,6 +837,12 @@
                     <span><i class="fas fa-clock"></i> ${esc(fmtDate(p.createdAt))}</span>
                 </div>
                 <div class="d-content">${esc(p.content || '')}</div>
+                <div class="d-actions">
+                    <button type="button" class="like-btn${detailLiked ? ' liked' : ''}" id="likeBtn">
+                        <i class="fas fa-heart"></i> 좋아요 <span id="likeCountNum">${Number(p.likeCount) || 0}</span>
+                    </button>
+                    <button type="button" class="report-btn" id="postReportBtn"><i class="fas fa-flag"></i> 신고</button>
+                </div>
             `;
             document.getElementById('postDelBtn')?.addEventListener('click', async () => {
                 if (!confirm('이 게시글을 삭제하시겠습니까?')) return;
@@ -626,7 +855,59 @@
                     alert('삭제 중 오류가 발생했습니다.');
                 }
             });
+            document.getElementById('likeBtn').addEventListener('click', () => toggleLike(id));
+            document.getElementById('postReportBtn').addEventListener('click', () => {
+                openReport({ targetType: 'post', postId: id, commentId: '', preview: (p.title || '').slice(0, 200) });
+            });
             renderCommentForm(id);
+        }
+
+        // ===== 좋아요 =====
+        async function refreshMyLike(postId) {
+            detailLiked = false;
+            if (!currentUser) return;
+            try {
+                const snap = await window.fsGetDoc(window.fsDoc(db, 'community_posts', postId, 'likes', currentUser.uid));
+                detailLiked = snap.exists();
+            } catch (e) { console.error('좋아요 상태 조회 오류:', e); }
+            const btn = document.getElementById('likeBtn');
+            if (btn && openPostId === postId) btn.classList.toggle('liked', detailLiked);
+        }
+
+        async function toggleLike(postId) {
+            if (!currentUser) {
+                if (confirm('좋아요를 누르려면 Google 로그인이 필요합니다. 로그인할까요?')) login();
+                return;
+            }
+            if (likeBusy) return;
+            likeBusy = true;
+            const p = posts.find(x => x.id === postId);
+            const postRef = window.fsDoc(db, 'community_posts', postId);
+            const likeRef = window.fsDoc(db, 'community_posts', postId, 'likes', currentUser.uid);
+            try {
+                const batch = window.fsWriteBatch(db);
+                if (detailLiked) {
+                    batch.delete(likeRef);
+                    if ((Number(p?.likeCount) || 0) > 0) batch.update(postRef, { likeCount: window.fsIncrement(-1) });
+                    detailLiked = false;
+                    if (p) p.likeCount = Math.max(0, (Number(p.likeCount) || 0) - 1);
+                } else {
+                    batch.set(likeRef, { createdAt: window.fsServerTimestamp() });
+                    batch.update(postRef, { likeCount: window.fsIncrement(1) });
+                    detailLiked = true;
+                    if (p) p.likeCount = (Number(p.likeCount) || 0) + 1;
+                }
+                await batch.commit();
+            } catch (e) {
+                console.error('좋아요 처리 오류:', e);
+            } finally {
+                likeBusy = false;
+                const btn = document.getElementById('likeBtn');
+                const num = document.getElementById('likeCountNum');
+                if (btn) btn.classList.toggle('liked', detailLiked);
+                if (num && p) num.textContent = Number(p.likeCount) || 0;
+                renderList();
+            }
         }
 
         async function loadComments(postId) {
@@ -650,7 +931,8 @@
                         <div class="comment-head">
                             <strong>${esc(c.authorName || '익명')}</strong>
                             <time>${esc(fmtDate(c.createdAt))}</time>
-                            ${canDelete(c) ? `<button class="d-del" data-cid="${esc(c.id)}"><i class="fas fa-trash-can"></i></button>` : ''}
+                            ${canDelete(c) ? `<button class="d-del" data-cid="${esc(c.id)}" title="댓글 삭제"><i class="fas fa-trash-can"></i></button>` : ''}
+                            <button class="report-btn" data-rcid="${esc(c.id)}" data-rpreview="${esc((c.content || '').slice(0, 80))}" title="댓글 신고"><i class="fas fa-flag"></i></button>
                         </div>
                         <div class="comment-body">${esc(c.content || '')}</div>
                     </div>
@@ -659,12 +941,25 @@
                     btn.addEventListener('click', async () => {
                         if (!confirm('이 댓글을 삭제하시겠습니까?')) return;
                         try {
-                            await window.fsDeleteDoc(window.fsDoc(db, 'community_posts', postId, 'comments', btn.dataset.cid));
+                            const p = posts.find(x => x.id === postId);
+                            const batch = window.fsWriteBatch(db);
+                            batch.delete(window.fsDoc(db, 'community_posts', postId, 'comments', btn.dataset.cid));
+                            if ((Number(p?.commentCount) || 0) > 0) {
+                                batch.update(window.fsDoc(db, 'community_posts', postId), { commentCount: window.fsIncrement(-1) });
+                                if (p) p.commentCount = Math.max(0, (Number(p.commentCount) || 0) - 1);
+                            }
+                            await batch.commit();
                             loadComments(postId);
+                            renderList();
                         } catch (err) {
                             console.error('댓글 삭제 오류:', err);
                             alert('삭제 중 오류가 발생했습니다.');
                         }
+                    });
+                });
+                wrap.querySelectorAll('.report-btn[data-rcid]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        openReport({ targetType: 'comment', postId, commentId: btn.dataset.rcid, preview: btn.dataset.rpreview || '' });
                     });
                 });
             } catch (e) {
@@ -694,14 +989,38 @@
                 const btn = e.target.querySelector('button');
                 btn.disabled = true;
                 try {
-                    await window.fsAddDoc(window.fsCollection(db, 'community_posts', postId, 'comments'), {
+                    const p = posts.find(x => x.id === postId);
+                    const batch = window.fsWriteBatch(db);
+                    const commentRef = window.fsDoc(window.fsCollection(db, 'community_posts', postId, 'comments'));
+                    batch.set(commentRef, {
                         content,
                         authorUid: currentUser.uid,
-                        authorName: currentUser.displayName || (currentUser.email || '').split('@')[0] || '교육자',
+                        authorName: myName(),
                         createdAt: window.fsServerTimestamp(),
                     });
+                    batch.update(window.fsDoc(db, 'community_posts', postId), { commentCount: window.fsIncrement(1) });
+                    await batch.commit();
+                    if (p) p.commentCount = (Number(p.commentCount) || 0) + 1;
                     input.value = '';
                     loadComments(postId);
+                    renderList();
+                    // 글 작성자에게 사이트 내 알림 (본인 글에 단 댓글은 제외)
+                    if (p && p.authorUid && p.authorUid !== currentUser.uid) {
+                        try {
+                            await window.fsAddDoc(window.fsCollection(db, 'notifications'), {
+                                type: 'comment',
+                                toUid: p.authorUid,
+                                fromUid: currentUser.uid,
+                                fromName: myName().slice(0, 50),
+                                postId,
+                                postTitle: (p.title || '').slice(0, 120),
+                                read: false,
+                                createdAt: window.fsServerTimestamp(),
+                            });
+                        } catch (nerr) {
+                            console.error('알림 생성 오류:', nerr);
+                        }
+                    }
                 } catch (err) {
                     console.error('댓글 등록 오류:', err);
                     alert('댓글 등록 중 오류가 발생했습니다.');
@@ -709,6 +1028,128 @@
                     btn.disabled = false;
                 }
             });
+        }
+
+        // ===== 알림 =====
+        async function loadNotifications() {
+            if (!currentUser || !db) return;
+            try {
+                const q = window.fsQuery(
+                    window.fsCollection(db, 'notifications'),
+                    window.fsWhere('toUid', '==', currentUser.uid)
+                );
+                const snap = await window.fsGetDocs(q);
+                notifs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => tsMs(b.createdAt) - tsMs(a.createdAt))
+                    .slice(0, 50);
+            } catch (e) {
+                console.error('알림 로드 오류:', e);
+                notifs = [];
+            }
+            renderNotifBadge();
+        }
+
+        function renderNotifBadge() {
+            const badge = document.getElementById('notifBadge');
+            const unread = notifs.filter(n => !n.read).length;
+            badge.style.display = unread ? 'inline-flex' : 'none';
+            badge.textContent = unread > 9 ? '9+' : unread;
+        }
+
+        function renderNotifList() {
+            const wrap = document.getElementById('notifList');
+            if (!notifs.length) {
+                wrap.innerHTML = '<div style="color:var(--text-soft);font-size:0.88rem;padding:1.5rem 0.5rem;text-align:center;">아직 알림이 없습니다.<br>내 글에 댓글이 달리면 여기에 표시됩니다.</div>';
+                return;
+            }
+            wrap.innerHTML = notifs.map(n => `
+                <button type="button" class="notif-item${n.read ? '' : ' unread'}" data-nid="${esc(n.id)}" data-pid="${esc(n.postId || '')}">
+                    <i class="fas fa-comment" style="color:var(--primary);margin-right:0.4rem;"></i>
+                    <strong>${esc(n.fromName || '누군가')}</strong>님이 <strong>"${esc(n.postTitle || '내 글')}"</strong>에 댓글을 남겼습니다.
+                    <time>${esc(fmtDate(n.createdAt))}</time>
+                </button>
+            `).join('');
+            wrap.querySelectorAll('.notif-item').forEach(item => {
+                item.addEventListener('click', async () => {
+                    const nid = item.dataset.nid;
+                    const pid = item.dataset.pid;
+                    markNotifRead(nid);
+                    closeModal('notifModal');
+                    if (pid) {
+                        const found = await fetchSinglePost(pid);
+                        if (found) openDetail(pid);
+                        else alert('해당 게시글이 삭제되었거나 찾을 수 없습니다.');
+                    }
+                });
+            });
+        }
+
+        async function markNotifRead(nid) {
+            const n = notifs.find(x => x.id === nid);
+            if (!n || n.read) return;
+            n.read = true;
+            renderNotifBadge();
+            try {
+                await window.fsUpdateDoc(window.fsDoc(db, 'notifications', nid), { read: true });
+            } catch (e) { console.error('알림 읽음 처리 오류:', e); }
+        }
+
+        async function markAllNotifsRead() {
+            const unread = notifs.filter(n => !n.read);
+            if (!unread.length) return;
+            unread.forEach(n => { n.read = true; });
+            renderNotifBadge();
+            renderNotifList();
+            try {
+                const batch = window.fsWriteBatch(db);
+                unread.forEach(n => batch.update(window.fsDoc(db, 'notifications', n.id), { read: true }));
+                await batch.commit();
+            } catch (e) { console.error('알림 일괄 읽음 오류:', e); }
+        }
+
+        // ===== 신고 =====
+        function openReport(target) {
+            if (!currentUser) {
+                if (confirm('신고하려면 Google 로그인이 필요합니다. 로그인할까요?')) login();
+                return;
+            }
+            reportTarget = target;
+            document.getElementById('reportForm').reset();
+            const el = document.getElementById('reportError');
+            el.textContent = ''; el.classList.remove('show');
+            openModal('reportModal');
+        }
+
+        async function submitReport(e) {
+            e.preventDefault();
+            if (!currentUser || !reportTarget) { closeModal('reportModal'); return; }
+            const reasonType = document.getElementById('reportReason').value;
+            const detail = document.getElementById('reportDetail').value.trim();
+            const reason = (detail ? `[${reasonType}] ${detail}` : `[${reasonType}]`).slice(0, 500);
+            const btn = document.getElementById('reportSubmitBtn');
+            btn.disabled = true; btn.textContent = '접수 중...';
+            try {
+                await window.fsAddDoc(window.fsCollection(db, 'reports'), {
+                    targetType: reportTarget.targetType,
+                    postId: reportTarget.postId,
+                    commentId: reportTarget.commentId || '',
+                    preview: (reportTarget.preview || '').slice(0, 200),
+                    reason,
+                    reporterUid: currentUser.uid,
+                    reporterName: myName().slice(0, 50),
+                    createdAt: window.fsServerTimestamp(),
+                });
+                reportTarget = null;
+                closeModal('reportModal');
+                alert('신고가 접수되었습니다. 관리자가 확인 후 조치하겠습니다.');
+            } catch (err) {
+                console.error('신고 접수 오류:', err);
+                const el = document.getElementById('reportError');
+                el.textContent = '신고 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+                el.classList.add('show');
+            } finally {
+                btn.disabled = false; btn.textContent = '신고 접수';
+            }
         }
 
         init();
