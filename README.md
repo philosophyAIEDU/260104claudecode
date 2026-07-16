@@ -7,7 +7,7 @@
 ```
 260104claudecode/
 ├── index.html                    # 메인 랜딩 페이지 (나침반 컨셉)
-├── auth-system.html              # 구글 로그인 회원 시스템 (이름/이메일/직업 수집)
+├── auth-system.html              # 구글 로그인 회원 시스템 (닉네임/소속/이메일/직업 수집)
 ├── admin-dashboard.html          # 관리자 대시보드 (방문 통계 + GA)
 ├── firebase-app.html             # Firebase 데모/유틸
 ├── firestore.rules               # Firestore 보안 규칙 (방문자 카운터 포함)
@@ -22,9 +22,13 @@
    푸터에 표시. 한 세션당 1회 집계(`sessionStorage`)로 새로고침 중복을 방지합니다.
 2. **관리자 애널리틱스** — 관리자(`warmcomfortforyou@gmail.com`) 로그인 시 메인 페이지에
    "방문 통계 & 애널리틱스" 패널이 노출되며, Google Analytics(GA4 `G-KWCY47PZWB`) 바로가기 제공.
-3. **회원 가입 정보** — 가입 시 이름/닉네임, 이메일, 직업(드롭다운, '기타' 직접입력)을 받습니다.
+3. **회원 가입 정보** — 가입 시 닉네임, 소속(학교·기관), 이메일, 직업(드롭다운, '기타' 직접입력)을 받습니다.
+   닉네임·소속은 `leaderboard/{uid}` 문서에도 공개용으로 저장되어 게시판·랭킹에 노출됩니다 (이메일 등 민감정보는 미포함).
 4. **서울 교육 공공데이터** — `data.seoul.go.kr` 교육청·학교 통계를 교육자가 보기 쉽게 표로 제공.
    Netlify 서버리스 함수가 환경변수 키로 서버에서 호출(CORS/Mixed-content/키 노출 해결).
+5. **좋아요 크레딧 · 레벨 · 랭킹** — 게시글이 좋아요를 받으면 작성자의 `leaderboard/{uid}.likeCredits`가 +1(좋아요 취소 시 -1) 되고,
+   크레딧 구간(0/5/15/30/60)에 따라 새싹→성장하는→나침반→등대→마스터 교육자로 레벨이 올라갑니다.
+   `community.html` 상단 🏆 랭킹 버튼에서 크레딧 상위 10명(닉네임·소속·레벨)을 확인할 수 있습니다.
 
 ### Netlify 환경변수 설정 (서울 공공데이터)
 Site settings → Environment variables 에 등록:
@@ -67,7 +71,9 @@ Site settings → Environment variables 에 등록:
 
 ## 교육자 커뮤니티 게시판 (community.html)
 - Google 로그인 후 수업 사례·질문·자료 공유 글 작성, 댓글, 분류 탭·검색. 본인 글/댓글 및 관리자만 삭제 가능 (Firestore `community_posts` + `comments` 하위 컬렉션)
+- 글 작성 시 작성자의 닉네임·소속(`leaderboard/{uid}`에서 조회)이 `authorName`/`authorAffiliation`으로 함께 저장되어 목록·상세에 "닉네임 · 소속" 형태로 표시됩니다
 - 부가 기능: 좋아요(`likes` 하위 컬렉션)·인기순 정렬, 내 글 댓글 알림(`notifications`), 게시글/댓글 신고(`reports`, 관리자 대시보드에서 처리), 커뮤니티 규칙 안내, AI 툴 카드 → `community.html?tool=툴이름` 후기 연동, `?post=ID` 딥링크, `?cat=분류명` 분류 필터 딥링크
+- 🏆 랭킹 버튼 — 좋아요를 받으면 글 작성자의 크레딧이 오르는 구조를 이용해, `leaderboard` 컬렉션을 크레딧 내림차순으로 조회한 상위 10명을 닉네임·소속·레벨과 함께 모달로 보여줍니다
 - **바이브코딩 쇼케이스** — 교육자가 바이브코딩으로 직접 만든 AI 도구를 전시·연구하는 전용 카테고리. 글쓰기 시 프로젝트 URL·사용한 AI 툴(Claude Code, Cursor 등)·제작 스토리(프롬프트, 삽질기, 배포 방법)를 함께 입력하면 목록/상세에서 "프로젝트 보러가기" 버튼과 제작 과정 박스로 노출되고, index.html `#showcase` 섹션에도 최신 글이 미리보기로 노출 (`community_posts` 문서의 `projectUrl`/`aiTool`/`process` 필드)
 
 ## 디자인
@@ -81,7 +87,9 @@ Site settings → Environment variables 에 등록:
 - **문의 저장**: localStorage (데모용)
 
 ## 회원 시스템 (auth-system.html)
-- 구글 OAuth 로그인 / 프로필 / 로그아웃
+- 구글 OAuth 로그인 / 프로필(닉네임·소속·이메일·직업) 입력 / 로그아웃
+- 프로필 저장 시 `users/{uid}`(비공개: 이메일·직업 등)와 `leaderboard/{uid}`(공개: 닉네임·소속·좋아요 크레딧)에 함께 기록
+- 가입 완료 화면의 "닉네임·소속 수정하기" 링크로 언제든 프로필 재입력 가능
 - 메인 페이지 헤더의 로그인 상태와 연동
 
 ## 수정 방법

@@ -268,6 +268,25 @@
         .rules-btn { border: none; background: none; cursor: pointer; font: inherit; padding: 0; margin-left: 1.2rem; }
         .rules-list { margin: 0.4rem 0 1rem 1.1rem; color: var(--text); font-size: 0.92rem; }
         .rules-list li { list-style: disc; margin-bottom: 0.45rem; }
+        .rank-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 60vh; overflow-y: auto; }
+        .rank-item {
+            display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 0.9rem;
+            background: var(--bg-soft); border-radius: 12px;
+        }
+        .rank-item.top3 { background: var(--bg-tint); }
+        .rank-num {
+            width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 1.5px solid var(--line);
+            display: grid; place-items: center; font-size: 0.78rem; font-weight: 800; color: var(--text-soft); flex-shrink: 0;
+        }
+        .rank-item.top3 .rank-num { background: var(--gradient); border-color: transparent; color: #fff; }
+        .rank-name { flex: 1; min-width: 0; }
+        .rank-name strong { font-size: 0.92rem; color: var(--ink); }
+        .rank-name .rank-affil { font-size: 0.76rem; color: var(--text-soft); }
+        .rank-level {
+            font-size: 0.7rem; font-weight: 700; color: var(--primary-dark); background: var(--bg-tint);
+            padding: 0.12rem 0.55rem; border-radius: 50px; white-space: nowrap;
+        }
+        .rank-credit { font-size: 0.85rem; font-weight: 800; color: var(--primary); white-space: nowrap; }
         .notif-item {
             display: block; width: 100%; text-align: left; border: none; background: var(--bg-soft);
             border-radius: 12px; padding: 0.8rem 1rem; font-family: inherit; font-size: 0.88rem;
@@ -321,6 +340,7 @@
                 <span class="logo-text">Philosophy AI Education</span>
             </a>
             <div class="nav-right">
+                <button class="bell-btn" id="rankBtn" title="랭킹"><i class="fas fa-trophy"></i></button>
                 <button class="bell-btn" id="notifBtn" style="display:none;" title="알림">
                     <i class="fas fa-bell"></i><span class="bell-badge" id="notifBadge" style="display:none;">0</span>
                 </button>
@@ -418,6 +438,19 @@
             <div class="comments-title"><i class="fas fa-comments"></i> 댓글 <span id="commentCount"></span></div>
             <div class="comment-list" id="commentList"></div>
             <div id="commentFormWrap"></div>
+        </div>
+    </div>
+
+    <!-- 랭킹 모달 -->
+    <div class="modal-backdrop" id="rankModal">
+        <div class="modal-panel">
+            <button class="modal-close" id="rankModalClose" aria-label="닫기"><i class="fas fa-times"></i></button>
+            <h3><i class="fas fa-trophy"></i> 좋아요 랭킹</h3>
+            <p style="font-size:0.85rem; color:var(--text-soft); margin-bottom:1rem;">
+                게시글에 좋아요를 많이 받을수록 크레딧이 쌓이고 레벨이 올라갑니다.</p>
+            <div class="rank-list" id="rankList">
+                <div style="color:var(--text-soft);font-size:0.85rem;text-align:center;padding:1.5rem 0;"><i class="fas fa-spinner fa-spin"></i> 불러오는 중...</div>
+            </div>
         </div>
     </div>
 
@@ -520,6 +553,22 @@
         let detailLiked = false;           // 열려 있는 글에 내가 좋아요를 눌렀는지
         let likeBusy = false;
         let reportTarget = null;           // { targetType, postId, commentId, preview }
+        let myProfile = null;              // leaderboard/{uid} 캐시 (닉네임/소속/크레딧)
+
+        // ===== 크레딧 → 레벨 =====
+        const LEVELS = [
+            { min: 0, title: '새싹 교육자' },
+            { min: 5, title: '성장하는 교육자' },
+            { min: 15, title: '나침반 교육자' },
+            { min: 30, title: '등대 교육자' },
+            { min: 60, title: '마스터 교육자' },
+        ];
+        function levelInfo(credit) {
+            const c = Number(credit) || 0;
+            let idx = 0;
+            for (let i = 0; i < LEVELS.length; i++) { if (c >= LEVELS[i].min) idx = i; }
+            return { level: idx + 1, title: LEVELS[idx].title, credit: c };
+        }
 
         // ===== 헬퍼 =====
         // HTML/속성 컨텍스트 모두에서 안전하도록 이스케이프
@@ -546,7 +595,11 @@
             } catch { return 0; }
         }
         function myName() {
-            return currentUser ? (currentUser.displayName || (currentUser.email || '').split('@')[0] || '교육자') : '';
+            if (!currentUser) return '';
+            return (myProfile && myProfile.nickname) || currentUser.displayName || (currentUser.email || '').split('@')[0] || '교육자';
+        }
+        function myAffiliation() {
+            return (myProfile && myProfile.affiliation) || '';
         }
         function canDelete(item) {
             return isAdmin || (currentUser && item.authorUid === currentUser.uid);
@@ -564,6 +617,7 @@
                         db = window.getFirestore(app);
                         window.onAuthStateChanged(auth, onAuth);
                         loadPosts();
+                        loadRanking();
                     } catch (e) {
                         console.error('Firebase init 오류:', e);
                         showListError();
@@ -581,6 +635,7 @@
         function onAuth(user) {
             currentUser = user || null;
             isAdmin = !!user && user.email === ADMIN_EMAIL;
+            myProfile = null;
             document.getElementById('navLoginBtn').style.display = user ? 'none' : 'inline-flex';
             document.getElementById('navUserChip').style.display = user ? 'inline-flex' : 'none';
             if (user) {
@@ -589,6 +644,7 @@
                     ? user.photoURL
                     : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23d99812'/%3E%3Ccircle cx='16' cy='12' r='5.5' fill='%23fff'/%3E%3Cpath d='M5 30a11 8.5 0 0 1 22 0z' fill='%23fff'/%3E%3C/svg%3E";
                 document.getElementById('navUserName').textContent = user.displayName || (user.email || '').split('@')[0];
+                loadMyProfile(user.uid);
             }
             // 알림 벨은 로그인 시에만 표시
             document.getElementById('notifBtn').style.display = user ? 'inline-block' : 'none';
@@ -597,6 +653,16 @@
             // 로그인 상태가 바뀌면 삭제 버튼/댓글 입력 표시가 달라지므로 다시 렌더
             renderList();
             if (openPostId) renderDetail(openPostId);
+        }
+
+        // 공개 프로필(닉네임/소속) 캐시 — 글쓰기 시 작성자 정보로 사용
+        async function loadMyProfile(uid) {
+            try {
+                const snap = await window.fsGetDoc(window.fsDoc(db, 'leaderboard', uid));
+                myProfile = snap.exists() ? snap.data() : null;
+            } catch (e) {
+                console.error('프로필 조회 오류:', e);
+            }
         }
 
         async function login() {
@@ -736,7 +802,7 @@
                         </a>` : ''}
                     <p class="b-preview">${esc(p.content || '')}</p>
                     <div class="b-meta">
-                        <span><i class="fas fa-user"></i>${esc(p.authorName || '익명')}</span>
+                        <span><i class="fas fa-user"></i>${esc(p.authorName || '익명')}${p.authorAffiliation ? ' · ' + esc(p.authorAffiliation) : ''}</span>
                         <span><i class="fas fa-clock"></i>${esc(fmtDate(p.createdAt))}</span>
                         <span><i class="fas fa-heart" style="color:#d64545;"></i>${Number(p.likeCount) || 0}</span>
                         <span><i class="fas fa-comment"></i>${Number(p.commentCount) || 0}</span>
@@ -803,6 +869,13 @@
             document.getElementById('notifModalClose').addEventListener('click', () => closeModal('notifModal'));
             document.getElementById('notifClearBtn').addEventListener('click', markAllNotifsRead);
 
+            // 랭킹
+            document.getElementById('rankBtn').addEventListener('click', () => {
+                openModal('rankModal');
+                loadRanking();
+            });
+            document.getElementById('rankModalClose').addEventListener('click', () => closeModal('rankModal'));
+
             // 커뮤니티 규칙
             document.getElementById('rulesBtn').addEventListener('click', () => openModal('rulesModal'));
             document.getElementById('rulesModalClose').addEventListener('click', () => closeModal('rulesModal'));
@@ -813,7 +886,7 @@
             document.getElementById('reportCancelBtn').addEventListener('click', () => closeModal('reportModal'));
             document.getElementById('reportForm').addEventListener('submit', submitReport);
 
-            const ALL_MODALS = ['writeModal', 'detailModal', 'notifModal', 'reportModal', 'rulesModal'];
+            const ALL_MODALS = ['writeModal', 'detailModal', 'notifModal', 'reportModal', 'rulesModal', 'rankModal'];
             ALL_MODALS.forEach(id => {
                 document.getElementById(id).addEventListener('click', (e) => {
                     if (e.target.id === id) closeModal(id);
@@ -889,6 +962,7 @@
                     commentCount: 0,
                     createdAt: window.fsServerTimestamp(),
                 };
+                if (myAffiliation()) docData.authorAffiliation = myAffiliation().slice(0, 60);
                 if (isShowcase) {
                     docData.projectUrl = projectUrl.slice(0, 300);
                     if (aiTool) docData.aiTool = aiTool.slice(0, 60);
@@ -925,7 +999,7 @@
                 </div>
                 <div class="d-title">${esc(p.title)}</div>
                 <div class="d-meta">
-                    <span><i class="fas fa-user"></i> ${esc(p.authorName || '익명')}</span>
+                    <span><i class="fas fa-user"></i> ${esc(p.authorName || '익명')}${p.authorAffiliation ? ' · ' + esc(p.authorAffiliation) : ''}</span>
                     <span><i class="fas fa-clock"></i> ${esc(fmtDate(p.createdAt))}</span>
                 </div>
                 ${p.category === SHOWCASE_CATEGORY && (p.projectUrl || p.aiTool) ? `
@@ -1000,6 +1074,16 @@
                     if (p) p.likeCount = (Number(p.likeCount) || 0) + 1;
                 }
                 await batch.commit();
+                // 작성자 크레딧 갱신은 별도 처리 — 작성자가 아직 공개 프로필(leaderboard)이 없으면
+                // 문서가 없어 실패할 수 있으므로, 핵심 기능(좋아요)에는 영향이 없도록 분리
+                if (p && p.authorUid && p.authorUid !== currentUser.uid) {
+                    const creditRef = window.fsDoc(db, 'leaderboard', p.authorUid);
+                    try {
+                        await window.fsUpdateDoc(creditRef, { likeCredits: window.fsIncrement(detailLiked ? 1 : -1) });
+                    } catch (creditErr) {
+                        console.error('크레딧 갱신 오류:', creditErr);
+                    }
+                }
             } catch (e) {
                 console.error('좋아요 처리 오류:', e);
             } finally {
@@ -1207,6 +1291,48 @@
                 unread.forEach(n => batch.update(window.fsDoc(db, 'notifications', n.id), { read: true }));
                 await batch.commit();
             } catch (e) { console.error('알림 일괄 읽음 오류:', e); }
+        }
+
+        // ===== 랭킹 =====
+        async function loadRanking() {
+            const wrap = document.getElementById('rankList');
+            if (!db) return;
+            try {
+                const q = window.fsQuery(
+                    window.fsCollection(db, 'leaderboard'),
+                    window.fsOrderBy('likeCredits', 'desc'),
+                    window.fsLimit(10)
+                );
+                const snap = await window.fsGetDocs(q);
+                renderRanking(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+            } catch (e) {
+                console.error('랭킹 로드 오류:', e);
+                if (wrap) wrap.innerHTML = '<div style="color:var(--text-soft);font-size:0.85rem;text-align:center;padding:1.5rem 0;">랭킹을 불러오지 못했습니다.</div>';
+            }
+        }
+
+        function renderRanking(list) {
+            const wrap = document.getElementById('rankList');
+            if (!wrap) return;
+            const ranked = list.filter(u => (Number(u.likeCredits) || 0) > 0);
+            if (!ranked.length) {
+                wrap.innerHTML = '<div style="color:var(--text-soft);font-size:0.85rem;text-align:center;padding:1.5rem 0;">아직 랭킹에 오른 교육자가 없습니다.<br>좋아요를 받으면 여기에 표시됩니다.</div>';
+                return;
+            }
+            wrap.innerHTML = ranked.map((u, i) => {
+                const lv = levelInfo(u.likeCredits);
+                return `
+                    <div class="rank-item${i < 3 ? ' top3' : ''}">
+                        <div class="rank-num">${i + 1}</div>
+                        <div class="rank-name">
+                            <strong>${esc(u.nickname || '익명')}</strong>
+                            ${u.affiliation ? `<div class="rank-affil">${esc(u.affiliation)}</div>` : ''}
+                        </div>
+                        <span class="rank-level">Lv.${lv.level} ${esc(lv.title)}</span>
+                        <span class="rank-credit"><i class="fas fa-heart" style="color:#d64545;"></i> ${lv.credit}</span>
+                    </div>
+                `;
+            }).join('');
         }
 
         // ===== 신고 =====
