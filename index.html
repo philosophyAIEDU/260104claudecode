@@ -27,7 +27,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, where, limit, deleteDoc, doc, getDoc, setDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         window.initializeApp = initializeApp;
         window.getAuth = getAuth;
@@ -39,6 +39,8 @@
         window.fsGetDocs = getDocs;
         window.fsQuery = query;
         window.fsOrderBy = orderBy;
+        window.fsWhere = where;
+        window.fsLimit = limit;
         window.fsDeleteDoc = deleteDoc;
         window.fsDoc = doc;
         window.fsGetDoc = getDoc;
@@ -138,6 +140,11 @@
         }
         .nav-menu > li > a.nav-youtube i { font-size: 1.05rem; }
         .nav-menu > li > a.nav-youtube:hover { color: #fff; background: #ff0000; border-color: #ff0000; }
+        .nav-menu > li > a.nav-naver {
+            display: inline-flex; align-items: center; gap: 0.4rem; color: #03c75a; font-weight: 600;
+            border: 1px solid rgba(3, 199, 90, 0.25); background: rgba(3, 199, 90, 0.06);
+        }
+        .nav-menu > li > a.nav-naver:hover { color: #fff; background: #03c75a; border-color: #03c75a; }
 
         .login-btn {
             background: var(--ink); color: #fff !important; font-weight: 600;
@@ -313,84 +320,6 @@
         }
         .tool-review-link:hover { color: var(--primary); }
 
-        /* ===== Photo Galleries (봉사단 소식 / 교육 사진) ===== */
-        .gallery-section.alt { background: var(--bg-soft); }
-        .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
-        .post-card {
-            background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
-            overflow: hidden; display: flex; flex-direction: column; transition: var(--transition); cursor: pointer;
-        }
-        .post-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
-        .post-photo { position: relative; aspect-ratio: 4 / 3; background: var(--bg-tint); overflow: hidden; }
-        .post-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
-        .post-card:hover .post-photo img { transform: scale(1.05); }
-        .post-photo .no-photo { position: absolute; inset: 0; display: grid; place-items: center; color: var(--text-soft); font-size: 2rem; }
-        .post-body { padding: 1.2rem 1.3rem 1.4rem; display: flex; flex-direction: column; flex: 1; }
-        .post-date { font-size: 0.78rem; font-weight: 600; color: var(--primary); margin-bottom: 0.35rem; }
-        .post-title { font-size: 1.08rem; font-weight: 700; color: var(--ink); margin-bottom: 0.4rem; line-height: 1.4; }
-        .post-text {
-            font-size: 0.9rem; color: var(--text-soft); flex: 1;
-            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-        }
-        .post-delete {
-            margin-top: 0.9rem; align-self: flex-end; background: #fff; border: 1px solid var(--line);
-            color: var(--text-soft); font-size: 0.78rem; padding: 0.3rem 0.8rem; border-radius: 50px;
-            cursor: pointer; font-family: inherit; transition: var(--transition);
-        }
-        .post-delete:hover { color: #e11d48; border-color: #fecdd3; background: #fff1f2; }
-        .gallery-empty {
-            grid-column: 1 / -1; text-align: center; padding: 3.5rem 1rem; color: var(--text-soft);
-            background: #fff; border: 1px dashed var(--line); border-radius: var(--radius);
-        }
-        .gallery-empty i { font-size: 2rem; color: var(--accent); display: block; margin-bottom: 0.8rem; }
-        .gallery-loading { grid-column: 1 / -1; text-align: center; padding: 2.5rem; color: var(--text-soft); }
-        .gallery-loading i { animation: spin 0.9s linear infinite; margin-right: 0.5rem; }
-
-        .admin-add-btn {
-            display: none; margin: 0 auto 2.2rem; background: var(--gradient); color: #fff; border: none;
-            font-family: inherit; font-weight: 700; font-size: 0.95rem; padding: 0.85rem 1.7rem;
-            border-radius: 50px; cursor: pointer; box-shadow: 0 10px 24px -8px rgba(200,137,15,0.6);
-            transition: var(--transition); align-items: center; gap: 0.5rem;
-        }
-        .admin-add-btn.visible { display: inline-flex; }
-        .admin-add-btn:hover { transform: translateY(-2px); }
-        .admin-bar { text-align: center; }
-
-        /* ===== Post / Lightbox Modals ===== */
-        .modal-backdrop {
-            display: none; position: fixed; inset: 0; z-index: 2000;
-            background: rgba(43, 35, 23, 0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-            padding: 1.5rem; overflow-y: auto;
-        }
-        .modal-backdrop.open { display: grid; place-items: center; }
-        .modal-panel {
-            background: #fff; border-radius: var(--radius-lg); max-width: 560px; width: 100%;
-            padding: 2rem; box-shadow: var(--shadow-xl); position: relative; margin: auto;
-        }
-        .modal-panel h3 { font-size: 1.25rem; font-weight: 800; color: var(--ink); margin-bottom: 1.4rem; display: flex; align-items: center; gap: 0.6rem; }
-        .modal-panel h3 i { color: var(--primary); }
-        .modal-close {
-            position: absolute; top: 1.1rem; right: 1.1rem; width: 36px; height: 36px; border-radius: 50%;
-            border: 1px solid var(--line); background: #fff; color: var(--text-soft); cursor: pointer;
-            font-size: 0.95rem; transition: var(--transition);
-        }
-        .modal-close:hover { color: var(--ink); border-color: var(--text-soft); }
-        .photo-input-wrap {
-            border: 2px dashed var(--line); border-radius: 12px; padding: 1.1rem; text-align: center;
-            color: var(--text-soft); font-size: 0.9rem; cursor: pointer; transition: var(--transition);
-        }
-        .photo-input-wrap:hover { border-color: var(--primary); color: var(--primary); }
-        .photo-input-wrap img { max-height: 180px; margin: 0.6rem auto 0; border-radius: 10px; }
-        .modal-error { display: none; color: #e11d48; font-size: 0.85rem; margin-top: 0.8rem; }
-        .modal-error.show { display: block; }
-
-        .lightbox-panel { max-width: 760px; padding: 0; overflow: hidden; }
-        .lightbox-panel img { width: 100%; max-height: 65vh; object-fit: contain; background: var(--bg-tint); }
-        .lightbox-body { padding: 1.6rem 2rem 2rem; }
-        .lightbox-body .post-date { margin-bottom: 0.4rem; }
-        .lightbox-body h3 { font-size: 1.3rem; font-weight: 800; color: var(--ink); margin-bottom: 0.7rem; }
-        .lightbox-body p { color: var(--text); font-size: 0.97rem; white-space: pre-wrap; }
-
         /* ===== Community CTA ===== */
         .community { padding: 100px 0; }
         .community-inner {
@@ -407,8 +336,6 @@
         .community h2 { font-size: clamp(1.7rem, 3.5vw, 2.4rem); font-weight: 800; letter-spacing: -0.8px; margin-bottom: 1rem; line-height: 1.25; }
         .community p { color: rgba(255,255,255,0.82); font-size: 1.08rem; margin-bottom: 2rem; }
         .community-actions { display: flex; flex-wrap: wrap; gap: 1rem; }
-        .btn-light { background: #fff; color: var(--ink); }
-        .btn-light:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
         .btn-outline { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
         .btn-outline:hover { background: rgba(255,255,255,0.16); transform: translateY(-2px); }
         .study-note { position: relative; margin-top: 2rem; font-size: 0.85rem; color: rgba(255,255,255,0.65); }
@@ -481,7 +408,6 @@
             .hero-figure { order: -1; }
             .hero-figure img { max-width: 230px; }
             .tools-grid { grid-template-columns: repeat(2, 1fr); }
-            .gallery-grid { grid-template-columns: 1fr 1fr; }
             .contact-wrap { grid-template-columns: 1fr; gap: 2.5rem; }
             .community-inner { padding: 2.6rem; }
         }
@@ -503,7 +429,6 @@
             .hero { padding: 130px 0 70px; }
             .hero-stats { gap: 1.8rem; }
             .tools-grid { grid-template-columns: 1fr; }
-            .gallery-grid { grid-template-columns: 1fr; }
             .community { padding: 70px 0; }
         }
 
@@ -593,12 +518,11 @@
             </a>
             <ul class="nav-menu" id="navMenu">
                 <li><a href="#tools">AI 툴</a></li>
-                <li><a href="#volunteer">봉사단 소식</a></li>
-                <li><a href="#gallery">교육 사진</a></li>
-                <li><a href="#community">커뮤니티</a></li>
+                <li><a href="#showcase">바이브코딩 쇼케이스</a></li>
                 <li><a href="community.html">게시판</a></li>
                 <li><a href="#contact">문의</a></li>
-                <li><a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="nav-youtube"><i class="fab fa-youtube"></i> 필로소피 AI 교육 유튜브</a></li>
+                <li><a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener" class="nav-naver"><i class="fas fa-mug-hot"></i> 네이버 카페</a></li>
+                <li><a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="nav-youtube"><i class="fab fa-youtube"></i> 유튜브</a></li>
                 <li id="navLoginItem"><a href="auth-system.html" class="login-btn">로그인</a></li>
                 <li id="navUserItem" style="display: none;">
                     <div class="user-info-nav">
@@ -627,9 +551,10 @@
                     <div class="hero-note"><i class="fas fa-chalkboard-user"></i>
                         학생들에게 AI를 어떻게 가르쳐야 할지 고민하시는 <strong>교육자분들을 위한 AI 연구 채널</strong>입니다.</div>
                     <div class="hero-buttons">
-                        <a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="btn btn-youtube"><i class="fab fa-youtube"></i> 필로소피 AI 교육 유튜브</a>
-                        <a href="#tools" class="btn btn-primary"><i class="fas fa-toolbox"></i> 교육자용 AI 툴 보기</a>
-                        <a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener" class="btn btn-naver">☕ 필로소피 AI 교육 네이버 카페</a>
+                        <a href="#showcase" class="btn btn-primary"><i class="fas fa-rocket"></i> 바이브코딩 쇼케이스 보기</a>
+                        <a href="#tools" class="btn btn-ghost"><i class="fas fa-toolbox"></i> 교육자용 AI 툴 보기</a>
+                        <a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener" class="btn btn-naver">☕ 네이버 카페</a>
+                        <a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="btn btn-youtube"><i class="fab fa-youtube"></i> 유튜브</a>
                     </div>
                     <div class="hero-stats">
                         <div class="hero-stat"><div class="num"><span>18</span>+</div><div class="label">직접 만든 학습 도구</div></div>
@@ -666,40 +591,24 @@
         </div>
     </section>
 
-    <!-- ===== 필로소피 AI 봉사단 소식 ===== -->
-    <section id="volunteer" class="section-pad gallery-section">
+    <!-- ===== 교육자를 위한 바이브코딩 쇼케이스 ===== -->
+    <section id="showcase" class="section-pad tools">
         <div class="container">
             <div class="section-head reveal">
-                <span class="eyebrow"><i class="fas fa-hand-holding-heart"></i> Volunteer</span>
-                <h2 class="section-title">필로소피 AI 봉사단 소식</h2>
-                <p class="section-sub">필로소피 AI 봉사단의 활동 사진과 이야기를 전합니다.</p>
+                <span class="eyebrow"><i class="fas fa-rocket"></i> Vibe Coding Showcase</span>
+                <h2 class="section-title">교육자를 위한 바이브코딩 쇼케이스</h2>
+                <p class="section-sub">Claude Code, Cursor 같은 AI 툴로 교육자들이 직접 만든 수업 도구를 소개하고,
+                    프롬프트와 제작 과정을 함께 연구하는 공간입니다.</p>
             </div>
-            <div class="admin-bar">
-                <button class="admin-add-btn" id="volunteerAddBtn" data-board="volunteer">
-                    <i class="fas fa-pen-to-square"></i> 봉사단 소식 쓰기
-                </button>
+            <div class="tools-grid" id="showcaseGrid">
+                <div class="tools-loading" style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-soft);">
+                    <i class="fas fa-spinner fa-spin"></i> 쇼케이스를 불러오는 중...
+                </div>
             </div>
-            <div class="gallery-grid" id="volunteerGrid">
-                <div class="gallery-loading"><i class="fas fa-spinner"></i> 소식을 불러오는 중...</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== 필로소피 AI 교육 사진 ===== -->
-    <section id="gallery" class="section-pad gallery-section alt">
-        <div class="container">
-            <div class="section-head reveal">
-                <span class="eyebrow"><i class="fas fa-camera"></i> Gallery</span>
-                <h2 class="section-title">필로소피 AI 교육 사진</h2>
-                <p class="section-sub">교육 현장의 생생한 순간들을 사진으로 기록합니다.</p>
-            </div>
-            <div class="admin-bar">
-                <button class="admin-add-btn" id="educationAddBtn" data-board="education">
-                    <i class="fas fa-camera"></i> 교육 사진 올리기
-                </button>
-            </div>
-            <div class="gallery-grid" id="educationGrid">
-                <div class="gallery-loading"><i class="fas fa-spinner"></i> 사진을 불러오는 중...</div>
+            <div style="text-align:center;margin-top:2.4rem;">
+                <a href="community.html?cat=%EB%B0%94%EC%9D%B4%EB%B8%8C%EC%BD%94%EB%94%A9%20%EC%87%BC%EC%BC%80%EC%9D%B4%EC%8A%A4" class="btn btn-primary">
+                    <i class="fas fa-pen-to-square"></i> 내가 만든 프로젝트 공유하기
+                </a>
             </div>
         </div>
     </section>
@@ -732,19 +641,19 @@
         </div>
     </section>
 
-    <!-- ===== Community CTA ===== -->
+    <!-- ===== 카페 · 유튜브 안내 ===== -->
     <section id="community" class="community">
         <div class="container">
             <div class="community-inner reveal">
                 <div class="community-content">
-                    <span class="eyebrow"><i class="fas fa-users"></i> Community</span>
-                    <h2>AI에 관심 있는 교육자들이<br>함께 모이는 곳</h2>
-                    <p>변화의 속도는 빠르지만, 함께라면 두렵지 않습니다.
-                        AI 활용 스터디와 실습 자료를 나누고, 수업에 적용한 경험을 함께 이야기해요.
-                        AI 시대를 항해하는 교육자들의 든든한 나침반이 되겠습니다.</p>
+                    <span class="eyebrow"><i class="fas fa-compass"></i> 더 보고 싶다면</span>
+                    <h2>봉사단 소식, 교육 사진,<br>더 많은 이야기는 카페에서</h2>
+                    <p>필로소피 AI 교육의 활동 소식과 자료, 스터디 이야기는 네이버 카페에서,
+                        강의와 실습 영상은 유튜브 채널에서 만나보실 수 있습니다.
+                        이 사이트는 교육자들이 직접 만든 바이브코딩 프로젝트를 나누고 연구하는 데 집중합니다.</p>
                     <div class="community-actions">
-                        <a href="community.html" class="btn btn-light"><i class="fas fa-comments"></i> 교육자 커뮤니티 게시판</a>
-                        <a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener" class="btn btn-outline"><i class="fas fa-user-plus"></i> 네이버 카페 합류하기</a>
+                        <a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener" class="btn btn-naver">☕ 네이버 카페 바로가기</a>
+                        <a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="btn btn-youtube"><i class="fab fa-youtube"></i> 유튜브 바로가기</a>
                         <a href="https://padlet.com/warmcomfortforyou/ai-2-7-ftxqlkdvb76p3r3" target="_blank" rel="noopener" class="btn btn-outline"><i class="fas fa-book-open"></i> 스터디 실습 자료</a>
                     </div>
                     <p class="study-note">스터디 자료 주소가 열리지 않으면 아래를 길게 눌러 복사하세요<br>
@@ -837,10 +746,10 @@
                     </div>
                     <div class="footer-col">
                         <h4>둘러보기</h4>
+                        <a href="#showcase">바이브코딩 쇼케이스</a>
                         <a href="community.html">교육자 커뮤니티 게시판</a>
-                        <a href="#volunteer">봉사단 소식</a>
-                        <a href="#gallery">교육 사진</a>
                         <a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener">네이버 카페</a>
+                        <a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener">유튜브</a>
                         <a href="#contact">문의하기</a>
                     </div>
                 </div>
@@ -855,50 +764,6 @@
             </div>
         </div>
     </footer>
-
-    <!-- ===== 관리자 글쓰기 모달 ===== -->
-    <div class="modal-backdrop" id="postModal">
-        <div class="modal-panel">
-            <button class="modal-close" id="postModalClose" aria-label="닫기"><i class="fas fa-times"></i></button>
-            <h3 id="postModalTitle"><i class="fas fa-pen-to-square"></i> 소식 쓰기</h3>
-            <form id="postForm">
-                <div class="form-group">
-                    <label for="postTitle">제목</label>
-                    <input type="text" id="postTitle" placeholder="제목을 입력해 주세요" required maxlength="100">
-                </div>
-                <div class="form-group">
-                    <label for="postContent">내용</label>
-                    <textarea id="postContent" placeholder="활동 내용을 적어주세요" rows="4"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>사진</label>
-                    <label class="photo-input-wrap" id="photoInputWrap">
-                        <span id="photoInputLabel"><i class="fas fa-image"></i> 클릭해서 사진을 선택하세요 (선택)</span>
-                        <img id="photoPreview" style="display:none" alt="미리보기">
-                        <input type="file" id="postPhoto" accept="image/*" hidden>
-                    </label>
-                </div>
-                <button type="submit" class="submit-btn">
-                    <span class="text"><i class="fas fa-paper-plane"></i> 게시하기</span>
-                    <span class="loading"><i class="fas fa-spinner"></i> 게시 중...</span>
-                </button>
-                <div class="modal-error" id="postError"></div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ===== 라이트박스 (게시물 크게 보기) ===== -->
-    <div class="modal-backdrop" id="lightbox">
-        <div class="modal-panel lightbox-panel">
-            <button class="modal-close" id="lightboxClose" aria-label="닫기" style="z-index:10; background:#fff;"><i class="fas fa-times"></i></button>
-            <img id="lightboxImg" src="" alt="" style="display:none">
-            <div class="lightbox-body">
-                <div class="post-date" id="lightboxDate"></div>
-                <h3 id="lightboxTitle"></h3>
-                <p id="lightboxText"></p>
-            </div>
-        </div>
-    </div>
 
     <script>
         // ===== Header scroll state =====
@@ -1044,12 +909,6 @@
         const ADMIN_EMAIL = 'warmcomfortforyou@gmail.com';
         let isAdmin = false;
 
-        const BOARDS = {
-            volunteer: { collection: 'volunteer_posts', grid: 'volunteerGrid', addBtn: 'volunteerAddBtn', emptyIcon: 'fa-hand-holding-heart', emptyText: '아직 등록된 봉사단 소식이 없습니다.', modalTitle: '봉사단 소식 쓰기' },
-            education: { collection: 'education_posts', grid: 'educationGrid', addBtn: 'educationAddBtn', emptyIcon: 'fa-camera', emptyText: '아직 등록된 교육 사진이 없습니다.', modalTitle: '교육 사진 올리기' },
-        };
-        const boardCache = { volunteer: [], education: [] };
-
         function initFirebase() {
             let attempts = 0;
             const t = setInterval(() => {
@@ -1061,14 +920,12 @@
                         db = window.getFirestore(app);
                         window.onAuthStateChanged(auth, updateAuthUI);
                         setupLogout();
-                        loadBoard('volunteer');
-                        loadBoard('education');
+                        loadShowcase();
                         recordVisit();
                         loadAITools();
                     } catch (e) {
                         console.error('Firebase init 오류:', e);
-                        showBoardError('volunteer');
-                        showBoardError('education');
+                        showShowcaseError();
                     }
                 }
                 if (++attempts > 50) {
@@ -1096,13 +953,8 @@
 
             // 관리자 전용 UI 토글
             isAdmin = !!user && (user.email || '').toLowerCase() === ADMIN_EMAIL;
-            Object.values(BOARDS).forEach(b => {
-                document.getElementById(b.addBtn).classList.toggle('visible', isAdmin);
-            });
             document.getElementById('adminStats').classList.toggle('visible', isAdmin);
             if (isAdmin) loadAdminStats();
-            renderBoard('volunteer');
-            renderBoard('education');
         }
 
         // ===== 방문자 통계 (누적 / 오늘) =====
@@ -1182,69 +1034,62 @@
             });
         }
 
-        // ===== 갤러리 게시판 (봉사단 소식 / 교육 사진) =====
-        async function loadBoard(boardKey) {
-            const board = BOARDS[boardKey];
+        // ===== 바이브코딩 쇼케이스 미리보기 (community_posts 중 '바이브코딩 쇼케이스' 카테고리) =====
+        const SHOWCASE_CATEGORY = '바이브코딩 쇼케이스';
+        async function loadShowcase() {
             try {
-                const q = window.fsQuery(window.fsCollection(db, board.collection), window.fsOrderBy('createdAt', 'desc'));
+                const q = window.fsQuery(
+                    window.fsCollection(db, 'community_posts'),
+                    window.fsWhere('category', '==', SHOWCASE_CATEGORY),
+                    window.fsOrderBy('createdAt', 'desc'),
+                    window.fsLimit(6)
+                );
                 const snap = await window.fsGetDocs(q);
-                boardCache[boardKey] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                renderBoard(boardKey);
+                renderShowcase(snap.docs.map(d => ({ id: d.id, ...d.data() })));
             } catch (e) {
-                console.error(`${board.collection} 불러오기 오류:`, e);
-                showBoardError(boardKey);
+                console.error('쇼케이스 불러오기 오류:', e);
+                showShowcaseError();
             }
         }
 
-        function showBoardError(boardKey) {
-            const board = BOARDS[boardKey];
-            document.getElementById(board.grid).innerHTML =
-                `<div class="gallery-empty"><i class="fas fa-triangle-exclamation"></i>게시물을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.</div>`;
+        function showShowcaseError() {
+            document.getElementById('showcaseGrid').innerHTML =
+                `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-soft);"><i class="fas fa-triangle-exclamation"></i> 쇼케이스를 불러오지 못했습니다. 잠시 후 새로고침해 주세요.</div>`;
         }
 
-        function renderBoard(boardKey) {
-            const board = BOARDS[boardKey];
-            const grid = document.getElementById(board.grid);
-            const posts = boardCache[boardKey];
-            if (!Array.isArray(posts)) return;
+        function showcaseCardHtml(p, i) {
+            return `
+                <article class="tool-card reveal">
+                    <div class="tool-top">
+                        <div class="tool-icon ${ICON_COLORS[i % ICON_COLORS.length]}"><i class="fas fa-rocket"></i></div>
+                        <div class="tool-head">
+                            <h3>${escapeHtml(p.title || '')}</h3>
+                            <div class="tool-tagline">${p.aiTool ? escapeHtml(p.aiTool) + '로 제작' : escapeHtml(p.authorName || '교육자') + ' 선생님 제작'}</div>
+                        </div>
+                    </div>
+                    <p title="${escapeHtml(p.content || '')}">${escapeHtml(p.content || '')}</p>
+                    ${p.projectUrl ? `<a href="${escapeHtml(p.projectUrl)}" target="_blank" rel="noopener" class="tool-link"><i class="fas fa-arrow-up-right-from-square"></i> 프로젝트 보기</a>` : ''}
+                    <a href="community.html?post=${encodeURIComponent(p.id)}" class="tool-review-link">
+                        <i class="fas fa-flask"></i> 만든 과정 보기
+                    </a>
+                </article>
+            `;
+        }
 
-            if (posts.length === 0) {
-                grid.innerHTML = `<div class="gallery-empty"><i class="fas ${board.emptyIcon}"></i>${board.emptyText}<br>곧 새로운 소식으로 찾아뵙겠습니다!</div>`;
+        function renderShowcase(items) {
+            const grid = document.getElementById('showcaseGrid');
+            if (!items.length) {
+                grid.innerHTML = `
+                    <div style="grid-column:1/-1;text-align:center;padding:3.5rem 1rem;color:var(--text-soft);background:#fff;border:1px dashed var(--line);border-radius:var(--radius);">
+                        <i class="fas fa-rocket" style="font-size:2rem;color:var(--accent);display:block;margin-bottom:0.8rem;"></i>
+                        아직 등록된 쇼케이스가 없습니다.<br>첫 프로젝트를 공유해 주세요!
+                    </div>`;
                 return;
             }
-
-            grid.innerHTML = posts.map((p, idx) => `
-                <article class="post-card" data-board="${boardKey}" data-idx="${idx}">
-                    <div class="post-photo">
-                        ${safeImageData(p.imageData)
-                            ? `<img src="${escapeHtml(safeImageData(p.imageData))}" alt="${escapeHtml(p.title)}" loading="lazy">`
-                            : `<span class="no-photo"><i class="fas fa-image"></i></span>`}
-                    </div>
-                    <div class="post-body">
-                        <div class="post-date">${formatDate(p.createdAt)}</div>
-                        <div class="post-title">${escapeHtml(p.title)}</div>
-                        ${p.content ? `<p class="post-text">${escapeHtml(p.content)}</p>` : ''}
-                        ${isAdmin ? `<button class="post-delete" data-board="${boardKey}" data-id="${p.id}"><i class="fas fa-trash-can"></i> 삭제</button>` : ''}
-                    </div>
-                </article>
-            `).join('');
-
-            grid.querySelectorAll('.post-card').forEach(card => {
-                card.addEventListener('click', () => openLightbox(card.dataset.board, Number(card.dataset.idx)));
-            });
-            grid.querySelectorAll('.post-delete').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
-                    try {
-                        await window.fsDeleteDoc(window.fsDoc(db, BOARDS[btn.dataset.board].collection, btn.dataset.id));
-                        loadBoard(btn.dataset.board);
-                    } catch (err) {
-                        console.error('삭제 오류:', err);
-                        alert('삭제 중 오류가 발생했습니다.');
-                    }
-                });
-            });
+            grid.innerHTML = items.map(showcaseCardHtml).join('');
+            if (typeof revealObserver !== 'undefined') {
+                grid.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+            }
         }
 
         // ===== AI 툴 동적 로드 =====
@@ -1393,147 +1238,6 @@
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
-
-        // 게시물 이미지는 업로더가 생성하는 data:image/ 형식만 허용
-        function safeImageData(v) {
-            return (typeof v === 'string' && v.startsWith('data:image/')) ? v : '';
-        }
-
-        // ===== 글쓰기 모달 =====
-        const postModal = document.getElementById('postModal');
-        const postForm = document.getElementById('postForm');
-        const postError = document.getElementById('postError');
-        const photoInput = document.getElementById('postPhoto');
-        const photoPreview = document.getElementById('photoPreview');
-        const photoInputLabel = document.getElementById('photoInputLabel');
-        let activeBoard = null;
-        let pendingImageData = null;
-        let isPosting = false;
-
-        Object.entries(BOARDS).forEach(([key, b]) => {
-            document.getElementById(b.addBtn).addEventListener('click', () => openPostModal(key));
-        });
-
-        function openPostModal(boardKey) {
-            activeBoard = boardKey;
-            document.getElementById('postModalTitle').innerHTML =
-                `<i class="fas fa-pen-to-square"></i> ${BOARDS[boardKey].modalTitle}`;
-            postForm.reset();
-            pendingImageData = null;
-            photoPreview.style.display = 'none';
-            photoInputLabel.style.display = '';
-            postError.classList.remove('show');
-            postModal.classList.add('open');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closePostModal() {
-            postModal.classList.remove('open');
-            document.body.style.overflow = '';
-        }
-        document.getElementById('postModalClose').addEventListener('click', closePostModal);
-        postModal.addEventListener('click', (e) => { if (e.target === postModal) closePostModal(); });
-
-        // 사진 선택 → 리사이즈(최대 1100px, JPEG) 후 데이터 URL로 보관 (Firestore 1MB 문서 제한 대응)
-        photoInput.addEventListener('change', () => {
-            const file = photoInput.files?.[0];
-            if (!file) return;
-            const img = new Image();
-            const url = URL.createObjectURL(file);
-            img.onload = () => {
-                URL.revokeObjectURL(url);
-                const maxDim = 1100;
-                const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-                const canvas = document.createElement('canvas');
-                canvas.width = Math.round(img.width * scale);
-                canvas.height = Math.round(img.height * scale);
-                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                let quality = 0.82;
-                let dataUrl = canvas.toDataURL('image/jpeg', quality);
-                while (dataUrl.length > 900000 && quality > 0.4) {
-                    quality -= 0.1;
-                    dataUrl = canvas.toDataURL('image/jpeg', quality);
-                }
-                if (dataUrl.length > 900000) {
-                    showPostError('사진 용량이 너무 큽니다. 더 작은 사진을 선택해 주세요.');
-                    return;
-                }
-                pendingImageData = dataUrl;
-                photoPreview.src = dataUrl;
-                photoPreview.style.display = 'block';
-                photoInputLabel.style.display = 'none';
-                postError.classList.remove('show');
-            };
-            img.onerror = () => {
-                URL.revokeObjectURL(url);
-                showPostError('이미지 파일을 읽을 수 없습니다.');
-            };
-            img.src = url;
-        });
-
-        function showPostError(msg) {
-            postError.textContent = msg;
-            postError.classList.add('show');
-        }
-
-        postForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (isPosting || !activeBoard) return;
-            if (!isAdmin) { showPostError('관리자만 게시할 수 있습니다.'); return; }
-
-            const title = document.getElementById('postTitle').value.trim();
-            if (!title) { showPostError('제목을 입력해 주세요.'); return; }
-
-            isPosting = true;
-            const btn = postForm.querySelector('.submit-btn');
-            btn.classList.add('loading');
-            btn.disabled = true;
-
-            try {
-                await window.fsAddDoc(window.fsCollection(db, BOARDS[activeBoard].collection), {
-                    title,
-                    content: document.getElementById('postContent').value.trim(),
-                    imageData: pendingImageData,
-                    authorEmail: ADMIN_EMAIL,
-                    createdAt: window.fsServerTimestamp(),
-                });
-                closePostModal();
-                loadBoard(activeBoard);
-            } catch (err) {
-                console.error('게시 오류:', err);
-                showPostError('게시 중 오류가 발생했습니다. 로그인 상태를 확인해 주세요.');
-            } finally {
-                isPosting = false;
-                btn.classList.remove('loading');
-                btn.disabled = false;
-            }
-        });
-
-        // ===== 라이트박스 =====
-        const lightbox = document.getElementById('lightbox');
-        function openLightbox(boardKey, idx) {
-            const p = boardCache[boardKey]?.[idx];
-            if (!p) return;
-            const img = document.getElementById('lightboxImg');
-            const imgData = safeImageData(p.imageData);
-            if (imgData) { img.src = imgData; img.style.display = 'block'; }
-            else { img.style.display = 'none'; }
-            document.getElementById('lightboxDate').textContent = formatDate(p.createdAt);
-            document.getElementById('lightboxTitle').textContent = p.title || '';
-            document.getElementById('lightboxText').textContent = p.content || '';
-            lightbox.classList.add('open');
-            document.body.style.overflow = 'hidden';
-        }
-        function closeLightbox() {
-            lightbox.classList.remove('open');
-            document.body.style.overflow = '';
-        }
-        document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
-        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') { closeLightbox(); closePostModal(); }
-        });
 
         // ===== 서울 교육 공공데이터 =====
         // Netlify 서버리스 함수(/.netlify/functions/seoul-edu)가 환경변수 SEOUL_API_KEY로
