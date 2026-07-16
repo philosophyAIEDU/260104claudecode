@@ -62,6 +62,7 @@ Site settings → Environment variables 에 등록:
 5. **커뮤니티** — AI에 관심 있는 교육자들이 모이는 공간, 스터디 자료 안내
    - **교육자 커뮤니티 게시판** (`community.html`) — Google 로그인 후 수업 사례·질문·자료 공유 글 작성, 댓글, 분류 탭·검색. 본인 글/댓글 및 관리자만 삭제 가능 (Firestore `community_posts` + `comments` 하위 컬렉션)
    - 게시판 부가 기능: 좋아요(`likes` 하위 컬렉션)·인기순 정렬, 내 글 댓글 알림(`notifications`), 게시글/댓글 신고(`reports`, 관리자 대시보드에서 처리), 커뮤니티 규칙 안내, AI 툴 카드 → `community.html?tool=툴이름` 후기 연동, `?post=ID` 딥링크
+   - **바이브코딩 쇼케이스** — 교육자가 바이브코딩으로 직접 만든 AI 도구를 전시·연구하는 전용 카테고리. 글쓰기 시 프로젝트 URL·사용한 AI 툴(Claude Code, Cursor 등)·제작 스토리(프롬프트, 삽질기, 배포 방법)를 함께 입력하면 목록/상세에서 "프로젝트 보러가기" 버튼과 제작 과정 박스로 노출 (`community_posts` 문서의 `projectUrl`/`aiTool`/`process` 필드)
 6. **문의** — 실시간 검증 문의 폼 (localStorage 저장)
 7. **Footer**
 

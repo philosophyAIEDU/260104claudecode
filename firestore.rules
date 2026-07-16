@@ -70,7 +70,10 @@ service cloud.firestore {
         && request.resource.data.content is string
         && request.resource.data.content.size() >= 1
         && request.resource.data.content.size() <= 5000
-        && request.resource.data.category in ['수업 사례', '질문·고민', '자료 공유', '자유'];
+        && request.resource.data.category in ['수업 사례', '바이브코딩 쇼케이스', '질문·고민', '자료 공유', '자유']
+        && (!('projectUrl' in request.resource.data) || (request.resource.data.projectUrl is string && request.resource.data.projectUrl.size() <= 300))
+        && (!('aiTool' in request.resource.data) || (request.resource.data.aiTool is string && request.resource.data.aiTool.size() <= 60))
+        && (!('process' in request.resource.data) || (request.resource.data.process is string && request.resource.data.process.size() <= 4000));
       // 본문 수정은 불가. 좋아요/댓글 수 카운터 한 개만 ±1 변경하는 것은 허용
       allow update: if request.auth != null
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount', 'commentCount'])
