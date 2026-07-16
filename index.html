@@ -1080,10 +1080,11 @@
                         <div class="tool-icon ${ICON_COLORS[i % ICON_COLORS.length]}"><i class="fas fa-rocket"></i></div>
                         <div class="tool-head">
                             <h3>${escapeHtml(p.title || '')}</h3>
-                            <div class="tool-tagline">${p.aiTool ? escapeHtml(p.aiTool) + '로 제작' : escapeHtml(p.authorName || '교육자') + ' 선생님 제작'}</div>
+                            <div class="tool-tagline">${escapeHtml(p.authorName || '교육자')} 선생님${p.authorAffiliation ? ' · ' + escapeHtml(p.authorAffiliation) : ''}</div>
                         </div>
                     </div>
                     <p title="${escapeHtml(p.content || '')}">${escapeHtml(p.content || '')}</p>
+                    ${p.aiTool ? `<div class="tool-tags"><span><i class="fas fa-robot"></i> ${escapeHtml(p.aiTool)}로 제작</span></div>` : ''}
                     ${p.projectUrl ? `<a href="${escapeHtml(p.projectUrl)}" target="_blank" rel="noopener" class="tool-link"><i class="fas fa-arrow-up-right-from-square"></i> 프로젝트 보기</a>` : ''}
                     <a href="community.html?post=${encodeURIComponent(p.id)}" class="tool-review-link">
                         <i class="fas fa-flask"></i> 만든 과정 보기

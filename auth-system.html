@@ -502,8 +502,13 @@
 
                 <form id="userProfileForm">
                     <div class="form-group">
-                        <label for="displayName">이름 또는 닉네임 <span style="color: var(--error-color)">*</span></label>
-                        <input type="text" id="displayName" name="displayName" placeholder="예: 김선생 / 철학교사" required>
+                        <label for="displayName">닉네임 <span style="color: var(--error-color)">*</span></label>
+                        <input type="text" id="displayName" name="displayName" placeholder="예: 김선생 / 철학교사" maxlength="50" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="affiliation">소속 <span style="color: var(--error-color)">*</span></label>
+                        <input type="text" id="affiliation" name="affiliation" placeholder="예: OO초등학교, OO학원, 개인" maxlength="60" required>
                     </div>
 
                     <div class="form-group">
@@ -723,10 +728,11 @@
                 const jobSelect = (formData.get('job') || '').trim();
                 const job = jobSelect === '기타' ? (formData.get('jobEtc') || '').trim() : jobSelect;
                 const name = (formData.get('displayName') || '').trim();
+                const affiliation = (formData.get('affiliation') || '').trim();
                 const email = (formData.get('profileEmail') || '').trim();
 
-                if (!name || !email || !job) {
-                    showError('이름/닉네임, 이메일, 직업은 필수 입력 항목입니다.', 'profileError');
+                if (!name || !affiliation || !email || !job) {
+                    showError('닉네임, 소속, 이메일, 직업은 필수 입력 항목입니다.', 'profileError');
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '프로필 저장하기';
                     return;
@@ -734,6 +740,7 @@
 
                 const profileData = {
                     name: name,
+                    affiliation: affiliation,
                     email: email,
                     googleEmail: currentUser.email,
                     job: job,
@@ -745,12 +752,23 @@
                 // Create document only if it doesn't exist, else merge
                 const userRef = window.doc(db, 'users', currentUser.uid);
                 const docSnap = await window.getDoc(userRef);
-                
+
                 if (!docSnap.exists()) {
                     profileData.createdAt = window.serverTimestamp();
                 }
-                
+
                 await window.setDoc(userRef, profileData, { merge: true });
+
+                // 게시판·랭킹에서 공개적으로 보여줄 닉네임/소속 (이메일 등 민감정보 제외)
+                try {
+                    const boardRef = window.doc(db, 'leaderboard', currentUser.uid);
+                    const boardSnap = await window.getDoc(boardRef);
+                    const boardData = { nickname: name, affiliation: affiliation, updatedAt: window.serverTimestamp() };
+                    if (!boardSnap.exists()) boardData.likeCredits = 0;
+                    await window.setDoc(boardRef, boardData, { merge: true });
+                } catch (boardErr) {
+                    console.error('공개 프로필 저장 오류:', boardErr);
+                }
 
                 showMessage('프로필이 성공적으로 저장되었습니다.', 'profileMessage');
                 setTimeout(() => showWelcomeScreen(profileData), 1500);
@@ -861,8 +879,10 @@
             loginSection.style.display = 'none';
             // 구글 계정 정보로 기본값 채우기
             const nameInput = document.getElementById('displayName');
+            const affiliationInput = document.getElementById('affiliation');
             const emailInput = document.getElementById('profileEmail');
             if (nameInput) nameInput.value = (existing && existing.name) || user.displayName || '';
+            if (affiliationInput) affiliationInput.value = (existing && existing.affiliation) || '';
             if (emailInput) emailInput.value = (existing && existing.email) || user.email || '';
         }
 
@@ -872,10 +892,15 @@
             authSection.innerHTML = `
                 <h1 class="auth-title">환영합니다, ${esc(profile.name)}님!</h1>
                 <p class="auth-subtitle">로그인이 완료되었습니다.<br>곧 Philosophy AI Education의 최신 소식을 받아보실 수 있습니다.</p>
-                <div style="margin-top: 2rem;">
+                <div style="margin-top: 2rem; display:flex; flex-direction:column; gap:0.6rem;">
                     <a href="/" style="color: var(--primary-color); text-decoration: none;">← 메인 페이지로 돌아가기</a>
+                    <a href="/community.html" style="color: var(--primary-color); text-decoration: none;">교육자 커뮤니티 게시판 가기 →</a>
+                    <button type="button" id="editProfileBtn" style="border:none;background:none;color:var(--text-light);text-decoration:underline;cursor:pointer;font:inherit;">닉네임·소속 수정하기</button>
                 </div>
             `;
+            document.getElementById('editProfileBtn')?.addEventListener('click', () => {
+                if (currentUser) showProfileForm(currentUser, profile);
+            });
             userInfo.style.display = 'flex';
             loginSection.style.display = 'none';
         }

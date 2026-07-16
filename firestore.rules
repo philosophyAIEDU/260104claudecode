@@ -19,6 +19,32 @@ service cloud.firestore {
       }
     }
 
+    // 공개 프로필(닉네임/소속/좋아요 크레딧) — 게시판·랭킹 표시용. 이메일 등 민감정보는 없음
+    match /leaderboard/{uid} {
+      allow read: if true;
+      // 본인이 프로필 저장 시 생성 — 최초 크레딧은 0
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.nickname is string && request.resource.data.nickname.size() >= 1
+        && request.resource.data.nickname.size() <= 50
+        && request.resource.data.affiliation is string && request.resource.data.affiliation.size() <= 60
+        && request.resource.data.get('likeCredits', 0) == 0;
+      allow update: if request.auth != null && (
+        // 본인은 닉네임/소속만 수정 가능
+        (request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nickname', 'affiliation', 'updatedAt'])
+          && request.resource.data.nickname is string && request.resource.data.nickname.size() >= 1
+          && request.resource.data.nickname.size() <= 50
+          && request.resource.data.affiliation is string && request.resource.data.affiliation.size() <= 60)
+        ||
+        // 글에 좋아요를 누른 사람이 작성자의 크레딧을 ±1만 갱신 (좋아요/좋아요 취소)
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCredits'])
+          && request.resource.data.likeCredits is int
+          && request.resource.data.likeCredits >= 0
+          && (request.resource.data.likeCredits - resource.data.get('likeCredits', 0)) in [1, -1])
+      );
+      allow delete: if isAdmin();
+    }
+
     // 필로소피 AI 봉사단 소식 — 누구나 읽기, 관리자만 쓰기
     match /volunteer_posts/{postId} {
       allow read: if true;
@@ -73,7 +99,8 @@ service cloud.firestore {
         && request.resource.data.category in ['수업 사례', '바이브코딩 쇼케이스', '질문·고민', '자료 공유', '자유']
         && (!('projectUrl' in request.resource.data) || (request.resource.data.projectUrl is string && request.resource.data.projectUrl.size() <= 300))
         && (!('aiTool' in request.resource.data) || (request.resource.data.aiTool is string && request.resource.data.aiTool.size() <= 60))
-        && (!('process' in request.resource.data) || (request.resource.data.process is string && request.resource.data.process.size() <= 4000));
+        && (!('process' in request.resource.data) || (request.resource.data.process is string && request.resource.data.process.size() <= 4000))
+        && (!('authorAffiliation' in request.resource.data) || (request.resource.data.authorAffiliation is string && request.resource.data.authorAffiliation.size() <= 60));
       // 본문 수정은 불가. 좋아요/댓글 수 카운터 한 개만 ±1 변경하는 것은 허용
       allow update: if request.auth != null
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount', 'commentCount'])
