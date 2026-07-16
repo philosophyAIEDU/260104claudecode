@@ -625,18 +625,24 @@
             }
         }
 
-        // ?tool=툴이름 → 해당 툴 검색 + 글쓰기 프리필 / ?post=ID → 글 바로 열기
+        // ?tool=툴이름 → 해당 툴 검색 + 글쓰기 프리필 / ?post=ID → 글 바로 열기 / ?cat=분류명 → 분류 탭 필터
         async function handleUrlParams() {
             if (paramsHandled) return;
             paramsHandled = true;
             const params = new URLSearchParams(location.search);
             const tool = (params.get('tool') || '').trim().slice(0, 60);
             const postId = (params.get('post') || '').trim();
+            const cat = (params.get('cat') || '').trim();
             if (tool) {
                 pendingTool = tool;
                 searchTerm = tool;
                 const box = document.getElementById('boardSearch');
                 box.value = tool;
+                renderList();
+            }
+            if (cat && CATEGORIES.some(c => c.id === cat)) {
+                activeCategory = cat;
+                renderTabs();
                 renderList();
             }
             if (postId) {

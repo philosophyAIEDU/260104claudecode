@@ -32,7 +32,7 @@ Site settings → Environment variables 에 등록:
 - `SEOUL_SERVICE` : 교육 데이터셋 서비스명/ID (선택, 미설정 시 기본값 사용)
 
 ## 메인 페이지 구성 (index.html)
-1. **Hero** — "AI 시대, 교육자의 나침반" 메시지와 CTA
+1. **Hero** — "AI 시대, 교육자의 나침반" 메시지와 CTA (바이브코딩 쇼케이스 · AI 툴 · 카페 · 유튜브 바로가기 버튼)
 2. **교육자분들을 위한 AI 툴** — 직접 만든 AI 학습 도구 (카테고리 탭으로 분류 표시)
    - 언어·독서
      - 영어 사전 — https://philoenglishdictionary.netlify.app
@@ -57,14 +57,17 @@ Site settings → Environment variables 에 등록:
      - AI 커리어 코치 — https://philocareer.netlify.app/
      - AI 확률 프롬프트 실험실 — https://philoailab.netlify.app/
      - 바둑·장기·체스 게임 — https://philogo1.netlify.app/
-3. **교육자를 위한 AI 나침반** — 교육 현장에 유용한 외부 AI 도구 큐레이션
-4. **우리가 지키는 방향** — 도구보다 사람 / 비판적 활용 / 함께 배우기
-5. **커뮤니티** — AI에 관심 있는 교육자들이 모이는 공간, 스터디 자료 안내
-   - **교육자 커뮤니티 게시판** (`community.html`) — Google 로그인 후 수업 사례·질문·자료 공유 글 작성, 댓글, 분류 탭·검색. 본인 글/댓글 및 관리자만 삭제 가능 (Firestore `community_posts` + `comments` 하위 컬렉션)
-   - 게시판 부가 기능: 좋아요(`likes` 하위 컬렉션)·인기순 정렬, 내 글 댓글 알림(`notifications`), 게시글/댓글 신고(`reports`, 관리자 대시보드에서 처리), 커뮤니티 규칙 안내, AI 툴 카드 → `community.html?tool=툴이름` 후기 연동, `?post=ID` 딥링크
-   - **바이브코딩 쇼케이스** — 교육자가 바이브코딩으로 직접 만든 AI 도구를 전시·연구하는 전용 카테고리. 글쓰기 시 프로젝트 URL·사용한 AI 툴(Claude Code, Cursor 등)·제작 스토리(프롬프트, 삽질기, 배포 방법)를 함께 입력하면 목록/상세에서 "프로젝트 보러가기" 버튼과 제작 과정 박스로 노출 (`community_posts` 문서의 `projectUrl`/`aiTool`/`process` 필드)
-6. **문의** — 실시간 검증 문의 폼 (localStorage 저장)
-7. **Footer**
+3. **교육자를 위한 바이브코딩 쇼케이스** (`#showcase`) — Firestore `community_posts` 중 `바이브코딩 쇼케이스` 카테고리 최신 6개를 카드로 미리보기 (AI 툴 카드와 동일한 `tool-card` 스타일 재사용). 각 카드는 프로젝트 바로가기 링크와 `community.html?post=ID`로 연결되는 "만든 과정 보기" 링크를 제공하며, 하단 버튼으로 전체 게시판(`community.html`)에서 직접 글쓰기로 이동
+4. **교육자를 위한 AI 나침반** — 교육 현장에 유용한 외부 AI 도구 큐레이션
+5. **우리가 지키는 방향** — 도구보다 사람 / 비판적 활용 / 함께 배우기
+6. **카페 · 유튜브 안내** (`#community`) — 봉사단 소식·교육 사진 등 그 외 이야기는 네이버 카페로, 강의·실습 영상은 유튜브 채널로 자연스럽게 연결하는 배너. 이 사이트 자체는 바이브코딩 쇼케이스에 집중하고, 그 외 콘텐츠는 카페·유튜브에 맡깁니다
+7. **문의** — 실시간 검증 문의 폼 (localStorage 저장)
+8. **Footer**
+
+## 교육자 커뮤니티 게시판 (community.html)
+- Google 로그인 후 수업 사례·질문·자료 공유 글 작성, 댓글, 분류 탭·검색. 본인 글/댓글 및 관리자만 삭제 가능 (Firestore `community_posts` + `comments` 하위 컬렉션)
+- 부가 기능: 좋아요(`likes` 하위 컬렉션)·인기순 정렬, 내 글 댓글 알림(`notifications`), 게시글/댓글 신고(`reports`, 관리자 대시보드에서 처리), 커뮤니티 규칙 안내, AI 툴 카드 → `community.html?tool=툴이름` 후기 연동, `?post=ID` 딥링크, `?cat=분류명` 분류 필터 딥링크
+- **바이브코딩 쇼케이스** — 교육자가 바이브코딩으로 직접 만든 AI 도구를 전시·연구하는 전용 카테고리. 글쓰기 시 프로젝트 URL·사용한 AI 툴(Claude Code, Cursor 등)·제작 스토리(프롬프트, 삽질기, 배포 방법)를 함께 입력하면 목록/상세에서 "프로젝트 보러가기" 버튼과 제작 과정 박스로 노출되고, index.html `#showcase` 섹션에도 최신 글이 미리보기로 노출 (`community_posts` 문서의 `projectUrl`/`aiTool`/`process` 필드)
 
 ## 디자인
 - 인디고 → 시안 그라데이션의 프로페셔널한 컬러 시스템
