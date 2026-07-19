@@ -42,6 +42,7 @@ Site settings → Environment variables 에 등록:
      - 영어 사전 — https://philoenglishdictionary.netlify.app
      - AI 독서 코치 — https://philoreading.netlify.app/
      - 문장나무 (문장 분석 학습 앱) — https://philolang.netlify.app/
+     - 영어 원서 읽기 — https://philoenglish2.netlify.app
    - 수학·물리
      - 미분적분 학습 도우미 — https://philomath77.netlify.app
      - AI 뉴턴 역학 학습 도우미 — https://philophysics1.netlify.app/
@@ -61,6 +62,7 @@ Site settings → Environment variables 에 등록:
      - AI 커리어 코치 — https://philocareer.netlify.app/
      - AI 확률 프롬프트 실험실 — https://philoailab.netlify.app/
      - 바둑·장기·체스 게임 — https://philogo1.netlify.app/
+     - 유튜브 분석 도우미 — https://philoyoutube.netlify.app
 3. **교육자를 위한 바이브코딩 쇼케이스** (`#showcase`) — Firestore `community_posts` 중 `바이브코딩 쇼케이스` 카테고리 최신 6개를 카드로 미리보기 (AI 툴 카드와 동일한 `tool-card` 스타일 재사용). 각 카드는 프로젝트 바로가기 링크와 `community.html?post=ID`로 연결되는 "만든 과정 보기" 링크를 제공하며, 하단 버튼으로 전체 게시판(`community.html`)에서 직접 글쓰기로 이동
 4. **교육자를 위한 AI 나침반** — 교육 현장에 유용한 외부 AI 도구 큐레이션
 5. **우리가 지키는 방향** — 도구보다 사람 / 비판적 활용 / 함께 배우기
