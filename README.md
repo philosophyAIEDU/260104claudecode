@@ -48,6 +48,7 @@ Site settings → Environment variables 에 등록:
      - AI 뉴턴 역학 학습 도우미 — https://philophysics1.netlify.app/
      - 역학 물리 샌드박스 — https://philophysics2.netlify.app/
      - 물리 역학 시뮬레이션 학습 앱 — https://philophysics5.netlify.app/
+     - 26년 하계 물리 정교사(1급) 자격연수 과정 — https://philoksnu.netlify.app/
    - 과학·자연
      - 알파폴드 학습 도우미 — https://philoalphafold.netlify.app
      - 신체 해부 레이어 뷰어 — https://philoanatomy.netlify.app/
