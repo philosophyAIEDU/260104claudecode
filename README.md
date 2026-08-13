@@ -60,6 +60,7 @@ Site settings → Environment variables 에 등록:
      - 사고력 코치 — https://philofable5.netlify.app
      - AI 토론 메이트 — https://philodiscussion.netlify.app/
      - 단종 이야기 — https://philohistory.netlify.app
+     - 독립운동가 인물 사전 — https://philokoreanhistory.netlify.app/
    - 진로·AI·게임
      - AI 커리어 코치 — https://philocareer.netlify.app/
      - AI 확률 프롬프트 실험실 — https://philoailab.netlify.app/
