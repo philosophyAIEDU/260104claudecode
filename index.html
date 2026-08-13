@@ -318,54 +318,29 @@ section { scroll-margin-top: 88px; }
 .channels-actions .btn i.fa-mug-hot { color: #0a8f46; }
 .channels-actions .btn i.fa-youtube { color: #c33; font-size: 17px; }
 
-/* ===== Contact ===== */
-.contact-wrap { display: grid; grid-template-columns: 1fr 1.1fr; gap: 72px; align-items: start; }
-.contact-aside .eyebrow { margin-bottom: 14px; }
-.contact-aside h2 {
+/* ===== 교육 문의 CTA ===== */
+.edu-cta-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+.edu-cta-copy .eyebrow { margin-bottom: 14px; }
+.edu-cta-copy h2 {
     font-family: var(--font-display); font-weight: 500;
     font-size: clamp(28px, 3.4vw, 40px); color: var(--aubergine-deep); letter-spacing: -0.01em;
     line-height: 1.2; margin-bottom: 16px;
 }
-.contact-aside > p { color: var(--text-soft); margin-bottom: 36px; font-size: 15.5px; }
-.contact-list { display: flex; flex-direction: column; gap: 20px; }
-.contact-list li { display: flex; align-items: center; gap: 16px; font-weight: 600; color: var(--ink); font-size: 15px; }
-.contact-list .ci {
-    width: 44px; height: 44px; border-radius: var(--radius-lg); background: var(--aubergine-wash);
-    color: var(--aubergine); display: grid; place-items: center; flex-shrink: 0; font-size: 15px;
+.edu-cta-copy h2 em { color: var(--indigo-ink); }
+.edu-cta-copy > p { color: var(--text-soft); font-size: 15.5px; line-height: 1.75; margin-bottom: 26px; }
+.edu-cta-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; margin-bottom: 32px; }
+.edu-cta-list li { display: flex; align-items: center; gap: 10px; font-size: 14.5px; font-weight: 500; color: var(--ink); }
+.edu-cta-list i { color: var(--aubergine); font-size: 13px; width: 18px; text-align: center; }
+.edu-cta-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.edu-collage { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.edu-collage figure {
+    margin: 0; border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden;
+    background: var(--parchment-deep); box-shadow: var(--shadow-sm); transition: var(--transition);
 }
-.contact-list small { display: block; color: var(--text-soft); font-weight: 400; font-size: 13px; margin-top: 1px; }
-.contact-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-xl); padding: 40px; box-shadow: var(--shadow); }
-.form-group { margin-bottom: 20px; }
-.form-group label { display: block; font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
-.form-group input, .form-group textarea {
-    width: 100%; padding: 13px 16px; border: 1px solid var(--line); border-radius: var(--radius);
-    font-family: inherit; font-size: 15px; color: var(--ink); background: var(--parchment); transition: var(--transition);
-}
-.form-group input::placeholder, .form-group textarea::placeholder { color: #a99d94; }
-.form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--aubergine); background: var(--surface); box-shadow: 0 0 0 3px rgba(74, 21, 86, 0.1); }
-.form-group textarea { resize: vertical; min-height: 130px; }
-.form-group.error input, .form-group.error textarea { border-color: var(--ember); background: #f7ece8; }
-.form-group.success input, .form-group.success textarea { border-color: var(--aubergine); }
-.error-message { display: none; color: var(--ember); font-size: 12.5px; margin-top: 6px; }
-.error-message.show { display: block; }
-.submit-btn {
-    width: 100%; background: var(--aubergine); color: #fbf7f0; border: none; font-family: inherit;
-    font-weight: 600; font-size: 15px; padding: 15px; border-radius: var(--radius); cursor: pointer;
-    box-shadow: 0 1px 0 rgba(44,20,50,.15); transition: var(--transition);
-}
-.submit-btn:hover:not(:disabled) { background: var(--aubergine-soft); }
-.submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
-.submit-btn .loading { display: none; }
-.submit-btn.loading .text { display: none; }
-.submit-btn.loading .loading { display: inline-block; }
-.submit-btn.loading .loading i { animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.success-message {
-    display: none; margin-top: 16px; padding: 14px 18px; background: var(--aubergine-wash); color: var(--aubergine-deep);
-    border: 1px solid rgba(74, 21, 86, 0.15); border-radius: var(--radius); font-size: 14px; font-weight: 500;
-}
-.success-message.show { display: flex; align-items: center; gap: 10px; }
-.submission-counter { margin-top: 14px; font-size: 12.5px; color: var(--text-soft); text-align: center; }
+.edu-collage figure.wide { grid-column: 1 / -1; }
+.edu-collage img { width: 100%; height: 100%; aspect-ratio: 4 / 3; object-fit: cover; transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1); }
+.edu-collage:hover figure { border-color: var(--line-strong); box-shadow: var(--shadow); }
+.edu-collage figure:hover img { transform: scale(1.03); }
 
 /* ===== Footer ===== */
 footer { background: var(--parchment-deep); border-top: 1px solid var(--parchment-ink); padding: 72px 0 36px; color: var(--text); }
@@ -448,7 +423,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
     .hero-figure { order: -1; max-width: 340px; margin: 0 auto; }
     .hero-quote { left: -12px; }
     .tools-grid { grid-template-columns: repeat(2, 1fr); }
-    .contact-wrap { grid-template-columns: 1fr; gap: 48px; }
+    .edu-cta-inner { grid-template-columns: 1fr; gap: 44px; }
     .community-inner { padding: 44px 36px; }
 }
 @media (max-width: 768px) {
@@ -484,7 +459,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                 <li><a href="#tools">필로소피 AI 툴</a></li>
                 <li><a href="#showcase">바이브코딩 쇼케이스</a></li>
                 <li><a href="community.html">커뮤니티</a></li>
-                <li><a href="#contact">문의</a></li>
+                <li><a href="education-inquiry.html">교육 문의</a></li>
                 <li><a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="nav-ext nav-youtube"><i class="fab fa-youtube"></i> 유튜브</a></li>
                 <li><a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener" class="nav-ext nav-naver"><i class="fas fa-mug-hot"></i> 카페</a></li>
                 <li id="navLoginItem"><a href="auth-system.html" class="login-btn">로그인</a></li>
@@ -637,52 +612,38 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         </div>
     </section>
 
-    <!-- ===== Contact ===== -->
+    <!-- ===== 교육 문의 (전용 페이지 안내) ===== -->
     <section id="contact" class="section-pad">
         <div class="container">
-            <div class="contact-wrap">
-                <div class="contact-aside reveal">
-                    <span class="eyebrow">Contact</span>
-                    <h2>함께 만들어가요.</h2>
-                    <p>수업에 필요한 AI 도구, 협업하고 싶은 아이디어, 강의나 워크샵 문의를 자유롭게 남겨 주세요.
-                        교육 현장의 목소리가 다음 도구를 만듭니다.</p>
-                    <ul class="contact-list">
-                        <li><span class="ci"><i class="fas fa-envelope"></i></span>
-                            <div>이메일 문의<small><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="96f2f3f7e4f8f7fbf3a4a1d6f8f7e0f3e4b8f5f9fb">[email&#160;protected]</a></small></div></li>
-                        <li><span class="ci"><i class="fas fa-lightbulb"></i></span>
-                            <div>새로운 도구 제안<small>현장에서 필요한 AI 도구를 알려주세요</small></div></li>
-                        <li><span class="ci"><i class="fas fa-chalkboard-user"></i></span>
-                            <div>강의·워크샵<small>교육자 대상 AI 활용 교육 문의</small></div></li>
+            <div class="edu-cta-inner reveal">
+                <div class="edu-cta-copy">
+                    <span class="eyebrow">Education Inquiry</span>
+                    <h2>교육 현장에서 검증한<br><em>AI 교육을 제안합니다</em>.</h2>
+                    <p>교육청·대학원·고등학교·공공기관·연구실에서 진행해 온 AI 리터러시와 바이브 코딩 교육 이력,
+                        그리고 필로소피 AI 봉사단의 활동을 한 페이지에 정리했습니다.
+                        필요한 교육을 편하게 문의해 주세요.</p>
+                    <ul class="edu-cta-list">
+                        <li><i class="fas fa-compass"></i> AI 리터러시 교육</li>
+                        <li><i class="fas fa-code"></i> 바이브 코딩 입문·심화</li>
+                        <li><i class="fas fa-chalkboard-user"></i> 교육자 대상 직무연수</li>
+                        <li><i class="fas fa-flask"></i> 연구실·기업 특강</li>
                     </ul>
-                </div>
-
-                <div class="contact-card reveal">
-                    <form id="contactForm" novalidate>
-                        <div class="form-group">
-                            <label for="name">이름</label>
-                            <input type="text" id="name" name="name" placeholder="성함을 입력해 주세요" required>
-                            <div class="error-message" id="nameError">이름을 2글자 이상 입력해주세요.</div>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">이메일</label>
-                            <input type="email" id="email" name="email" placeholder="answer@example.com" required>
-                            <div class="error-message" id="emailError">올바른 이메일 주소를 입력해주세요.</div>
-                        </div>
-                        <div class="form-group">
-                            <label for="message">문의 내용</label>
-                            <textarea id="message" name="message" placeholder="문의하실 내용을 자세히 적어주세요." required></textarea>
-                            <div class="error-message" id="messageError">문의내용을 10글자 이상 입력해주세요.</div>
-                        </div>
-                        <button type="submit" class="submit-btn">
-                            <span class="text"><i class="fas fa-paper-plane"></i> 문의 보내기</span>
-                            <span class="loading"><i class="fas fa-spinner"></i> 전송 중...</span>
-                        </button>
-                    </form>
-                    <div class="success-message" id="successMessage">
-                        <i class="fas fa-circle-check"></i> 메일 작성 창이 열렸습니다. '보내기'를 누르면 문의가 전송됩니다.
+                    <div class="edu-cta-actions">
+                        <a href="education-inquiry.html" class="btn btn-primary"><i class="fas fa-paper-plane"></i> 교육 문의 페이지 보기</a>
+                        <a href="education-inquiry.html#history" class="btn btn-ghost">교육 이력 한눈에 보기 →</a>
                     </div>
-                    <div class="submission-counter" id="submissionCounter"></div>
                 </div>
+                <a class="edu-collage" href="education-inquiry.html#history" aria-label="교육 이력 페이지로 이동">
+                    <figure class="wide">
+                        <img src="assets/web/edu-2607-gnu-2.jpg" alt="경상국립대학교 물리 정교사 자격 연수 AI 리터러시 교육 현장" loading="lazy">
+                    </figure>
+                    <figure>
+                        <img src="assets/web/edu-2606-jeonju-2.jpg" alt="전주교육청 교육실무사 직무연수 강의 현장" loading="lazy">
+                    </figure>
+                    <figure>
+                        <img src="assets/web/vol-2603-study2.jpg" alt="필로소피 AI 봉사단 정기 스터디 현장" loading="lazy">
+                    </figure>
+                </a>
             </div>
         </div>
     </section>
@@ -734,7 +695,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                         <a href="community.html">교육자 커뮤니티 게시판</a>
                         <a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener">네이버 카페</a>
                         <a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener">유튜브</a>
-                        <a href="#contact">문의하기</a>
+                        <a href="education-inquiry.html">교육 문의</a>
                     </div>
                 </div>
             </div>
@@ -780,104 +741,6 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
             });
         }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
         document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-        // ===== Contact form =====
-        const CONTACT_EMAIL = 'dearname27@naver.com';
-        const contactForm = document.getElementById('contactForm');
-        const successMessage = document.getElementById('successMessage');
-        const submissionCounter = document.getElementById('submissionCounter');
-        let isSubmitting = false;
-
-        const validators = {
-            name: v => v.trim().length >= 2 && /^[가-힣a-zA-Z\s]+$/.test(v.trim()),
-            email: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()),
-            message: v => v.trim().length >= 10,
-        };
-
-        function setFieldState(field, valid) {
-            const group = field.closest('.form-group');
-            const err = group.querySelector('.error-message');
-            group.classList.toggle('error', !valid);
-            group.classList.toggle('success', valid);
-            err.classList.toggle('show', !valid);
-        }
-
-        ['name', 'email', 'message'].forEach(id => {
-            const field = document.getElementById(id);
-            field.addEventListener('blur', () => setFieldState(field, validators[id](field.value)));
-            field.addEventListener('input', () => {
-                if (field.closest('.form-group').classList.contains('error')) {
-                    setFieldState(field, validators[id](field.value));
-                }
-            });
-        });
-
-        function getInquiries() {
-            try { return JSON.parse(localStorage.getItem('philosophyAI_inquiries')) || []; }
-            catch { return []; }
-        }
-        function updateCounter() {
-            const n = getInquiries().length;
-            submissionCounter.textContent = n ? `지금까지 ${n}건의 문의가 접수되었습니다.` : '';
-        }
-
-        contactForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (isSubmitting) return;
-
-            let allValid = true;
-            ['name', 'email', 'message'].forEach(id => {
-                const field = document.getElementById(id);
-                const valid = validators[id](field.value);
-                setFieldState(field, valid);
-                if (!valid) allValid = false;
-            });
-            if (!allValid) return;
-
-            isSubmitting = true;
-            const btn = contactForm.querySelector('.submit-btn');
-            btn.classList.add('loading');
-            btn.disabled = true;
-
-            try {
-                const name = document.getElementById('name').value.trim();
-                const email = document.getElementById('email').value.trim();
-                const message = document.getElementById('message').value.trim();
-
-                // 로컬 기록(백업용)
-                const inquiries = getInquiries();
-                inquiries.unshift({
-                    id: `inq_${Date.now()}`,
-                    name, email, message,
-                    timestamp: new Date().toISOString(),
-                    dateFormatted: new Date().toLocaleString('ko-KR'),
-                });
-                localStorage.setItem('philosophyAI_inquiries', JSON.stringify(inquiries));
-
-                // 방문자의 기본 메일 앱으로 문의 메일 작성 창 열기
-                const subject = `[Philosophy AI Education 문의] ${name}님`;
-                const body =
-                    `이름: ${name}\n` +
-                    `회신 이메일: ${email}\n\n` +
-                    `문의 내용:\n${message}\n`;
-                const mailtoUrl = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                window.location.href = mailtoUrl;
-
-                successMessage.classList.add('show');
-                setTimeout(() => successMessage.classList.remove('show'), 6000);
-                contactForm.reset();
-                contactForm.querySelectorAll('.form-group').forEach(g => g.classList.remove('error', 'success'));
-                updateCounter();
-            } catch (err) {
-                console.error('문의 전송 오류:', err);
-                alert('메일 앱을 여는 중 오류가 발생했습니다. dearname27@naver.com 으로 직접 보내주세요.');
-            } finally {
-                isSubmitting = false;
-                btn.classList.remove('loading');
-                btn.disabled = false;
-            }
-        });
-        updateCounter();
 
         // ===== Firebase auth (login state in nav) =====
         const firebaseConfig = {

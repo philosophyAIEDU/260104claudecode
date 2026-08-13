@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교육 문의 — Philosophy AI Education</title>
+    <meta name="description" content="교육청·대학·학교·공공기관에서 진행한 AI 리터러시, 바이브 코딩 교육 이력과 필로소피 AI 봉사단 활동을 소개합니다. 강의·연수 문의를 남겨 주세요.">
+    <meta property="og:title" content="교육 문의 — Philosophy AI Education">
+    <meta property="og:description" content="AI 리터러시·바이브 코딩 교육 이력과 봉사단 활동. 강의와 연수 문의를 받습니다.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23f2ebe0'/%3E%3Cpath d='M50 16 L57 43 L84 50 L57 57 L50 84 L43 57 L16 50 L43 43 Z' fill='%234a1556'/%3E%3C/svg%3E">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Serif+KR:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KWCY47PZWB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-KWCY47PZWB');
+    </script>
+
+    <!-- Firebase (모듈형) — 네비게이션 로그인 상태 표시 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        window.initializeApp = initializeApp;
+        window.getAuth = getAuth;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signOut = signOut;
+        window.__firebaseReady = true;
+    </script>
+
+    <style>
+
+:root {
+    --parchment: #f2ebe0;
+    --parchment-deep: #e4dbd2;
+    --parchment-ink: #d6cabb;
+    --surface: #fbf7f0;
+    --aubergine: #4a1556;
+    --aubergine-deep: #2f0b38;
+    --aubergine-soft: #3c1047;
+    --aubergine-wash: #efe4f2;
+    --indigo-ink: #221b67;
+    --ember: #b5422a;
+    --gold: #b98a3a;
+    --primary: var(--aubergine);
+    --accent: var(--gold);
+    --ink: #2a1f2d;
+    --text: #4f434b;
+    --text-soft: #7d716e;
+    --line: #ddd2c3;
+    --line-strong: #c4b6a2;
+    --bg: var(--parchment);
+    --bg-soft: #ece3d5;
+    --white: var(--surface);
+    --font-display: 'Cormorant Garamond', 'Noto Serif KR', serif;
+    --font-body: 'Pretendard Variable', Pretendard, 'Inter', -apple-system, sans-serif;
+    --shadow-sm: 0 1px 2px rgba(44, 20, 50, 0.06);
+    --shadow: 0 4px 12px rgba(44, 20, 50, 0.08), 0 1px 2px rgba(44, 20, 50, 0.05);
+    --shadow-lg: 0 16px 40px rgba(44, 20, 50, 0.12), 0 2px 6px rgba(44, 20, 50, 0.06);
+    --radius: 6px;
+    --radius-lg: 10px;
+    --radius-xl: 16px;
+    --transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+body {
+    font-family: var(--font-body); line-height: 1.7; color: var(--text); background: var(--bg);
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; overflow-x: hidden;
+    word-break: keep-all; overflow-wrap: break-word;
+}
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+img { max-width: 100%; display: block; }
+em { font-style: italic; }
+.container { max-width: 1120px; margin: 0 auto; padding: 0 40px; }
+
+/* ===== Header ===== */
+header {
+    position: fixed; top: 0; width: 100%; z-index: 1000;
+    background: rgba(242, 235, 224, 0.96); border-bottom: 1px solid transparent;
+    transition: var(--transition);
+}
+header.scrolled { background: var(--parchment); border-bottom-color: var(--line); }
+nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; gap: 32px; }
+.logo {
+    font-family: var(--font-display); font-weight: 500; font-size: 24px;
+    color: var(--aubergine-deep); letter-spacing: -0.01em;
+    display: flex; align-items: baseline; gap: 10px; white-space: nowrap;
+}
+.logo em { font-style: italic; font-weight: 400; }
+.logo .logo-kr { font-family: var(--font-body); font-size: 12px; color: var(--text-soft); letter-spacing: 0.02em; font-weight: 500; }
+.nav-menu { display: flex; align-items: center; gap: 4px; }
+.nav-menu > li > a {
+    color: var(--text); font-weight: 500; font-size: 14px; white-space: nowrap;
+    padding: 8px 12px; border-radius: var(--radius); transition: var(--transition);
+}
+.nav-menu > li > a:hover { color: var(--aubergine); }
+.nav-menu > li > a.active { color: var(--aubergine); font-weight: 600; }
+.nav-menu > li > a.nav-ext { color: var(--text-soft); font-size: 13.5px; }
+.nav-menu > li > a.nav-ext i { margin-right: 4px; }
+.nav-menu > li > a.nav-ext:hover { color: var(--aubergine); }
+.login-btn {
+    background: var(--aubergine); color: var(--surface) !important; font-weight: 500;
+    padding: 9px 18px !important; border-radius: var(--radius); margin-left: 8px;
+    box-shadow: 0 1px 0 rgba(44,20,50,.15); transition: var(--transition);
+}
+.login-btn:hover { background: var(--aubergine-soft); }
+.user-info-nav {
+    display: flex; align-items: center; gap: 10px; background: var(--surface);
+    padding: 5px 6px 5px 14px; border-radius: var(--radius); margin-left: 8px; border: 1px solid var(--line);
+}
+.user-avatar-sm { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+#navUserName { font-size: 13.5px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.logout-btn-sm {
+    background: var(--parchment); border: 1px solid var(--line); color: var(--text-soft);
+    font-size: 12px; padding: 5px 10px; border-radius: var(--radius); cursor: pointer;
+    font-family: inherit; transition: var(--transition);
+}
+.logout-btn-sm:hover { color: var(--ember); border-color: var(--ember); }
+.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; }
+.hamburger span { width: 24px; height: 2px; background: var(--ink); border-radius: 2px; transition: var(--transition); }
+
+/* ===== Buttons ===== */
+.btn {
+    display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-body);
+    font-size: 15px; font-weight: 500; padding: 12px 22px; border-radius: var(--radius);
+    border: 1px solid transparent; cursor: pointer; white-space: nowrap; transition: var(--transition);
+}
+.btn-primary { background: var(--aubergine); color: #fbf7f0; box-shadow: 0 1px 0 rgba(44,20,50,.15); }
+.btn-primary:hover { background: var(--aubergine-soft); }
+.btn-ghost { background: transparent; color: var(--aubergine); padding: 12px 8px; }
+.btn-ghost:hover { color: var(--aubergine-deep); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.btn-outline-quiet { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.btn-outline-quiet:hover { border-color: var(--line-strong); box-shadow: var(--shadow-sm); }
+.btn-light { background: var(--parchment); color: var(--aubergine-deep); }
+.btn-light:hover { background: #fff; }
+
+/* ===== Sections ===== */
+section { scroll-margin-top: 88px; }
+.section-pad { padding: 104px 0; }
+.section-head { max-width: 720px; margin: 0 auto 56px; text-align: center; }
+.section-head .eyebrow { margin-bottom: 14px; }
+.eyebrow {
+    display: block; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--aubergine); font-weight: 600; margin-bottom: 20px;
+}
+.ornament { color: var(--aubergine); display: flex; justify-content: center; margin-bottom: 28px; opacity: 0.65; }
+.section-title {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(30px, 3.8vw, 44px); line-height: 1.18; letter-spacing: -0.01em;
+    color: var(--aubergine-deep);
+}
+.section-title em { color: var(--indigo-ink); }
+.section-sub { margin-top: 18px; font-size: 16px; color: var(--text-soft); line-height: 1.7; }
+
+/* ===== Page hero ===== */
+.page-hero { padding: 156px 0 76px; background: var(--parchment); }
+.page-hero-layout { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 64px; align-items: center; }
+.page-hero h1 {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(36px, 4.4vw, 54px); line-height: 1.16; letter-spacing: -0.02em;
+    color: var(--aubergine-deep); margin-bottom: 24px;
+}
+.page-hero h1 em { color: var(--indigo-ink); font-weight: 500; }
+.page-hero .lead { font-size: 17px; line-height: 1.75; color: var(--text); max-width: 520px; margin-bottom: 32px; }
+.page-hero .lead strong { color: var(--aubergine-deep); font-weight: 600; }
+.page-hero-buttons { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+
+.hero-figure { position: relative; }
+.hero-photo {
+    background: var(--parchment-deep); border-radius: var(--radius-xl); overflow: hidden;
+    aspect-ratio: 4 / 3; box-shadow: var(--shadow-lg); border: 1px solid var(--line);
+}
+.hero-photo img { width: 100%; height: 100%; object-fit: cover; }
+.hero-photo-caption {
+    position: absolute; left: -24px; bottom: -24px; max-width: 260px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
+    padding: 14px 18px; box-shadow: 0 8px 24px rgba(44,20,50,.1);
+}
+.hero-photo-caption strong { display: block; font-size: 14px; color: var(--aubergine-deep); font-weight: 600; }
+.hero-photo-caption small { font-size: 12.5px; color: var(--text-soft); }
+
+/* ===== Credential strip ===== */
+.cred-strip { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg-soft); }
+.cred-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; padding: 44px 0; }
+.cred-item { text-align: center; }
+.cred-item .num { font-family: var(--font-display); font-size: 40px; font-weight: 500; color: var(--aubergine); line-height: 1.1; }
+.cred-item .num small { font-family: var(--font-body); font-size: 16px; font-weight: 600; margin-left: 2px; }
+.cred-item .label { margin-top: 6px; font-size: 13.5px; color: var(--text-soft); }
+
+/* ===== Topics ===== */
+.topic-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.topic-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
+    padding: 26px 26px 24px; box-shadow: var(--shadow-sm); transition: var(--transition);
+}
+.topic-card:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
+.topic-icon {
+    width: 40px; height: 40px; border-radius: var(--radius-lg); display: grid; place-items: center;
+    font-size: 15px; margin-bottom: 14px; background: var(--aubergine-wash); color: var(--aubergine);
+    border: 1px solid rgba(74, 21, 86, 0.12);
+}
+.topic-icon.c2 { color: var(--indigo-ink); }
+.topic-icon.c3 { background: #f2e8d5; color: var(--gold); border-color: rgba(185, 138, 58, 0.2); }
+.topic-icon.c4 { background: #f5e6e1; color: var(--ember); border-color: rgba(181, 66, 42, 0.16); }
+.topic-card h3 { font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 4px; letter-spacing: -0.01em; }
+.topic-card .topic-sub { font-family: var(--font-display); font-style: italic; font-size: 15px; color: var(--aubergine); margin-bottom: 10px; }
+.topic-card p { font-size: 14.5px; color: var(--text-soft); line-height: 1.7; }
+
+/* ===== Timeline (교육 이력) ===== */
+.history-band { background: var(--parchment); }
+.timeline { position: relative; max-width: 940px; margin: 0 auto; padding-left: 132px; }
+.timeline::before {
+    content: ''; position: absolute; left: 96px; top: 8px; bottom: 8px;
+    width: 1px; background: var(--line-strong);
+}
+.tl-item { position: relative; margin-bottom: 32px; }
+.tl-item:last-child { margin-bottom: 0; }
+.tl-date {
+    position: absolute; left: -132px; top: 22px; width: 88px; text-align: right;
+    font-size: 13px; font-weight: 600; color: var(--aubergine); line-height: 1.35;
+}
+.tl-date span { display: block; font-size: 11.5px; font-weight: 500; color: var(--text-soft); }
+.tl-item::before {
+    content: ''; position: absolute; left: -40px; top: 27px; width: 9px; height: 9px;
+    border-radius: 50%; background: var(--aubergine); border: 2px solid var(--parchment);
+    box-shadow: 0 0 0 2px var(--aubergine-wash);
+}
+.tl-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
+    padding: 24px 26px 26px; box-shadow: var(--shadow-sm); transition: var(--transition);
+}
+.tl-card:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
+.tl-org { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.tl-org h3 { font-size: 18px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+.tl-kind {
+    font-size: 11.5px; font-weight: 600; color: var(--aubergine); background: var(--aubergine-wash);
+    border: 1px solid rgba(74, 21, 86, 0.12); border-radius: 999px; padding: 2px 10px; white-space: nowrap;
+}
+.tl-subject { font-family: var(--font-display); font-style: italic; font-size: 17px; color: var(--aubergine); line-height: 1.45; margin-bottom: 12px; }
+.tl-subject-list { display: flex; flex-direction: column; gap: 2px; }
+.tl-desc { font-size: 14.5px; color: var(--text-soft); line-height: 1.7; margin-bottom: 16px; }
+.tl-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.tl-tags span {
+    font-size: 11.5px; font-weight: 500; color: var(--text-soft); background: var(--parchment);
+    border: 1px solid var(--line); padding: 2px 10px; border-radius: 999px; white-space: nowrap;
+}
+.photo-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.photo-grid.single { max-width: 460px; }
+.photo {
+    position: relative; margin: 0; border: 1px solid var(--line); border-radius: var(--radius);
+    overflow: hidden; background: var(--parchment-deep); cursor: zoom-in; transition: var(--transition);
+}
+.photo img { width: 100%; height: 100%; aspect-ratio: 4 / 3; object-fit: cover; transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1); }
+.photo:hover { border-color: var(--aubergine); box-shadow: var(--shadow); }
+.photo:hover img { transform: scale(1.03); }
+.photo figcaption {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 12px 8px;
+    background: linear-gradient(to top, rgba(47, 11, 56, 0.8), rgba(47, 11, 56, 0));
+    color: #f6f0e6; font-size: 12px; font-weight: 500; opacity: 0; transition: var(--transition);
+}
+.photo:hover figcaption, .photo:focus-visible figcaption { opacity: 1; }
+.photo:focus-visible { outline: 2px solid var(--aubergine); outline-offset: 2px; }
+
+/* ===== Volunteer gallery ===== */
+.volunteer-band { background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.vol-group { margin-bottom: 40px; }
+.vol-group:last-child { margin-bottom: 0; }
+.vol-group-head {
+    display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px;
+    font-family: var(--font-display); font-size: 24px; font-weight: 500; color: var(--aubergine-deep);
+}
+.vol-group-head i { font-size: 14px; color: var(--aubergine); opacity: 0.75; }
+.vol-group-head .cnt { font-family: var(--font-body); font-size: 12.5px; font-weight: 500; color: var(--text-soft); }
+.vol-group-head .line { flex: 1; height: 1px; background: var(--line); align-self: center; }
+.vol-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.vol-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
+    overflow: hidden; box-shadow: var(--shadow-sm); transition: var(--transition);
+    display: flex; flex-direction: column;
+}
+.vol-card:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
+.vol-card .photo { border: none; border-radius: 0; }
+.vol-card .photo img { aspect-ratio: 4 / 3; }
+.vol-meta { padding: 14px 16px 16px; }
+.vol-meta h4 { font-size: 14.5px; font-weight: 600; color: var(--ink); margin-bottom: 2px; letter-spacing: -0.01em; }
+.vol-meta p { font-size: 12.5px; color: var(--text-soft); }
+
+/* ===== Inquiry ===== */
+.contact-wrap { display: grid; grid-template-columns: 1fr 1.1fr; gap: 72px; align-items: start; }
+.contact-aside h2 {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(28px, 3.4vw, 40px); color: var(--aubergine-deep); letter-spacing: -0.01em;
+    line-height: 1.2; margin-bottom: 16px;
+}
+.contact-aside > p { color: var(--text-soft); margin-bottom: 36px; font-size: 15.5px; }
+.contact-list { display: flex; flex-direction: column; gap: 20px; }
+.contact-list li { display: flex; align-items: center; gap: 16px; font-weight: 600; color: var(--ink); font-size: 15px; }
+.contact-list .ci {
+    width: 44px; height: 44px; border-radius: var(--radius-lg); background: var(--aubergine-wash);
+    color: var(--aubergine); display: grid; place-items: center; flex-shrink: 0; font-size: 15px;
+}
+.contact-list small { display: block; color: var(--text-soft); font-weight: 400; font-size: 13px; margin-top: 1px; }
+.contact-list a.mail-link { color: var(--aubergine); }
+.contact-list a.mail-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.copy-mail {
+    margin-top: 24px; display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 10px 16px; font-family: inherit; font-size: 13.5px; font-weight: 500;
+    color: var(--ink); cursor: pointer; transition: var(--transition);
+}
+.copy-mail:hover { border-color: var(--line-strong); box-shadow: var(--shadow-sm); }
+.copy-mail i { color: var(--aubergine); }
+
+.contact-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-xl); padding: 40px; box-shadow: var(--shadow); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+.form-group label .opt { font-weight: 400; color: var(--text-soft); font-size: 12.5px; margin-left: 4px; }
+.form-group input, .form-group textarea, .form-group select {
+    width: 100%; padding: 13px 16px; border: 1px solid var(--line); border-radius: var(--radius);
+    font-family: inherit; font-size: 15px; color: var(--ink); background: var(--parchment); transition: var(--transition);
+}
+.form-group select { appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 L6 6.5 L11 1.5' stroke='%237d716e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px;
+}
+.form-group input::placeholder, .form-group textarea::placeholder { color: #a99d94; }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--aubergine); background: var(--surface); box-shadow: 0 0 0 3px rgba(74, 21, 86, 0.1); }
+.form-group textarea { resize: vertical; min-height: 140px; }
+.form-group.error input, .form-group.error textarea { border-color: var(--ember); background: #f7ece8; }
+.form-group.success input, .form-group.success textarea { border-color: var(--aubergine); }
+.error-message { display: none; color: var(--ember); font-size: 12.5px; margin-top: 6px; }
+.error-message.show { display: block; }
+.submit-btn {
+    width: 100%; background: var(--aubergine); color: #fbf7f0; border: none; font-family: inherit;
+    font-weight: 600; font-size: 15px; padding: 15px; border-radius: var(--radius); cursor: pointer;
+    box-shadow: 0 1px 0 rgba(44,20,50,.15); transition: var(--transition);
+}
+.submit-btn:hover:not(:disabled) { background: var(--aubergine-soft); }
+.submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+.submit-btn .loading { display: none; }
+.submit-btn.loading .text { display: none; }
+.submit-btn.loading .loading { display: inline-block; }
+.submit-btn.loading .loading i { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.success-message {
+    display: none; margin-top: 16px; padding: 14px 18px; background: var(--aubergine-wash); color: var(--aubergine-deep);
+    border: 1px solid rgba(74, 21, 86, 0.15); border-radius: var(--radius); font-size: 14px; font-weight: 500;
+}
+.success-message.show { display: flex; align-items: flex-start; gap: 10px; }
+.form-note { margin-top: 14px; font-size: 12.5px; color: var(--text-soft); text-align: center; line-height: 1.6; }
+.form-note a { color: var(--aubergine); font-weight: 600; }
+.form-note a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ===== Lightbox ===== */
+.lightbox {
+    position: fixed; inset: 0; z-index: 2000; display: none;
+    background: rgba(31, 8, 38, 0.96); padding: 40px 24px;
+    align-items: center; justify-content: center;
+}
+.lightbox.open { display: flex; }
+.lb-inner { max-width: 1100px; width: 100%; text-align: center; }
+.lb-inner img { max-width: 100%; max-height: 76vh; margin: 0 auto; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); }
+.lb-caption { margin-top: 16px; color: #f2ebe0; font-size: 14.5px; font-weight: 500; }
+.lb-caption span { display: block; margin-top: 4px; font-size: 12.5px; color: rgba(242, 235, 224, 0.6); font-weight: 400; }
+.lb-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(242, 235, 224, 0.3);
+    background: rgba(242, 235, 224, 0.08); color: #f2ebe0; font-size: 16px; cursor: pointer;
+    display: grid; place-items: center; transition: var(--transition);
+}
+.lb-btn:hover { background: rgba(242, 235, 224, 0.2); }
+.lb-prev { left: 20px; }
+.lb-next { right: 20px; }
+.lb-close {
+    position: absolute; top: 20px; right: 20px; width: 42px; height: 42px; border-radius: 50%;
+    border: 1px solid rgba(242, 235, 224, 0.3); background: rgba(242, 235, 224, 0.08);
+    color: #f2ebe0; font-size: 16px; cursor: pointer; display: grid; place-items: center; transition: var(--transition);
+}
+.lb-close:hover { background: rgba(242, 235, 224, 0.2); }
+
+/* ===== Footer ===== */
+footer { background: var(--parchment-deep); border-top: 1px solid var(--parchment-ink); padding: 72px 0 36px; color: var(--text); }
+.footer-brand-row { max-width: 340px; }
+.footer-logo { font-family: var(--font-display); font-size: 26px; font-weight: 500; color: var(--aubergine-deep); margin-bottom: 6px; }
+.footer-logo em { font-style: italic; font-weight: 400; }
+.footer-logo-kr { font-size: 12.5px; color: var(--text-soft); letter-spacing: 0.02em; margin-bottom: 14px; }
+.footer-brand-row p { font-size: 14px; color: var(--text-soft); line-height: 1.7; }
+.footer-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 48px; padding-bottom: 44px; border-bottom: 1px solid var(--parchment-ink); }
+.footer-cols { display: flex; gap: 64px; flex-wrap: wrap; }
+.footer-col h4 { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--aubergine); margin-bottom: 14px; font-weight: 600; }
+.footer-col a { display: block; font-size: 13.5px; color: var(--text); padding: 4px 0; transition: var(--transition); }
+.footer-col a:hover { color: var(--aubergine); }
+.footer-col p { font-size: 13.5px; color: var(--text-soft); padding: 4px 0; }
+.footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 20px; font-size: 12.5px; color: var(--text-soft); }
+.footer-bottom em { font-family: var(--font-display); font-size: 14px; color: var(--aubergine); }
+
+/* ===== Reveal ===== */
+.reveal { opacity: 0; transform: translateY(8px); transition: opacity 0.36s cubic-bezier(0.25,0.1,0.25,1), transform 0.36s cubic-bezier(0.25,0.1,0.25,1); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+    .vol-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 960px) {
+    .page-hero-layout { grid-template-columns: 1fr; gap: 56px; }
+    .hero-figure { order: -1; }
+    .hero-photo-caption { left: 12px; bottom: -20px; }
+    .cred-grid { grid-template-columns: repeat(2, 1fr); gap: 28px; }
+    .topic-grid { grid-template-columns: 1fr; }
+    .contact-wrap { grid-template-columns: 1fr; gap: 48px; }
+    .timeline { padding-left: 32px; }
+    .timeline::before { left: 4px; }
+    .tl-item::before { left: -32px; }
+    .tl-date { position: static; width: auto; text-align: left; margin-bottom: 8px; }
+    .tl-date span { display: inline; margin-left: 6px; }
+}
+@media (max-width: 768px) {
+    .container { padding: 0 24px; }
+    .nav-menu {
+        position: fixed; top: 68px; left: 0; right: 0; flex-direction: column; align-items: stretch;
+        background: var(--parchment); padding: 16px; gap: 2px; border-bottom: 1px solid var(--line);
+        box-shadow: var(--shadow-lg); transform: translateY(-150%); transition: var(--transition); z-index: 999;
+    }
+    .nav-menu.active { transform: translateY(0); }
+    .nav-menu > li > a { display: block; padding: 12px 16px; }
+    .login-btn { text-align: center; margin: 8px 0 0; }
+    .user-info-nav { margin: 8px 0 0; justify-content: space-between; }
+    .hamburger { display: flex; }
+    .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .section-pad { padding: 72px 0; }
+    .page-hero { padding: 124px 0 64px; }
+    .vol-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+    .contact-card { padding: 28px 24px; }
+    .lb-prev { left: 6px; }
+    .lb-next { right: 6px; }
+}
+
+    </style>
+</head>
+<body>
+    <!-- ===== Header ===== -->
+    <header id="header">
+        <nav class="container">
+            <a href="index.html" class="logo">Philosophy <em>AI</em><span class="logo-kr">필로소피 AI 교육</span></a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html#tools">필로소피 AI 툴</a></li>
+                <li><a href="index.html#showcase">바이브코딩 쇼케이스</a></li>
+                <li><a href="community.html">커뮤니티</a></li>
+                <li><a href="education-inquiry.html" class="active">교육 문의</a></li>
+                <li><a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="nav-ext nav-youtube"><i class="fab fa-youtube"></i> 유튜브</a></li>
+                <li><a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener" class="nav-ext nav-naver"><i class="fas fa-mug-hot"></i> 카페</a></li>
+                <li id="navLoginItem"><a href="auth-system.html" class="login-btn">로그인</a></li>
+                <li id="navUserItem" style="display: none;">
+                    <div class="user-info-nav">
+                        <img id="navUserAvatar" class="user-avatar-sm" src="" alt="프로필">
+                        <span id="navUserName"></span>
+                        <button id="navLogoutBtn" class="logout-btn-sm"><i class="fas fa-sign-out-alt"></i></button>
+                    </div>
+                </li>
+            </ul>
+            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+        </nav>
+    </header>
+
+    <!-- ===== Page hero ===== -->
+    <section class="page-hero">
+        <div class="container">
+            <div class="page-hero-layout">
+                <div>
+                    <span class="eyebrow">Education Inquiry</span>
+                    <h1>교육 현장에서 검증한<br><em>AI 교육을 제안합니다</em>.</h1>
+                    <p class="lead">교육청·대학원·고등학교·공공기관·연구실에서
+                        <strong>AI 리터러시</strong>와 <strong>바이브 코딩</strong> 교육을 진행해 왔습니다.
+                        아래에서 지금까지의 교육 이력과 봉사단 활동을 한눈에 확인하시고,
+                        필요한 교육을 편하게 문의해 주세요.</p>
+                    <div class="page-hero-buttons">
+                        <a href="#inquiry" class="btn btn-primary"><i class="fas fa-paper-plane"></i> 교육 문의하기</a>
+                        <a href="#history" class="btn btn-ghost">교육 이력 먼저 보기 →</a>
+                    </div>
+                </div>
+                <div class="hero-figure">
+                    <div class="hero-photo">
+                        <img src="assets/web/edu-2607-gnu-2.jpg" alt="경상국립대학교 물리 정교사(1급) 자격 연수에서 진행한 AI 리터러시 교육 현장" loading="eager">
+                    </div>
+                    <div class="hero-photo-caption">
+                        <strong>경상국립대 물리 정교사(1급) 자격 연수</strong>
+                        <small>2026.07 · AI 리터러시 교육</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Credentials ===== -->
+    <section class="cred-strip">
+        <div class="container">
+            <div class="cred-grid">
+                <div class="cred-item">
+                    <div class="num">8<small>회</small></div>
+                    <div class="label">진행한 교육·연수</div>
+                </div>
+                <div class="cred-item">
+                    <div class="num">7<small>곳</small></div>
+                    <div class="label">교육 기관·기업</div>
+                </div>
+                <div class="cred-item">
+                    <div class="num">4<small>곳</small></div>
+                    <div class="label">봉사단 노트북 기부처</div>
+                </div>
+                <div class="cred-item">
+                    <div class="num">2025.04<small>~</small></div>
+                    <div class="label">교육 활동 기간</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 교육 주제 ===== -->
+    <section id="topics" class="section-pad">
+        <div class="container">
+            <div class="section-head reveal">
+                <div class="ornament"><svg width="200" height="24" viewBox="0 0 200 24" aria-hidden="true"><line x1="0" y1="12" x2="80" y2="12" stroke="currentColor" stroke-width="1" opacity="0.5"></line><line x1="120" y1="12" x2="200" y2="12" stroke="currentColor" stroke-width="1" opacity="0.5"></line><path d="M100 4 L96 18 L100 16 L104 18 Z" fill="currentColor"></path></svg></div>
+                <span class="eyebrow">What I Teach</span>
+                <h2 class="section-title">이런 <em>교육</em>을 진행합니다</h2>
+                <p class="section-sub">듣는 분들의 배경과 목표에 맞춰 실습 중심으로 구성합니다.
+                    아래 주제를 조합하거나, 기관에 필요한 형태로 새로 설계해 드릴 수 있습니다.</p>
+            </div>
+            <div class="topic-grid reveal">
+                <div class="topic-card">
+                    <div class="topic-icon"><i class="fas fa-compass"></i></div>
+                    <h3>AI 리터러시 교육</h3>
+                    <div class="topic-sub">사용법을 넘어, 판단 기준까지</div>
+                    <p>AI가 잘하는 일과 못하는 일, 환각과 검증, 개인정보와 저작권까지.
+                        현장에서 바로 쓸 수 있는 기준을 세우는 입문·심화 연수입니다.</p>
+                </div>
+                <div class="topic-card">
+                    <div class="topic-icon c2"><i class="fas fa-code"></i></div>
+                    <h3>바이브 코딩</h3>
+                    <div class="topic-sub">코딩을 몰라도 도구를 만든다</div>
+                    <p>Claude Code, GPT Codex 등으로 수업 도구와 업무 자동화를 직접 만들어 보는 실습 수업입니다.
+                        입문부터 배포까지 한 번에 경험합니다.</p>
+                </div>
+                <div class="topic-card">
+                    <div class="topic-icon c3"><i class="fas fa-chalkboard-user"></i></div>
+                    <h3>교육자 대상 직무연수</h3>
+                    <div class="topic-sub">수업과 업무에 바로 쓰는 AI</div>
+                    <p>교사·교육실무사·전문적학습공동체를 위한 연수입니다.
+                        수업 자료 제작, 평가 문항 설계, 행정 업무 자동화를 함께 실습합니다.</p>
+                </div>
+                <div class="topic-card">
+                    <div class="topic-icon c4"><i class="fas fa-flask"></i></div>
+                    <h3>연구실·기업 특강</h3>
+                    <div class="topic-sub">현장 맞춤 심화 주제</div>
+                    <p>파인튜닝, 하이브리드 AI 활용 등 연구·실무 목적에 맞춘 심화 특강입니다.
+                        기관의 데이터와 과제를 바탕으로 내용을 설계합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 교육 이력 ===== -->
+    <section id="history" class="section-pad history-band">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">Teaching History</span>
+                <h2 class="section-title">지금까지의 <em>교육 이력</em></h2>
+                <p class="section-sub">2025년 4월부터 공공기관·대학·교육청·학교에서 진행한 교육입니다.
+                    사진을 클릭하시면 크게 보실 수 있습니다.</p>
+            </div>
+
+            <div class="timeline">
+                <article class="tl-item reveal">
+                    <div class="tl-date">2026.07.27<span>경상국립대</span></div>
+                    <div class="tl-card">
+                        <div class="tl-org">
+                            <h3>경상국립대학교 물리 정교사(1급) 자격 연수</h3>
+                            <span class="tl-kind">대학·자격연수</span>
+                        </div>
+                        <div class="tl-subject">AI 리터러시 교육</div>
+                        <p class="tl-desc">물리 정교사 1급 자격 연수 과정에서 현직 교사분들과 함께
+                            AI를 수업과 연구에 활용하는 기준과 방법을 다뤘습니다.</p>
+                        <div class="tl-tags"><span>AI 리터러시</span><span>현직 교사</span><span>실습 중심</span></div>
+                        <div class="photo-grid">
+                            <figure class="photo" tabindex="0" data-caption="경상국립대 물리 정교사(1급) 자격 연수" data-sub="2026.07.27 · 2026년 하계 자격연수 안내 자료">
+                                <img src="assets/web/edu-2607-gnu-1.jpg" alt="경상국립대학교 사범대학 부설교육연수원 2026년 하계 물리 정교사(1급) 자격연수 안내 자료" loading="lazy">
+                                <figcaption>자격연수 안내 자료</figcaption>
+                            </figure>
+                            <figure class="photo" tabindex="0" data-caption="경상국립대 물리 정교사(1급) 자격 연수" data-sub="2026.07.27 · 선생님들의 고민에서 출발한 강의">
+                                <img src="assets/web/edu-2607-gnu-2.jpg" alt="선생님들의 고민을 정리한 슬라이드로 진행 중인 강의 장면" loading="lazy">
+                                <figcaption>선생님들의 고민 나눔</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="tl-item reveal">
+                    <div class="tl-date">2026.06.12<span>퇴계원고</span></div>
+                    <div class="tl-card">
+                        <div class="tl-org">
+                            <h3>퇴계원고등학교 전문적학습공동체</h3>
+                            <span class="tl-kind">고등학교 연수</span>
+                        </div>
+                        <div class="tl-subject">교육자분들을 위한 클로드 입문</div>
+                        <p class="tl-desc">학교 전문적학습공동체 선생님들과 Claude를 처음부터 함께 다뤘습니다.
+                            수업 자료 제작과 업무 활용을 실습으로 익히는 시간이었습니다.</p>
+                        <div class="tl-tags"><span>Claude 입문</span><span>전문적학습공동체</span><span>수업 활용</span></div>
+                        <div class="photo-grid">
+                            <figure class="photo" tabindex="0" data-caption="퇴계원고등학교 전문적학습공동체" data-sub="2026.06.12 · 교육자분들을 위한 클로드 입문">
+                                <img src="assets/web/edu-2606-toegyewon-1.jpg" alt="퇴계원고등학교 전문적학습공동체 연수 현장" loading="lazy">
+                                <figcaption>연수 현장</figcaption>
+                            </figure>
+                            <figure class="photo" tabindex="0" data-caption="퇴계원고등학교 전문적학습공동체" data-sub="2026.06.12 · 실습 진행 장면">
+                                <img src="assets/web/edu-2606-toegyewon-2.jpg" alt="퇴계원고등학교 연수에서 실습이 진행되는 장면" loading="lazy">
+                                <figcaption>실습 진행</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="tl-item reveal">
+                    <div class="tl-date">2026.06.05<span>전주교육청</span></div>
+                    <div class="tl-card">
+                        <div class="tl-org">
+                            <h3>전주교육청 교육실무사 직무연수</h3>
+                            <span class="tl-kind">교육청 직무연수</span>
+                        </div>
+                        <div class="tl-subject">AI 리터러시 수업</div>
+                        <p class="tl-desc">교육실무사 선생님들을 대상으로 한 직무연수입니다.
+                            행정 업무에 AI를 안전하게 활용하는 방법을 중심으로 구성했습니다.</p>
+                        <div class="tl-tags"><span>AI 리터러시</span><span>교육실무사</span><span>업무 자동화</span></div>
+                        <div class="photo-grid">
+                            <figure class="photo" tabindex="0" data-caption="전주교육청 교육실무사 직무연수" data-sub="2026.06.05 · AI 리터러시 수업">
+                                <img src="assets/web/edu-2606-jeonju-1.jpg" alt="전주교육청 교육실무사 직무연수 강의 현장" loading="lazy">
+                                <figcaption>직무연수 현장</figcaption>
+                            </figure>
+                            <figure class="photo" tabindex="0" data-caption="전주교육청 교육실무사 직무연수" data-sub="2026.06.05 · 대강당 강의 장면">
+                                <img src="assets/web/edu-2606-jeonju-2.jpg" alt="대강당에서 진행된 전주교육청 직무연수 강의 장면" loading="lazy">
+                                <figcaption>대강당 강의</figcaption>
+                            </figure>
+                            <figure class="photo" tabindex="0" data-caption="전주교육청 교육실무사 직무연수" data-sub="2026.06.05 · 참여 선생님들과 함께">
+                                <img src="assets/web/edu-2606-jeonju-3.jpg" alt="전주교육청 직무연수에 참여한 선생님들의 모습" loading="lazy">
+                                <figcaption>참여 선생님들</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="tl-item reveal">
+                    <div class="tl-date">2026.04.10<span>전주교육청</span></div>
+                    <div class="tl-card">
+                        <div class="tl-org">
+                            <h3>전주교육청</h3>
+                            <span class="tl-kind">교육청 교육</span>
+                        </div>
+                        <div class="tl-subject">바이브 코딩 입문 수업</div>
+                        <p class="tl-desc">코딩 경험이 없는 분들도 AI와 함께 직접 도구를 만들어 볼 수 있도록
+                            바이브 코딩의 첫 단계를 실습으로 안내했습니다.</p>
+                        <div class="tl-tags"><span>바이브 코딩</span><span>입문</span><span>실습</span></div>
+                        <div class="photo-grid single">
+                            <figure class="photo" tabindex="0" data-caption="전주교육청 바이브 코딩 입문 수업" data-sub="2026.04.10 · 컴퓨터실 실습 수업">
+                                <img src="assets/web/edu-2604-jeonju.jpg" alt="전주교육청 바이브 코딩 입문 수업 실습 현장" loading="lazy">
+                                <figcaption>실습 수업 현장</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="tl-item reveal">
+                    <div class="tl-date">2026.02.23<span>경희대 대학원</span></div>
+                    <div class="tl-card">
+                        <div class="tl-org">
+                            <h3>경희대학교 대학원</h3>
+                            <span class="tl-kind">대학원 특강</span>
+                        </div>
+                        <div class="tl-subject tl-subject-list">
+                            <span>Claude 활용 바이브 코딩</span>
+                            <span>GPT Codex 활용 바이브 코딩</span>
+                        </div>
+                        <p class="tl-desc">대학원생을 대상으로 두 가지 도구를 각각 다룬 바이브 코딩 특강입니다.
+                            연구와 과제에 필요한 도구를 직접 만들어 보는 과정으로 진행했습니다.</p>
+                        <div class="tl-tags"><span>Claude</span><span>GPT Codex</span><span>대학원</span><span>바이브 코딩</span></div>
+                        <div class="photo-grid">
+                            <figure class="photo" tabindex="0" data-caption="경희대학교 대학원 특강" data-sub="2026.02.23 · Claude 활용 바이브 코딩">
+                                <img src="assets/web/edu-2602-khu-claude.jpg" alt="경희대학교 대학원 Claude 활용 바이브 코딩 특강 현장" loading="lazy">
+                                <figcaption>Claude 활용 바이브 코딩</figcaption>
+                            </figure>
+                            <figure class="photo" tabindex="0" data-caption="경희대학교 대학원 특강" data-sub="2026.02.23 · GPT Codex 활용 바이브 코딩">
+                                <img src="assets/web/edu-2602-khu-codex.jpg" alt="경희대학교 대학원 GPT Codex 활용 바이브 코딩 특강 현장" loading="lazy">
+                                <figcaption>GPT Codex 활용 바이브 코딩</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="tl-item reveal">
+                    <div class="tl-date">2025.07.07<span>서울대학교</span></div>
+                    <div class="tl-card">
+                        <div class="tl-org">
+                            <h3>서울대학교 생산공학연구실</h3>
+                            <span class="tl-kind">연구실 특강</span>
+                        </div>
+                        <div class="tl-subject">파인튜닝 수업</div>
+                        <p class="tl-desc">연구실 구성원들과 함께 모델 파인튜닝의 개념부터 실제 적용까지 다뤘습니다.
+                            연구 데이터를 활용하는 방향을 중심으로 구성했습니다.</p>
+                        <div class="tl-tags"><span>파인튜닝</span><span>연구실</span><span>심화</span></div>
+                        <div class="photo-grid single">
+                            <figure class="photo" tabindex="0" data-caption="서울대학교 생산공학연구실" data-sub="2025.07.07 · 파인튜닝 수업">
+                                <img src="assets/web/edu-2507-snu.jpg" alt="서울대학교 생산공학연구실 파인튜닝 수업 현장" loading="lazy">
+                                <figcaption>파인튜닝 수업</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="tl-item reveal">
+                    <div class="tl-date">2025.04.30<span>경기도청</span></div>
+                    <div class="tl-card">
+                        <div class="tl-org">
+                            <h3>경기도청</h3>
+                            <span class="tl-kind">공공기관 특강</span>
+                        </div>
+                        <div class="tl-subject">하이브리드 AI 사용법</div>
+                        <p class="tl-desc">여러 AI 도구를 목적에 맞게 조합해 쓰는 방법을 공공기관 실무 관점에서 다뤘습니다.</p>
+                        <div class="tl-tags"><span>하이브리드 AI</span><span>공공기관</span><span>실무 활용</span></div>
+                        <div class="photo-grid single">
+                            <figure class="photo" tabindex="0" data-caption="경기도청 특강" data-sub="2025.04.30 · 하이브리드 AI 사용법">
+                                <img src="assets/web/edu-2504-gyeonggi.jpg" alt="경기도청 하이브리드 AI 사용법 특강 현장" loading="lazy">
+                                <figcaption>하이브리드 AI 사용법</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 봉사단 활동 ===== -->
+    <section id="volunteer" class="section-pad volunteer-band">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">Volunteer</span>
+                <h2 class="section-title">필로소피 AI <em>봉사단</em> 활동</h2>
+                <p class="section-sub">교육으로 얻은 것을 다시 나누기 위해 봉사단을 운영하고 있습니다.
+                    정기 스터디로 함께 공부하고, 리퍼 노트북을 정비해 필요한 곳에 전달합니다.</p>
+            </div>
+
+            <div class="vol-group reveal">
+                <div class="vol-group-head">
+                    <i class="fas fa-book-open-reader"></i> 봉사단 정기 스터디
+                    <span class="cnt">3회 진행</span>
+                    <span class="line"></span>
+                </div>
+                <div class="vol-grid">
+                    <div class="vol-card">
+                        <figure class="photo" tabindex="0" data-caption="필로소피 AI 봉사단 1차 스터디" data-sub="2026.02.07">
+                            <img src="assets/web/vol-2602-study1-1.jpg" alt="필로소피 AI 봉사단 1차 스터디 현장" loading="lazy">
+                        </figure>
+                        <div class="vol-meta"><h4>1차 스터디</h4><p>2026.02.07</p></div>
+                    </div>
+                    <div class="vol-card">
+                        <figure class="photo" tabindex="0" data-caption="필로소피 AI 봉사단 1차 스터디" data-sub="2026.02.07 · 실습 진행">
+                            <img src="assets/web/vol-2602-study1-2.jpg" alt="필로소피 AI 봉사단 1차 스터디 실습 장면" loading="lazy">
+                        </figure>
+                        <div class="vol-meta"><h4>1차 스터디 실습</h4><p>2026.02.07</p></div>
+                    </div>
+                    <div class="vol-card">
+                        <figure class="photo" tabindex="0" data-caption="필로소피 AI 봉사단 2차 스터디" data-sub="2026.03.22">
+                            <img src="assets/web/vol-2603-study2.jpg" alt="필로소피 AI 봉사단 2차 스터디 현장" loading="lazy">
+                        </figure>
+                        <div class="vol-meta"><h4>2차 스터디</h4><p>2026.03.22</p></div>
+                    </div>
+                    <div class="vol-card">
+                        <figure class="photo" tabindex="0" data-caption="필로소피 AI 봉사단 3차 스터디" data-sub="2026.06.28">
+                            <img src="assets/web/vol-2606-study3.jpg" alt="필로소피 AI 봉사단 3차 스터디 현장" loading="lazy">
+                        </figure>
+                        <div class="vol-meta"><h4>3차 스터디</h4><p>2026.06.28</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="vol-group reveal">
+                <div class="vol-group-head">
+                    <i class="fas fa-laptop"></i> 리퍼 노트북 전달
+                    <span class="cnt">4개 기관</span>
+                    <span class="line"></span>
+                </div>
+                <div class="vol-grid">
+                    <div class="vol-card">
+                        <figure class="photo" tabindex="0" data-caption="CLC 희망학교 노트북 전달" data-sub="필로소피 AI 봉사단">
+                            <img src="assets/web/vol-clc-1.jpg" alt="CLC 희망학교에 노트북을 전달한 모습" loading="lazy">
+                        </figure>
+                        <div class="vol-meta"><h4>CLC 희망학교</h4><p>노트북 전달</p></div>
+                    </div>
+                    <div class="vol-card">
+                        <figure class="photo" tabindex="0" data-caption="CLC 희망학교 노트북 전달" data-sub="필로소피 AI 봉사단">
+                            <img src="assets/web/vol-clc-2.jpg" alt="CLC 희망학교에 전달한 노트북" loading="lazy">
+                        </figure>
+                        <div class="vol-meta"><h4>CLC 희망학교</h4><p>전달 완료</p></div>
+                    </div>
+                    <div class="vol-card">
+                        <figure class="photo" tabindex="0" data-caption="상록보육원 리퍼 노트북 전달" data-sub="필로소피 AI 봉사단">
+                            <img src="assets/web/vol-sangnok-1.jpg" alt="상록보육원에 리퍼 노트북을 전달한 모습" loading="lazy">
+                        </figure>
+                        <div class="vol-meta"><h4>상록보육원</h4><p>리퍼 노트북 전달</p></div>
+                    </div>
+                    <div class="vol-card">
+                        <figure class="photo" tabindex="0" data-caption="상록보육원 리퍼 노트북 전달" data-sub="필로소피 AI 봉사단">
+                            <img src="assets/web/vol-sangnok-2.jpg" alt="상록보육원에 전달한 리퍼 노트북" loading="lazy">
+                        </figure>
+                        <div class="vol-meta"><h4>상록보육원</h4><p>전달 완료</p></div>
+                    </div>
+                    <div class="vol-card">
+                        <figure class="photo" tabindex="0" data-caption="에델마을 보육원 노트북 전달" data-sub="필로소피 AI 봉사단">
+                            <img src="assets/web/vol-edel-1.jpg" alt="에델마을 보육원에 노트북을 전달한 모습" loading="lazy">
+                        </figure>
+                        <div class="vol-meta"><h4>에델마을 보육원</h4><p>노트북 전달</p></div>
+                    </div>
+                    <div class="vol-card">
+                        <figure class="photo" tabindex="0" data-caption="에델마을 보육원 노트북 전달" data-sub="필로소피 AI 봉사단">
+                            <img src="assets/web/vol-edel-2.jpg" alt="에델마을 보육원에 전달한 노트북" loading="lazy">
+                        </figure>
+                        <div class="vol-meta"><h4>에델마을 보육원</h4><p>전달 완료</p></div>
+                    </div>
+                    <div class="vol-card">
+                        <figure class="photo" tabindex="0" data-caption="오류마을 보육원 노트북 전달" data-sub="필로소피 AI 봉사단">
+                            <img src="assets/web/vol-oryu-1.jpg" alt="오류마을 보육원에 노트북을 전달한 모습" loading="lazy">
+                        </figure>
+                        <div class="vol-meta"><h4>오류마을 보육원</h4><p>노트북 전달</p></div>
+                    </div>
+                    <div class="vol-card">
+                        <figure class="photo" tabindex="0" data-caption="오류마을 보육원 노트북 전달" data-sub="필로소피 AI 봉사단">
+                            <img src="assets/web/vol-oryu-2.jpg" alt="오류마을 보육원에 전달한 노트북" loading="lazy">
+                        </figure>
+                        <div class="vol-meta"><h4>오류마을 보육원</h4><p>전달 완료</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 교육 문의 ===== -->
+    <section id="inquiry" class="section-pad">
+        <div class="container">
+            <div class="contact-wrap">
+                <div class="contact-aside reveal">
+                    <span class="eyebrow">Contact</span>
+                    <h2>교육 문의를 남겨 주세요.</h2>
+                    <p>기관·대상·인원·희망 일정만 알려 주시면, 상황에 맞는 교육 구성과 진행 방식을 제안해 드립니다.
+                        아래 양식을 작성하시면 메일 작성 창이 열립니다.</p>
+                    <ul class="contact-list">
+                        <li><span class="ci"><i class="fas fa-envelope"></i></span>
+                            <div>이메일 문의<small><a class="mail-link" href="mailto:dearname27@naver.com">dearname27@naver.com</a></small></div></li>
+                        <li><span class="ci"><i class="fas fa-chalkboard-user"></i></span>
+                            <div>강의·연수<small>교육청·학교·대학·기업·공공기관</small></div></li>
+                        <li><span class="ci"><i class="fas fa-users-line"></i></span>
+                            <div>대상<small>교사·교육실무사·대학원생·연구원·일반 실무자</small></div></li>
+                        <li><span class="ci"><i class="fas fa-clock"></i></span>
+                            <div>회신<small>확인 후 순차적으로 답변드립니다</small></div></li>
+                    </ul>
+                    <button type="button" class="copy-mail" id="copyMailBtn">
+                        <i class="fas fa-copy"></i> <span id="copyMailText">메일 주소 복사하기</span>
+                    </button>
+                </div>
+
+                <div class="contact-card reveal">
+                    <form id="inquiryForm" novalidate>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">이름</label>
+                                <input type="text" id="name" name="name" placeholder="성함을 입력해 주세요" required>
+                                <div class="error-message" id="nameError">이름을 2글자 이상 입력해주세요.</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="org">소속·기관</label>
+                                <input type="text" id="org" name="org" placeholder="예) ○○교육청, ○○고등학교" required>
+                                <div class="error-message" id="orgError">소속·기관명을 2글자 이상 입력해주세요.</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">이메일</label>
+                                <input type="email" id="email" name="email" placeholder="answer@example.com" required>
+                                <div class="error-message" id="emailError">올바른 이메일 주소를 입력해주세요.</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">연락처<span class="opt">(선택)</span></label>
+                                <input type="tel" id="phone" name="phone" placeholder="010-0000-0000">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="topic">희망 교육 주제</label>
+                            <select id="topic" name="topic">
+                                <option value="AI 리터러시 교육">AI 리터러시 교육</option>
+                                <option value="바이브 코딩 (입문)">바이브 코딩 (입문)</option>
+                                <option value="바이브 코딩 (심화·프로젝트)">바이브 코딩 (심화·프로젝트)</option>
+                                <option value="교육자 대상 직무연수">교육자 대상 직무연수</option>
+                                <option value="학생 대상 AI 수업">학생 대상 AI 수업</option>
+                                <option value="연구실·기업 특강 (파인튜닝 등)">연구실·기업 특강 (파인튜닝 등)</option>
+                                <option value="아직 정하지 못했습니다 / 상담 희망">아직 정하지 못했습니다 / 상담 희망</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="schedule">희망 일정<span class="opt">(선택)</span></label>
+                                <input type="text" id="schedule" name="schedule" placeholder="예) 2026년 9월 중, 3시간">
+                            </div>
+                            <div class="form-group">
+                                <label for="people">예상 인원<span class="opt">(선택)</span></label>
+                                <input type="text" id="people" name="people" placeholder="예) 교사 30명">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">문의 내용</label>
+                            <textarea id="message" name="message" placeholder="교육 대상, 목표, 장소, 준비 환경 등 알려주시면 더 정확하게 제안드릴 수 있습니다." required></textarea>
+                            <div class="error-message" id="messageError">문의 내용을 10글자 이상 입력해주세요.</div>
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            <span class="text"><i class="fas fa-paper-plane"></i> 교육 문의 보내기</span>
+                            <span class="loading"><i class="fas fa-spinner"></i> 메일 창을 여는 중...</span>
+                        </button>
+                    </form>
+                    <div class="success-message" id="successMessage">
+                        <i class="fas fa-circle-check"></i>
+                        <span>메일 작성 창이 열렸습니다. 내용을 확인하시고 '보내기'를 누르면 문의가 전송됩니다.</span>
+                    </div>
+                    <p class="form-note">메일 앱이 열리지 않는다면
+                        <a href="mailto:dearname27@naver.com">dearname27@naver.com</a> 으로 직접 보내주세요.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Lightbox ===== -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="사진 크게 보기">
+        <button class="lb-close" id="lbClose" aria-label="닫기"><i class="fas fa-xmark"></i></button>
+        <button class="lb-btn lb-prev" id="lbPrev" aria-label="이전 사진"><i class="fas fa-chevron-left"></i></button>
+        <button class="lb-btn lb-next" id="lbNext" aria-label="다음 사진"><i class="fas fa-chevron-right"></i></button>
+        <div class="lb-inner">
+            <img id="lbImage" src="" alt="">
+            <div class="lb-caption" id="lbCaption"></div>
+        </div>
+    </div>
+
+    <!-- ===== Footer ===== -->
+    <footer>
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand-row">
+                    <div class="footer-logo">Philosophy <em>AI</em></div>
+                    <div class="footer-logo-kr">필로소피 AI 교육</div>
+                    <p>빠르게 진화하는 AI 시대, 교육자분들이 길을 잃지 않도록 방향을 안내하는 나침반이 되겠습니다.</p>
+                </div>
+                <div class="footer-cols">
+                    <div class="footer-col">
+                        <h4>둘러보기</h4>
+                        <a href="index.html">홈</a>
+                        <a href="index.html#tools">필로소피 AI 툴</a>
+                        <a href="index.html#showcase">바이브코딩 쇼케이스</a>
+                        <a href="community.html">교육자 커뮤니티 게시판</a>
+                        <a href="education-inquiry.html">교육 문의</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>교육 문의</h4>
+                        <a href="mailto:dearname27@naver.com">dearname27@naver.com</a>
+                        <a href="#history">교육 이력</a>
+                        <a href="#volunteer">봉사단 활동</a>
+                        <a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener">네이버 카페</a>
+                        <a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener">유튜브</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Philosophy AI Education. All rights reserved.</span>
+                <span><em>AI 시대, 교육자의 나침반</em></span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== Header scroll state =====
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 10);
+        }, { passive: true });
+
+        // ===== Mobile nav =====
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navMenu');
+        hamburger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        });
+        navMenu.querySelectorAll('a').forEach(a => {
+            a.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                hamburger.classList.remove('active');
+            });
+        });
+
+        // ===== Reveal on scroll =====
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // ===== Lightbox =====
+        const photos = Array.from(document.querySelectorAll('.photo'));
+        const lightbox = document.getElementById('lightbox');
+        const lbImage = document.getElementById('lbImage');
+        const lbCaption = document.getElementById('lbCaption');
+        let lbIndex = 0;
+
+        function showPhoto(i) {
+            lbIndex = (i + photos.length) % photos.length;
+            const fig = photos[lbIndex];
+            const img = fig.querySelector('img');
+            lbImage.src = img.getAttribute('src');
+            lbImage.alt = img.getAttribute('alt') || '';
+            const sub = fig.dataset.sub ? `<span>${fig.dataset.sub}</span>` : '';
+            lbCaption.innerHTML = `${fig.dataset.caption || ''}${sub}`;
+        }
+        function openLightbox(i) {
+            showPhoto(i);
+            lightbox.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeLightbox() {
+            lightbox.classList.remove('open');
+            document.body.style.overflow = '';
+            lbImage.src = '';
+        }
+        photos.forEach((fig, i) => {
+            fig.addEventListener('click', () => openLightbox(i));
+            fig.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(i); }
+            });
+        });
+        document.getElementById('lbClose').addEventListener('click', closeLightbox);
+        document.getElementById('lbPrev').addEventListener('click', (e) => { e.stopPropagation(); showPhoto(lbIndex - 1); });
+        document.getElementById('lbNext').addEventListener('click', (e) => { e.stopPropagation(); showPhoto(lbIndex + 1); });
+        lightbox.addEventListener('click', (e) => { if (e.target === lightbox || e.target.classList.contains('lb-inner')) closeLightbox(); });
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('open')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') showPhoto(lbIndex - 1);
+            if (e.key === 'ArrowRight') showPhoto(lbIndex + 1);
+        });
+
+        // ===== 메일 주소 복사 =====
+        const CONTACT_EMAIL = 'dearname27@naver.com';
+        const copyMailBtn = document.getElementById('copyMailBtn');
+        const copyMailText = document.getElementById('copyMailText');
+        copyMailBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(CONTACT_EMAIL);
+            } catch {
+                const ta = document.createElement('textarea');
+                ta.value = CONTACT_EMAIL;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+            }
+            copyMailText.textContent = '복사되었습니다 — dearname27@naver.com';
+            setTimeout(() => { copyMailText.textContent = '메일 주소 복사하기'; }, 2500);
+        });
+
+        // ===== 교육 문의 폼 =====
+        const inquiryForm = document.getElementById('inquiryForm');
+        const successMessage = document.getElementById('successMessage');
+        let isSubmitting = false;
+
+        const validators = {
+            name: v => v.trim().length >= 2,
+            org: v => v.trim().length >= 2,
+            email: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()),
+            message: v => v.trim().length >= 10,
+        };
+
+        function setFieldState(field, valid) {
+            const group = field.closest('.form-group');
+            const err = group.querySelector('.error-message');
+            group.classList.toggle('error', !valid);
+            group.classList.toggle('success', valid);
+            if (err) err.classList.toggle('show', !valid);
+        }
+
+        Object.keys(validators).forEach(id => {
+            const field = document.getElementById(id);
+            field.addEventListener('blur', () => setFieldState(field, validators[id](field.value)));
+            field.addEventListener('input', () => {
+                if (field.closest('.form-group').classList.contains('error')) {
+                    setFieldState(field, validators[id](field.value));
+                }
+            });
+        });
+
+        inquiryForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (isSubmitting) return;
+
+            let allValid = true;
+            let firstInvalid = null;
+            Object.keys(validators).forEach(id => {
+                const field = document.getElementById(id);
+                const valid = validators[id](field.value);
+                setFieldState(field, valid);
+                if (!valid) { allValid = false; firstInvalid = firstInvalid || field; }
+            });
+            if (!allValid) { firstInvalid.focus(); return; }
+
+            isSubmitting = true;
+            const btn = inquiryForm.querySelector('.submit-btn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            try {
+                const val = (id) => document.getElementById(id).value.trim();
+                const name = val('name'), org = val('org'), email = val('email');
+                const phone = val('phone'), topic = val('topic');
+                const schedule = val('schedule'), people = val('people'), message = val('message');
+
+                const subject = `[교육 문의] ${org} ${name}님 — ${topic}`;
+                const body =
+                    `■ 이름: ${name}\n` +
+                    `■ 소속·기관: ${org}\n` +
+                    `■ 이메일: ${email}\n` +
+                    `■ 연락처: ${phone || '-'}\n` +
+                    `■ 희망 교육 주제: ${topic}\n` +
+                    `■ 희망 일정: ${schedule || '-'}\n` +
+                    `■ 예상 인원: ${people || '-'}\n\n` +
+                    `■ 문의 내용\n${message}\n\n` +
+                    `— Philosophy AI Education 교육 문의 페이지에서 보냄`;
+                window.location.href =
+                    `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+                successMessage.classList.add('show');
+                setTimeout(() => successMessage.classList.remove('show'), 8000);
+            } catch (err) {
+                console.error('문의 전송 오류:', err);
+                alert(`메일 앱을 여는 중 오류가 발생했습니다. ${CONTACT_EMAIL} 으로 직접 보내주세요.`);
+            } finally {
+                isSubmitting = false;
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        });
+
+        // ===== Firebase auth (네비게이션 로그인 상태) =====
+        const firebaseConfig = {
+            projectId: "philosophyaiedumain",
+            appId: "1:791707583638:web:b86d59d52a20330baaaeb7",
+            storageBucket: "philosophyaiedumain.firebasestorage.app",
+            apiKey: "AIzaSyBylDxamogm1_g2URVxGQFz_c05pOWqjEI",
+            authDomain: "philosophyaiedumain.firebaseapp.com",
+            messagingSenderId: "791707583638",
+            measurementId: "G-KWCY47PZWB"
+        };
+        let auth;
+        (function initFirebase() {
+            let attempts = 0;
+            const t = setInterval(() => {
+                if (window.__firebaseReady && window.initializeApp) {
+                    clearInterval(t);
+                    try {
+                        const app = window.initializeApp(firebaseConfig);
+                        auth = window.getAuth(app);
+                        window.onAuthStateChanged(auth, updateAuthUI);
+                        document.getElementById('navLogoutBtn')?.addEventListener('click', async () => {
+                            try { await window.signOut(auth); window.location.reload(); }
+                            catch (e) { console.error('로그아웃 오류:', e); }
+                        });
+                    } catch (e) {
+                        console.error('Firebase init 오류:', e);
+                    }
+                }
+                if (++attempts > 50) clearInterval(t);
+            }, 100);
+        })();
+
+        function updateAuthUI(user) {
+            const loginItem = document.getElementById('navLoginItem');
+            const userItem = document.getElementById('navUserItem');
+            if (user) {
+                loginItem.style.display = 'none';
+                userItem.style.display = 'block';
+                document.getElementById('navUserAvatar').src = user.photoURL ||
+                    'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'User') + '&background=4a1556&color=fff';
+                document.getElementById('navUserName').textContent = user.displayName || '교육자';
+            } else {
+                loginItem.style.display = 'block';
+                userItem.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
