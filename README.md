@@ -50,6 +50,7 @@ Site settings → Environment variables 에 등록:
      - 물리 역학 시뮬레이션 학습 앱 — https://philophysics5.netlify.app/
      - 26년 하계 물리 정교사(1급) 자격연수 과정 — https://philoksnu.netlify.app/
      - 3D 물리 놀이터 — https://philophysics3d.netlify.app/
+     - 3D 물리학습 앱 (GPT-6 Astra 제작) — https://philogptphysics.netlify.app/
    - 과학·자연
      - 알파폴드 학습 도우미 — https://philoalphafold.netlify.app
      - 신체 해부 레이어 뷰어 — https://philoanatomy.netlify.app/
@@ -67,12 +68,16 @@ Site settings → Environment variables 에 등록:
      - AI 확률 프롬프트 실험실 — https://philoailab.netlify.app/
      - 바둑·장기·체스 게임 — https://philogo1.netlify.app/
      - 유튜브 분석 도우미 — https://philoyoutube.netlify.app
+     - 레이싱 게임 (GPT-6 Astra 제작) — https://philoracing.netlify.app/
+     - 축구 게임 (GPT-6 Astra 제작) — https://philofootball.netlify.app/
    - 직장·HR
      - 채용 면접 도우미 — https://philohr1.netlify.app/
      - 사내 규정 챗봇 — https://philohr2.netlify.app/
      - 사내 교육 사이트 — https://philohr3.netlify.app/
      - 2026 HTHT 대학 컨소시엄 하계 교직원 역량 강화 직무연수 — https://philo2026htht.netlify.app/
      - 소상공인시장진흥공단 공공 빅데이터 기반 전국 상권분석 & 경쟁 진단 — https://philoacademy.netlify.app
+   - 기타
+     - 전국 주차장 정보 — https://philoparking.netlify.app
 3. **교육자를 위한 바이브코딩 쇼케이스** (`#showcase`) — Firestore `community_posts` 중 `바이브코딩 쇼케이스` 카테고리 최신 6개를 카드로 미리보기 (AI 툴 카드와 동일한 `tool-card` 스타일 재사용). 각 카드는 프로젝트 바로가기 링크와 `community.html?post=ID`로 연결되는 "만든 과정 보기" 링크를 제공하며, 하단 버튼으로 전체 게시판(`community.html`)에서 직접 글쓰기로 이동
 4. **교육자를 위한 AI 나침반** — 교육 현장에 유용한 외부 AI 도구 큐레이션
 5. **우리가 지키는 방향** — 도구보다 사람 / 비판적 활용 / 함께 배우기
