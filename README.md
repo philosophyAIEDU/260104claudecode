@@ -70,7 +70,7 @@ Site settings → Environment variables 에 등록:
      - 유튜브 분석 도우미 — https://philoyoutube.netlify.app
      - 레이싱 게임 (GPT-6 Astra 제작) — https://philoracing.netlify.app/
      - 축구 게임 (GPT-6 Astra 제작) — https://philofootball.netlify.app/
-     - 코드 티처 '코드를 공부합시다' — https://philocodeteacher.netlify.app/
+     - 코드 렌즈 — https://philocodeteacher.netlify.app/
    - 직장·HR
      - 채용 면접 도우미 — https://philohr1.netlify.app/
      - 사내 규정 챗봇 — https://philohr2.netlify.app/
