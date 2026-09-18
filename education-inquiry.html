@@ -24,14 +24,22 @@
         gtag('config', 'G-KWCY47PZWB');
     </script>
 
-    <!-- Firebase (모듈형) — 네비게이션 로그인 상태 표시 -->
+    <!-- Firebase (모듈형) — 네비게이션 로그인 상태 표시 + 강연 후기 미리보기 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         window.initializeApp = initializeApp;
         window.getAuth = getAuth;
         window.onAuthStateChanged = onAuthStateChanged;
         window.signOut = signOut;
+        window.getFirestore = getFirestore;
+        window.fsCollection = collection;
+        window.fsQuery = query;
+        window.fsWhere = where;
+        window.fsOrderBy = orderBy;
+        window.fsLimit = limit;
+        window.fsGetDocs = getDocs;
         window.__firebaseReady = true;
     </script>
 
@@ -294,6 +302,26 @@ section { scroll-margin-top: 88px; }
 .vol-meta h4 { font-size: 14.5px; font-weight: 600; color: var(--ink); margin-bottom: 2px; letter-spacing: -0.01em; }
 .vol-meta p { font-size: 12.5px; color: var(--text-soft); }
 
+/* ===== 강연 후기 ===== */
+.reviews-band { background: var(--parchment); }
+.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.review-card {
+    position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
+    padding: 30px 26px 24px; box-shadow: var(--shadow-sm); transition: var(--transition);
+    display: flex; flex-direction: column; gap: 14px;
+}
+.review-card:hover { border-color: var(--gold); box-shadow: var(--shadow); }
+.review-quote-icon {
+    width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+    background: #f2e8d5; color: var(--gold); font-size: 13px; flex-shrink: 0;
+}
+.review-text { font-size: 14.5px; color: var(--text); line-height: 1.75; white-space: pre-wrap; word-break: break-word; }
+.review-meta { margin-top: auto; padding-top: 6px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.review-author { font-size: 13.5px; font-weight: 600; color: var(--aubergine-deep); }
+.review-org { font-size: 12.5px; color: var(--text-soft); }
+.reviews-loading, .reviews-empty { grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-soft); }
+.reviews-more { text-align: center; margin-top: 36px; }
+
 /* ===== Inquiry ===== */
 .contact-wrap { display: grid; grid-template-columns: 1fr 1.1fr; gap: 72px; align-items: start; }
 .contact-aside h2 {
@@ -411,6 +439,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
 /* ===== Responsive ===== */
 @media (max-width: 1024px) {
     .vol-grid { grid-template-columns: repeat(3, 1fr); }
+    .reviews-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 960px) {
     .page-hero-layout { grid-template-columns: 1fr; gap: 56px; }
@@ -418,6 +447,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
     .hero-photo-caption { left: 12px; bottom: -20px; }
     .cred-grid { grid-template-columns: repeat(2, 1fr); gap: 28px; }
     .topic-grid { grid-template-columns: 1fr; }
+    .reviews-grid { grid-template-columns: 1fr; }
     .contact-wrap { grid-template-columns: 1fr; gap: 48px; }
     .timeline { padding-left: 32px; }
     .timeline::before { left: 4px; }
@@ -852,6 +882,25 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         </div>
     </section>
 
+    <!-- ===== 강연 후기 ===== -->
+    <section id="reviews" class="section-pad reviews-band" hidden>
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">Reviews</span>
+                <h2 class="section-title">강연을 들으신 분들의 <em>생생한 후기</em></h2>
+                <p class="section-sub">직접 강연·연수에 참여하신 선생님들이 네이버 카페에 남겨 주신 후기입니다.</p>
+            </div>
+            <div class="reviews-grid" id="reviewsGrid">
+                <div class="reviews-loading"><i class="fas fa-spinner fa-spin"></i> 후기를 불러오는 중...</div>
+            </div>
+            <div class="reviews-more reveal">
+                <a href="community.html?cat=%EA%B0%95%EC%97%B0%20%ED%9B%84%EA%B8%B0" class="btn btn-outline-quiet">
+                    <i class="fas fa-comments"></i> 후기 더 보기
+                </a>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== 교육 문의 ===== -->
     <section id="inquiry" class="section-pad">
         <div class="container">
@@ -977,6 +1026,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                         <h4>교육 문의</h4>
                         <a href="mailto:dearname27@naver.com">dearname27@naver.com</a>
                         <a href="#history">교육 이력</a>
+                        <a href="#reviews">강연 후기</a>
                         <a href="#volunteer">봉사단 활동</a>
                         <a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener">네이버 카페</a>
                         <a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener">유튜브</a>
@@ -1175,7 +1225,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
             messagingSenderId: "791707583638",
             measurementId: "G-KWCY47PZWB"
         };
-        let auth;
+        let auth, db;
         (function initFirebase() {
             let attempts = 0;
             const t = setInterval(() => {
@@ -1184,18 +1234,77 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                     try {
                         const app = window.initializeApp(firebaseConfig);
                         auth = window.getAuth(app);
+                        db = window.getFirestore(app);
                         window.onAuthStateChanged(auth, updateAuthUI);
                         document.getElementById('navLogoutBtn')?.addEventListener('click', async () => {
                             try { await window.signOut(auth); window.location.reload(); }
                             catch (e) { console.error('로그아웃 오류:', e); }
                         });
+                        loadReviews();
                     } catch (e) {
                         console.error('Firebase init 오류:', e);
+                        showReviewsError();
                     }
                 }
-                if (++attempts > 50) clearInterval(t);
+                if (++attempts > 50) { clearInterval(t); showReviewsError(); }
             }, 100);
         })();
+
+        // ===== 강연 후기 미리보기 (community_posts 중 '강연 후기' 카테고리, 관리자만 작성) =====
+        const REVIEW_CATEGORY = '강연 후기';
+        function escHtml(s) {
+            return String(s ?? '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        async function loadReviews() {
+            try {
+                const q = window.fsQuery(
+                    window.fsCollection(db, 'community_posts'),
+                    window.fsWhere('category', '==', REVIEW_CATEGORY),
+                    window.fsOrderBy('createdAt', 'desc'),
+                    window.fsLimit(6)
+                );
+                const snap = await window.fsGetDocs(q);
+                renderReviews(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+            } catch (e) {
+                console.error('강연 후기 불러오기 오류:', e);
+                showReviewsError();
+            }
+        }
+        function showReviewsError() {
+            const section = document.getElementById('reviews');
+            const grid = document.getElementById('reviewsGrid');
+            if (section) section.hidden = true;
+            if (grid) grid.innerHTML = '<div class="reviews-empty"><i class="fas fa-triangle-exclamation"></i> 후기를 불러오지 못했습니다. 잠시 후 새로고침해 주세요.</div>';
+        }
+        function reviewCardHtml(p) {
+            return `
+                <article class="review-card reveal">
+                    <i class="fas fa-quote-left review-quote-icon"></i>
+                    <p class="review-text">${escHtml(p.content || '')}</p>
+                    <div class="review-meta">
+                        <span class="review-author">${escHtml(p.authorName || '참가자')} 선생님</span>
+                        ${p.authorAffiliation ? `<span class="review-org">${escHtml(p.authorAffiliation)}</span>` : ''}
+                    </div>
+                </article>
+            `;
+        }
+        function renderReviews(items) {
+            const section = document.getElementById('reviews');
+            const grid = document.getElementById('reviewsGrid');
+            if (!grid) return;
+            if (!items.length) {
+                // 등록된 후기가 아직 없으면 섹션 자체를 숨겨 빈 공간이 보이지 않도록 함
+                if (section) section.hidden = true;
+                return;
+            }
+            if (section) section.hidden = false;
+            grid.innerHTML = items.map(reviewCardHtml).join('');
+            if (typeof revealObserver !== 'undefined') {
+                grid.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+            }
+        }
 
         function updateAuthUI(user) {
             const loginItem = document.getElementById('navLoginItem');
