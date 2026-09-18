@@ -400,9 +400,23 @@
                     <label for="postCategory">분류</label>
                     <select id="postCategory" required></select>
                 </div>
+                <div class="form-group" id="fieldReviewPaste" style="display:none;">
+                    <label for="reviewPasteBox">전체 붙여넣기 (제목·작성자·소속·본문 자동 채우기)</label>
+                    <textarea id="reviewPasteBox" placeholder="제목: ...&#10;작성자: ...&#10;소속: ...&#10;---&#10;(후기 본문)"></textarea>
+                    <div class="form-hint">아래 형식으로 한 번에 붙여넣고 "자동 채우기"를 누르면 제목·작성자·소속·본문 칸에 자동으로 나뉘어 들어갑니다.<br>
+                        <code>제목: ...</code> / <code>작성자: ...</code> / <code>소속: ...</code> 줄 다음에 <code>---</code> 구분선, 그 아래부터 본문으로 인식합니다.</div>
+                    <button type="button" id="reviewParseBtn" class="btn-ghost" style="margin-top:0.6rem;"><i class="fas fa-wand-magic-sparkles"></i> 자동 채우기</button>
+                </div>
                 <div class="form-group">
                     <label for="postTitle">제목</label>
                     <input type="text" id="postTitle" maxlength="120" placeholder="제목을 입력해 주세요 (2자 이상)" required>
+                </div>
+                <div class="form-group" id="fieldReviewAuthor" style="display:none;">
+                    <label for="postReviewAuthor">후기 작성자 이름 (신청자에게 보여질 이름)</label>
+                    <input type="text" id="postReviewAuthor" maxlength="50" placeholder="예: 메이크머니">
+                    <label for="postReviewAffiliation" style="margin-top:0.7rem;">소속 (선택)</label>
+                    <input type="text" id="postReviewAffiliation" maxlength="60" placeholder="예: 퍼스널메이커스 독서챌린지">
+                    <div class="form-hint">강연 후기는 원 작성자(네이버 카페 후기 남긴 분)의 이름으로 표시됩니다. 대표님 계정 이름이 아닙니다.</div>
                 </div>
                 <div class="form-group" id="fieldProjectUrl" style="display:none;">
                     <label for="postProjectUrl">프로젝트 URL</label>
@@ -840,6 +854,7 @@
             document.getElementById('aiToolList').innerHTML =
                 AI_TOOL_SUGGESTIONS.map(t => `<option value="${esc(t)}"></option>`).join('');
             document.getElementById('postCategory').addEventListener('change', updateWriteFormFields);
+            document.getElementById('reviewParseBtn').addEventListener('click', parseReviewPaste);
 
             document.getElementById('navLoginBtn').addEventListener('click', login);
             document.getElementById('navLogoutBtn').addEventListener('click', async () => {
@@ -924,20 +939,59 @@
             if (!document.querySelector('.modal-backdrop.open')) document.body.style.overflow = '';
             if (id === 'detailModal') openPostId = null;
         }
-        // 분류가 '바이브코딩 쇼케이스'일 때만 프로젝트 URL·AI 툴·제작 스토리 입력란을 노출
+        // 분류가 '바이브코딩 쇼케이스'일 때만 프로젝트 URL·AI 툴·제작 스토리 입력란을,
+        // '강연 후기'일 때만 전체 붙여넣기·후기 작성자 입력란을 노출
         function updateWriteFormFields() {
-            const isShowcase = document.getElementById('postCategory').value === SHOWCASE_CATEGORY;
+            const category = document.getElementById('postCategory').value;
+            const isShowcase = category === SHOWCASE_CATEGORY;
+            const isReview = category === REVIEW_CATEGORY;
             document.getElementById('fieldProjectUrl').style.display = isShowcase ? '' : 'none';
             document.getElementById('fieldAiTool').style.display = isShowcase ? '' : 'none';
             document.getElementById('fieldProcess').style.display = isShowcase ? '' : 'none';
+            document.getElementById('fieldReviewPaste').style.display = isReview ? '' : 'none';
+            document.getElementById('fieldReviewAuthor').style.display = isReview ? '' : 'none';
             document.getElementById('postProjectUrl').required = isShowcase;
-            document.getElementById('postContentLabel').textContent = isShowcase ? '프로젝트 소개' : '내용';
+            document.getElementById('postReviewAuthor').required = isReview;
+            document.getElementById('postContentLabel').textContent = isShowcase ? '프로젝트 소개' : (isReview ? '후기 본문' : '내용');
             document.getElementById('postContent').placeholder = isShowcase
                 ? '어떤 문제를 해결하는 도구인지, 누구에게 도움이 되는지 소개해 주세요.'
-                : '수업 사례, 질문, 나누고 싶은 자료 등을 자유롭게 적어 주세요.';
+                : (isReview ? '네이버 카페 후기 내용을 붙여넣어 주세요. 위 "전체 붙여넣기"를 쓰면 자동으로 채워집니다.' : '수업 사례, 질문, 나누고 싶은 자료 등을 자유롭게 적어 주세요.');
             document.getElementById('postContentHint').textContent = isShowcase
                 ? '최대 5,000자 · 프로젝트 소개를 적어 주세요. 만든 과정은 아래 별도 항목에 적어 주세요.'
                 : '최대 5,000자 · 게시글은 모든 방문자에게 공개됩니다. 학생 개인정보는 적지 말아 주세요.';
+        }
+
+        // "전체 붙여넣기" 상자의 텍스트를 제목/작성자/소속/본문으로 나눠 각 입력란에 채워 넣음
+        // 형식: "제목: ...", "작성자: ...", "소속: ..." 줄 다음 "---" 구분선, 그 아래가 본문.
+        // 형식에 맞지 않으면 첫 줄을 제목으로, 나머지 전체를 본문으로 사용.
+        function parseReviewPaste() {
+            const raw = document.getElementById('reviewPasteBox').value;
+            if (!raw.trim()) return;
+            const lines = raw.replace(/\r\n/g, '\n').split('\n');
+            let title = '', author = '', affiliation = '';
+            let bodyStartIdx = 0;
+            let matchedHeader = false;
+            for (let i = 0; i < lines.length; i++) {
+                const t = lines[i].trim();
+                if (/^-{3,}$/.test(t)) { bodyStartIdx = i + 1; matchedHeader = true; break; }
+                const mTitle = t.match(/^제목\s*[:：]\s*(.+)$/);
+                const mAuthor = t.match(/^작성자\s*[:：]\s*(.+)$/);
+                const mAff = t.match(/^소속\s*[:：]\s*(.+)$/);
+                if (mTitle) { title = mTitle[1].trim(); bodyStartIdx = i + 1; matchedHeader = true; continue; }
+                if (mAuthor) { author = mAuthor[1].trim(); bodyStartIdx = i + 1; matchedHeader = true; continue; }
+                if (mAff) { affiliation = mAff[1].trim(); bodyStartIdx = i + 1; matchedHeader = true; continue; }
+                if (t === '') { bodyStartIdx = i + 1; continue; }
+                break; // 헤더 형식이 아닌 줄을 만나면 헤더 인식 종료
+            }
+            if (!matchedHeader) {
+                const firstNonEmpty = lines.findIndex(l => l.trim() !== '');
+                if (firstNonEmpty !== -1) { title = lines[firstNonEmpty].trim(); bodyStartIdx = firstNonEmpty + 1; }
+            }
+            const body = lines.slice(bodyStartIdx).join('\n').trim();
+            if (title) document.getElementById('postTitle').value = title.slice(0, 120);
+            if (author) document.getElementById('postReviewAuthor').value = author.slice(0, 50);
+            if (affiliation) document.getElementById('postReviewAffiliation').value = affiliation.slice(0, 60);
+            if (body) document.getElementById('postContent').value = body.slice(0, 5000);
         }
 
         function showWriteError(msg) {
@@ -956,28 +1010,38 @@
             if (!content) { showWriteError('내용을 입력해 주세요.'); return; }
 
             const isShowcase = category === SHOWCASE_CATEGORY;
+            const isReview = category === REVIEW_CATEGORY;
             const projectUrl = document.getElementById('postProjectUrl').value.trim();
             const aiTool = document.getElementById('postAiTool').value.trim();
             const process = document.getElementById('postProcess').value.trim();
+            const reviewAuthor = document.getElementById('postReviewAuthor').value.trim();
+            const reviewAffiliation = document.getElementById('postReviewAffiliation').value.trim();
             if (isShowcase) {
                 if (!/^https:\/\/.+/i.test(projectUrl)) {
                     showWriteError('프로젝트 URL을 https:// 로 시작하는 형태로 입력해 주세요.');
                     return;
                 }
             }
+            if (isReview && !reviewAuthor) {
+                showWriteError('후기 작성자 이름을 입력해 주세요.');
+                return;
+            }
 
             const btn = document.getElementById('writeSubmitBtn');
             btn.disabled = true; btn.textContent = '게시 중...';
             try {
+                // 강연 후기는 원 작성자(네이버 카페 후기 남긴 분) 이름으로 표시 — 로그인한 관리자 본인 이름이 아님
+                const displayName = isReview ? reviewAuthor : myName();
+                const displayAffiliation = isReview ? reviewAffiliation : myAffiliation();
                 const docData = {
                     category, title, content,
                     authorUid: currentUser.uid,
-                    authorName: myName(),
+                    authorName: displayName,
                     likeCount: 0,
                     commentCount: 0,
                     createdAt: window.fsServerTimestamp(),
                 };
-                if (myAffiliation()) docData.authorAffiliation = myAffiliation().slice(0, 60);
+                if (displayAffiliation) docData.authorAffiliation = displayAffiliation.slice(0, 60);
                 if (isShowcase) {
                     docData.projectUrl = projectUrl.slice(0, 300);
                     if (aiTool) docData.aiTool = aiTool.slice(0, 60);
