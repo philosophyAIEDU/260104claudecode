@@ -212,6 +212,8 @@
             background: #fff; border-radius: var(--radius-lg); width: min(640px, 100%);
             padding: 1.9rem; position: relative; box-shadow: var(--shadow-lg);
         }
+        /* 상세보기(글 읽기)는 긴 글도 편하게 읽도록 더 넓게 */
+        #detailModal .modal-panel { width: min(760px, 100%); padding: 2.4rem 2.6rem; }
         .modal-close {
             position: absolute; top: 1rem; right: 1rem; width: 34px; height: 34px;
             border: none; border-radius: 50%; background: var(--bg-tint); color: var(--text-soft);
@@ -246,9 +248,9 @@
 
         /* Detail modal */
         .d-top { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
-        .d-title { font-size: 1.3rem; font-weight: 800; color: var(--ink); letter-spacing: -0.4px; line-height: 1.35; margin-bottom: 0.4rem; padding-right: 2rem; }
-        .d-meta { font-size: 0.82rem; color: var(--text-soft); margin-bottom: 1.2rem; display: flex; gap: 0.9rem; flex-wrap: wrap; }
-        .d-content { color: var(--text); font-size: 0.95rem; white-space: pre-wrap; word-break: break-word; padding-bottom: 1.3rem; border-bottom: 1px solid var(--line); margin-bottom: 1.2rem; }
+        .d-title { font-size: 1.5rem; font-weight: 800; color: var(--ink); letter-spacing: -0.4px; line-height: 1.4; margin-bottom: 0.5rem; padding-right: 2rem; }
+        .d-meta { font-size: 0.85rem; color: var(--text-soft); margin-bottom: 1.3rem; display: flex; gap: 0.9rem; flex-wrap: wrap; }
+        .d-content { color: var(--text); font-size: 1.08rem; line-height: 1.9; white-space: pre-wrap; word-break: break-word; padding-bottom: 1.4rem; border-bottom: 1px solid var(--line); margin-bottom: 1.2rem; }
         .d-del {
             border: none; background: none; color: #c0392b; font-family: inherit; font-size: 0.8rem;
             font-weight: 600; cursor: pointer; padding: 0.2rem 0.4rem;
@@ -332,6 +334,7 @@
             .write-btn { justify-content: center; }
             .logo span.logo-text { display: none; }
             .modal-panel { padding: 1.4rem; }
+            #detailModal .modal-panel { padding: 1.5rem; }
         }
     </style>
 </head>

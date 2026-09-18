@@ -303,22 +303,27 @@ section { scroll-margin-top: 88px; }
 .vol-meta p { font-size: 12.5px; color: var(--text-soft); }
 
 /* ===== 강연 후기 ===== */
-.reviews-band { background: var(--parchment); }
-.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.reviews-band { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.reviews-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
 .review-card {
-    position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
-    padding: 30px 26px 24px; box-shadow: var(--shadow-sm); transition: var(--transition);
-    display: flex; flex-direction: column; gap: 14px;
+    position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-xl);
+    padding: 38px 34px 30px; box-shadow: var(--shadow-sm); transition: var(--transition);
+    display: flex; flex-direction: column; gap: 18px;
 }
-.review-card:hover { border-color: var(--gold); box-shadow: var(--shadow); }
+.review-card:hover { border-color: var(--gold); box-shadow: var(--shadow-lg); }
 .review-quote-icon {
-    width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
-    background: #f2e8d5; color: var(--gold); font-size: 13px; flex-shrink: 0;
+    width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+    background: #f2e8d5; color: var(--gold); font-size: 17px; flex-shrink: 0;
 }
-.review-text { font-size: 14.5px; color: var(--text); line-height: 1.75; white-space: pre-wrap; word-break: break-word; }
-.review-meta { margin-top: auto; padding-top: 6px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
-.review-author { font-size: 13.5px; font-weight: 600; color: var(--aubergine-deep); }
-.review-org { font-size: 12.5px; color: var(--text-soft); }
+.review-text {
+    font-size: 17px; color: var(--text); line-height: 1.9; white-space: pre-wrap; word-break: break-word;
+    display: -webkit-box; -webkit-line-clamp: 9; -webkit-box-orient: vertical; overflow: hidden;
+}
+.review-more-link { align-self: flex-start; font-size: 13.5px; font-weight: 600; color: var(--aubergine); }
+.review-more-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.review-meta { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+.review-author { font-size: 15.5px; font-weight: 700; color: var(--aubergine-deep); }
+.review-org { font-size: 13.5px; color: var(--text-soft); }
 .reviews-loading, .reviews-empty { grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-soft); }
 .reviews-more { text-align: center; margin-top: 36px; }
 
@@ -439,7 +444,6 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
 /* ===== Responsive ===== */
 @media (max-width: 1024px) {
     .vol-grid { grid-template-columns: repeat(3, 1fr); }
-    .reviews-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 960px) {
     .page-hero-layout { grid-template-columns: 1fr; gap: 56px; }
@@ -531,6 +535,25 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                         <small>2026.07 · AI 리터러시 교육</small>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 강연 후기 ===== -->
+    <section id="reviews" class="section-pad reviews-band" hidden>
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">Reviews</span>
+                <h2 class="section-title">강연을 들으신 분들의 <em>생생한 후기</em></h2>
+                <p class="section-sub">직접 강연·연수에 참여하신 선생님들이 네이버 카페에 남겨 주신 후기입니다.</p>
+            </div>
+            <div class="reviews-grid" id="reviewsGrid">
+                <div class="reviews-loading"><i class="fas fa-spinner fa-spin"></i> 후기를 불러오는 중...</div>
+            </div>
+            <div class="reviews-more reveal">
+                <a href="community.html?cat=%EA%B0%95%EC%97%B0%20%ED%9B%84%EA%B8%B0" class="btn btn-outline-quiet">
+                    <i class="fas fa-comments"></i> 후기 더 보기
+                </a>
             </div>
         </div>
     </section>
@@ -878,25 +901,6 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                         <div class="vol-meta"><h4>오류마을 보육원</h4><p>전달 완료</p></div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== 강연 후기 ===== -->
-    <section id="reviews" class="section-pad reviews-band" hidden>
-        <div class="container">
-            <div class="section-head reveal">
-                <span class="eyebrow">Reviews</span>
-                <h2 class="section-title">강연을 들으신 분들의 <em>생생한 후기</em></h2>
-                <p class="section-sub">직접 강연·연수에 참여하신 선생님들이 네이버 카페에 남겨 주신 후기입니다.</p>
-            </div>
-            <div class="reviews-grid" id="reviewsGrid">
-                <div class="reviews-loading"><i class="fas fa-spinner fa-spin"></i> 후기를 불러오는 중...</div>
-            </div>
-            <div class="reviews-more reveal">
-                <a href="community.html?cat=%EA%B0%95%EC%97%B0%20%ED%9B%84%EA%B8%B0" class="btn btn-outline-quiet">
-                    <i class="fas fa-comments"></i> 후기 더 보기
-                </a>
             </div>
         </div>
     </section>
@@ -1279,10 +1283,13 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
             if (grid) grid.innerHTML = '<div class="reviews-empty"><i class="fas fa-triangle-exclamation"></i> 후기를 불러오지 못했습니다. 잠시 후 새로고침해 주세요.</div>';
         }
         function reviewCardHtml(p) {
+            const content = p.content || '';
+            const isLong = content.length > 500;
             return `
                 <article class="review-card reveal">
                     <i class="fas fa-quote-left review-quote-icon"></i>
-                    <p class="review-text">${escHtml(p.content || '')}</p>
+                    <p class="review-text">${escHtml(content)}</p>
+                    ${isLong ? `<a href="community.html?post=${encodeURIComponent(p.id)}" class="review-more-link">후기 전체 보기 <i class="fas fa-arrow-right"></i></a>` : ''}
                     <div class="review-meta">
                         <span class="review-author">${escHtml(p.authorName || '참가자')} 선생님</span>
                         ${p.authorAffiliation ? `<span class="review-org">${escHtml(p.authorAffiliation)}</span>` : ''}
