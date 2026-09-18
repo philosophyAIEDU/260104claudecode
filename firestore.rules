@@ -96,7 +96,9 @@ service cloud.firestore {
         && request.resource.data.content is string
         && request.resource.data.content.size() >= 1
         && request.resource.data.content.size() <= 5000
-        && request.resource.data.category in ['수업 사례', '바이브코딩 쇼케이스', '질문·고민', '자료 공유', '자유']
+        && request.resource.data.category in ['수업 사례', '바이브코딩 쇼케이스', '질문·고민', '자료 공유', '자유', '강연 후기']
+        // '강연 후기'는 신청자에게 보여줄 검증된 후기이므로 관리자만 작성 가능
+        && (request.resource.data.category != '강연 후기' || isAdmin())
         && (!('projectUrl' in request.resource.data) || (request.resource.data.projectUrl is string && request.resource.data.projectUrl.size() <= 300))
         && (!('aiTool' in request.resource.data) || (request.resource.data.aiTool is string && request.resource.data.aiTool.size() <= 60))
         && (!('process' in request.resource.data) || (request.resource.data.process is string && request.resource.data.process.size() <= 4000))
