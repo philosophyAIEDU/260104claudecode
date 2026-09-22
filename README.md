@@ -44,6 +44,7 @@ Site settings → Environment variables 에 등록:
      - 문장나무 (문장 분석 학습 앱) — https://philolang.netlify.app/
      - 영어 원서 읽기 — https://philoenglish2.netlify.app
      - 아모배 영어 — https://amobeenglish.netlify.app/
+     - JEV 학습 앱 — https://philojev.netlify.app/
    - 수학·물리
      - 미분적분 학습 도우미 — https://philomath77.netlify.app
      - AI 뉴턴 역학 학습 도우미 — https://philophysics1.netlify.app/
