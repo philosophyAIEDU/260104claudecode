@@ -59,6 +59,8 @@ Site settings → Environment variables 에 등록:
      - 원소 배틀 아레나 (주기율표 학습) — https://philoatom.netlify.app/
      - 지구 속 탐험대 (지구 내부 탐험) — https://philoearth.netlify.app/
      - 먹이사슬 라이브 (생태계 학습) — https://philoeco.netlify.app/
+     - 천체 학습 앱 (Opus 5.5 제작) — https://philouniverseopus55.netlify.app/
+     - 천체 학습 앱 (GPT-6 Sol 제작) — https://philouniversegpt6sol.netlify.app/
    - 인문·사고력
      - 논문 학습 노트 — https://philoedu.netlify.app
      - 사고력 코치 — https://philofable5.netlify.app
