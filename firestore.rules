@@ -159,6 +159,15 @@ service cloud.firestore {
         || (request.auth != null && resource.data.toUid == request.auth.uid);
     }
 
+    // 운영자 전용 콘텐츠 공간 — 읽기·쓰기 모두 관리자만 (contents-admin.html)
+    // contents_input: 정제·태깅된 원천 콘텐츠 / contents_output: 이를 바탕으로 만든 결과물
+    match /contents_input/{docId} {
+      allow read, write: if isAdmin();
+    }
+    match /contents_output/{docId} {
+      allow read, write: if isAdmin();
+    }
+
     // 신고 — 로그인 사용자만 접수, 관리자만 열람/처리
     match /reports/{reportId} {
       allow read, delete: if isAdmin();
