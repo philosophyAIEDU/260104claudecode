@@ -508,6 +508,25 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
     </section>
 
     <!-- ===== Educator AI Tools ===== -->
+    <!-- ===== 관리자 전용: 관리자 대시보드 바로가기 (관리자 로그인 시에만 표시) ===== -->
+    <section id="adminQuick" class="section-pad admin-panel">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Admin Only</span>
+                <h2 class="section-title">관리자 대시보드</h2>
+                <p class="section-sub">운영자 계정으로 로그인하셨습니다. 아래에서 바로 이동하세요.</p>
+            </div>
+            <div class="admin-ga-row">
+                <a href="admin-dashboard.html" class="admin-ga-btn primary">
+                    <i class="fas fa-table-columns"></i> 관리자 대시보드 열기
+                </a>
+                <a href="contents-admin.html" class="admin-ga-btn ghost">
+                    <i class="fas fa-folder-open"></i> Contents Input / Output
+                </a>
+            </div>
+        </div>
+    </section>
+
     <section id="tools" class="section-pad tools">
         <div class="container">
             <div class="section-head reveal">
@@ -817,6 +836,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
             // 관리자 전용 UI 토글
             isAdmin = !!user && (user.email || '').toLowerCase() === ADMIN_EMAIL;
             document.getElementById('adminStats').classList.toggle('visible', isAdmin);
+            document.getElementById('adminQuick').classList.toggle('visible', isAdmin);
             if (isAdmin) loadAdminStats();
         }
 

@@ -613,6 +613,20 @@
 
         </div>
 
+        <!-- Contents Input (운영자 전용 콘텐츠 공간) -->
+        <div class="contents-input-section" style="margin-bottom:3rem;">
+            <div class="table-header" style="border-radius:15px 15px 0 0; display:flex; justify-content:space-between; align-items:center; padding:1.5rem;">
+                <span><i class="fas fa-folder-open"></i> Contents Input <span id="contentsInputCount" style="font-size:.85rem; font-weight:400;"></span></span>
+                <span style="display:flex; gap:.6rem;">
+                    <a href="contents-admin.html" style="background:#fff; color:var(--primary-color); text-decoration:none; padding:.6rem 1.2rem; border-radius:8px; font-weight:700; font-size:.95rem;">전체 보기 / Output</a>
+                    <button id="contentsInputRefreshBtn" style="background:#fff; color:var(--primary-color); border:none; padding:.6rem 1.2rem; border-radius:8px; font-weight:700; cursor:pointer; font-size:.95rem;"><i class="fas fa-rotate"></i> 새로고침</button>
+                </span>
+            </div>
+            <div id="contentsInputContainer" style="background:#fff; border-radius:0 0 15px 15px; box-shadow:0 5px 20px var(--shadow); min-height:80px; padding:1rem;">
+                <div class="loading"><div class="spinner"></div> 콘텐츠 불러오는 중...</div>
+            </div>
+        </div>
+
         <!-- AI 툴 관리 -->
         <div class="tools-mgmt-section" style="margin-bottom:3rem;">
             <div class="table-header" style="border-radius:15px 15px 0 0; display:flex; justify-content:space-between; align-items:center; padding:1.5rem;">
@@ -821,13 +835,51 @@
                 loadVisitorStats();
                 loadToolsList();
                 loadReportsList();
+                loadContentsInput();
                 document.getElementById('reportsRefreshBtn')?.addEventListener('click', loadReportsList);
+                document.getElementById('contentsInputRefreshBtn')?.addEventListener('click', loadContentsInput);
                 refreshTimer = setInterval(() => { loadDashboardData(); loadVisitorStats(); loadReportsList(); }, 5 * 60 * 1000);
             }
             if (!isAdminUser && refreshTimer) {
                 clearInterval(refreshTimer);
                 refreshTimer = null;
                 adminInitDone = false;
+            }
+        }
+
+        // Contents Input — 정제·태깅된 콘텐츠 목록 (텍스트는 textContent로만 삽입)
+        async function loadContentsInput() {
+            const box = document.getElementById('contentsInputContainer');
+            if (!box) return;
+            try {
+                const snap = await window.getDocs(window.collection(db, 'contents_input'));
+                box.replaceChildren();
+                document.getElementById('contentsInputCount').textContent = `(${snap.size}건)`;
+                if (snap.empty) {
+                    const p = document.createElement('p');
+                    p.textContent = '업로드된 콘텐츠가 없습니다.';
+                    box.appendChild(p);
+                    return;
+                }
+                snap.docs.forEach((d) => {
+                    const data = d.data();
+                    const t = data.tags || {};
+                    const row = document.createElement('div');
+                    row.className = 'table-item';
+                    const title = document.createElement('strong');
+                    title.textContent = `${d.id} · ${data.source_file || ''}`;
+                    const meta = document.createElement('div');
+                    meta.style.cssText = 'color:#7f8c8d; font-size:.85rem; margin-top:.3rem;';
+                    meta.textContent = [t.format, t.category, t.target_audience, t.performance_grade && `성과 ${t.performance_grade}`, t.published_at]
+                        .filter(Boolean).join(' · ');
+                    const msg = document.createElement('div');
+                    msg.style.cssText = 'font-size:.9rem; margin-top:.3rem;';
+                    msg.textContent = t.key_message || '';
+                    row.append(title, meta, msg);
+                    box.appendChild(row);
+                });
+            } catch (e) {
+                box.textContent = '불러오지 못했습니다: ' + e.message;
             }
         }
 
