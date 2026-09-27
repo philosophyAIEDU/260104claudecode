@@ -103,7 +103,7 @@ function el(tag, { text, cls } = {}, children = []) {
     const e = document.createElement(tag);
     if (text !== undefined) e.textContent = text;
     if (cls) e.className = cls;
-    children.forEach((c) => e.appendChild(c));
+    children.forEach((c) => e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c));
     return e;
 }
 function fmtDate(ts) { return ts?.toDate ? ts.toDate().toLocaleString('ko-KR') : ''; }
