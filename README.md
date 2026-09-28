@@ -81,6 +81,7 @@ Site settings → Environment variables 에 등록:
      - 사내 교육 사이트 — https://philohr3.netlify.app/
      - 2026 HTHT 대학 컨소시엄 하계 교직원 역량 강화 직무연수 — https://philo2026htht.netlify.app/
      - 소상공인시장진흥공단 공공 빅데이터 기반 전국 상권분석 & 경쟁 진단 — https://philoacademy.netlify.app
+     - JEV를 활용한 상권분석 앱 — https://philojev2.netlify.app/
    - 기타
      - 전국 주차장 정보 — https://philoparking.netlify.app
      - AI 구독료 관리 서비스 — https://philosubscription.netlify.app/
