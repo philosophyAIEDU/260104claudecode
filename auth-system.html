@@ -9,13 +9,14 @@
     <!-- Firebase JS (모듈형) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         
         window.initializeApp = initializeApp;
         window.getAuth = getAuth;
         window.signInWithPopup = signInWithPopup;
         window.GoogleAuthProvider = GoogleAuthProvider;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
         window.signOut = signOut;
         window.onAuthStateChanged = onAuthStateChanged;
         window.getFirestore = getFirestore;
@@ -149,6 +150,12 @@
             font-size: 1.1rem;
         }
 
+        .email-login { margin-top: 1.5rem; text-align: left; }
+        .email-login summary { cursor: pointer; text-align: center; color: var(--text-light); font-size: 0.9rem; }
+        .email-login form { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem; }
+        .email-login input { padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 10px; font-size: 0.95rem; font-family: inherit; }
+        .email-login button { padding: 0.75rem; border: none; border-radius: 10px; background: #333; color: #fff; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .email-login .hint { font-size: 0.8rem; color: var(--text-light); text-align: center; }
         .google-login-btn {
             display: inline-flex;
             align-items: center;
@@ -489,6 +496,16 @@
                     구글 계정으로 시작하기
                 </button>
 
+                <details class="email-login">
+                    <summary>이메일/비밀번호로 로그인</summary>
+                    <form id="emailLoginForm">
+                        <input type="email" id="emailLoginId" placeholder="이메일" autocomplete="username" required>
+                        <input type="password" id="emailLoginPw" placeholder="비밀번호" autocomplete="current-password" required>
+                        <button type="submit">로그인</button>
+                        <div class="hint">결제 심사용 테스트 계정 등 구글 계정이 없는 경우에 사용합니다.</div>
+                    </form>
+                </details>
+
                 <div id="authMessage" class="success-message"></div>
                 <div id="authError" class="error-message"></div>
             </div>
@@ -642,6 +659,7 @@
         function setupEventListeners() {
             document.getElementById('googleLogin')?.addEventListener('click', handleGoogleLogin);
             document.getElementById('googleLoginBtn')?.addEventListener('click', handleGoogleLogin);
+            document.getElementById('emailLoginForm')?.addEventListener('submit', handleEmailLogin);
             document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
             document.getElementById('userProfileForm')?.addEventListener('submit', handleProfileSubmit);
             // '기타' 직업 선택 시 직접 입력란 표시
@@ -668,6 +686,19 @@
             } catch (error) {
                 console.error('로그인 에러:', error);
                 showError('로그인 중 오류가 발생했습니다.');
+            }
+        }
+
+        async function handleEmailLogin(e) {
+            e.preventDefault();
+            if (!auth) return;
+            const email = document.getElementById('emailLoginId').value.trim();
+            const pw = document.getElementById('emailLoginPw').value;
+            try {
+                await window.signInWithEmailAndPassword(auth, email, pw);
+            } catch (error) {
+                console.error('이메일 로그인 에러:', error);
+                showError('이메일 또는 비밀번호가 올바르지 않습니다.');
             }
         }
 
