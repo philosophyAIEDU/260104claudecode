@@ -449,12 +449,13 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
 }
 
     </style>
+    <link rel="stylesheet" href="assets/space-theme.css">
 </head>
-<body>
+<body class="space-home">
     <!-- ===== Header ===== -->
     <header id="header">
         <nav class="container">
-            <a href="#home" class="logo">Philosophy <em>AI</em><span class="logo-kr">필로소피 AI 교육</span></a>
+            <a href="#home" class="logo"><svg class="brand-orbit" viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="14" ry="9" transform="rotate(-35 16 16)" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="16" cy="16" r="4" fill="currentColor"/><circle cx="25" cy="7" r="2" fill="#9fc9ea"/></svg>Philosophy <em>AI</em><span class="logo-kr">필로소피 AI 교육</span></a>
             <ul class="nav-menu" id="navMenu">
                 <li><a href="#tools">필로소피 AI 툴</a></li>
                 <li><a href="#showcase">바이브코딩 쇼케이스</a></li>
@@ -471,7 +472,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                     </div>
                 </li>
             </ul>
-            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+            <button type="button" class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="navMenu"><span></span><span></span><span></span></button>
         </nav>
     </header>
 
@@ -480,8 +481,8 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         <div class="container">
             <div class="hero-layout">
                 <div class="hero-content">
-                    <span class="hero-badge">AI 시대, 교육자의 나침반</span>
-                    <h1>AI 사용법이라는 지도를 넘어,<br><em>길을 잃지 않는 나침반을 제공합니다</em>.</h1>
+                    <span class="hero-badge">PHILOSOPHY AI EDUCATION · 함께 탐구하는 배움의 우주</span>
+                    <h1>AI 시대,<br><em>교육자의 나침반</em><span class="hero-heading-small">사용법 너머의 질문을 함께 탐구합니다.</span></h1>
                     <p class="lead">수업에 바로 쓰는 AI 학습 도구와, 교육자들이 바이브코딩으로 직접 만든 프로젝트.
                         AI의 한계는 무엇이고 우리가 할 수 있는 일은 무엇인지 —
                         <strong>사용법 너머의 질문</strong>을 함께 고민하는 교육자를 위한 연구 채널입니다.</p>
@@ -490,19 +491,37 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                         <a href="#showcase" class="btn btn-ghost">바이브코딩 쇼케이스 →</a>
                     </div>
                     <div class="hero-meta">
-                        <span>직접 만든 학습 도구 <strong>18+</strong></span>
+                        <span>직접 만든 AI 학습 도구</span>
                         <span class="dot">·</span>
                         <span>교육 현장 중심</span>
                         <span class="dot">·</span>
                         <span>가입 없이 무료 사용</span>
                     </div>
                 </div>
-                <div class="hero-figure" id="heroFigure">
-                    <div class="hero-mascot">
-                        <img src="assets/mascot.jpg" alt="필로소피 AI 마스코트"
-                             onerror="this.closest('.hero-layout').classList.add('img-missing'); document.getElementById('heroFigure').style.display='none'">
+                <figure class="hero-figure" id="heroFigure">
+                    <div class="planet-scene">
+                        <div class="planet-halo" aria-hidden="true"></div>
+                        <div class="orbit-line" aria-hidden="true"></div>
+                        <div class="earth-disc">
+                            <img src="assets/space/earth-blue-marble.jpg" alt="우주에서 바라본 푸른 지구 — NASA 아폴로 17호 사진" width="1280" height="1280" fetchpriority="high">
+                        </div>
+                        <span class="planet-label" aria-hidden="true">OUR PALE BLUE HOME</span>
                     </div>
-                </div>
+                    <figcaption class="planet-caption">CURIOSITY <span>●</span> LEARNING <span>●</span> TOGETHER</figcaption>
+                </figure>
+                <nav class="explore-nav" aria-label="배움의 우주 탐색">
+                    <p class="explore-title">CHOOSE YOUR EXPLORATION</p>
+                    <a class="explore-link" href="#tools"><span class="explore-number">01</span><span class="explore-name">필로소피 AI 툴<small>수업 · 학습 · 직접 만든 도구</small></span><span class="explore-arrow">↗</span></a>
+                    <a class="explore-link" href="#showcase"><span class="explore-number">02</span><span class="explore-name">바이브코딩 쇼케이스<small>아이디어 · 실험 · 제작 과정</small></span><span class="explore-arrow">↗</span></a>
+                    <a class="explore-link" href="community.html"><span class="explore-number">03</span><span class="explore-name">교육자 커뮤니티<small>질문 · 경험 · 함께 배우기</small></span><span class="explore-arrow">↗</span></a>
+                    <a class="explore-link" href="education-inquiry.html"><span class="explore-number">04</span><span class="explore-name">AI 교육 문의<small>직무연수 · 강연 · 코칭</small></span><span class="explore-arrow">↗</span></a>
+                    <a class="explore-link" href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener"><span class="explore-number">05</span><span class="explore-name">유튜브 연구 채널<small>AI 이야기 · 강의 · 실습 영상</small></span><span class="explore-arrow">↗</span></a>
+                    <a class="explore-link" href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener"><span class="explore-number">06</span><span class="explore-name">필로소피 AI 카페<small>학습 자료 · 스터디 · 나눔</small></span><span class="explore-arrow">↗</span></a>
+                </nav>
+            </div>
+            <div class="observatory-note">
+                <span><i class="fas fa-compass" aria-hidden="true"></i> 도구보다 사람을, 정답보다 질문을.</span>
+                <span>지구 이미지 · <a href="https://images.nasa.gov/details/as17-148-22727" target="_blank" rel="noopener">NASA / Apollo 17</a></span>
             </div>
         </div>
     </section>
@@ -759,12 +778,27 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         hamburger.addEventListener('click', () => {
             navMenu.classList.toggle('active');
             hamburger.classList.toggle('active');
+            const open = navMenu.classList.contains('active');
+            hamburger.setAttribute('aria-expanded', String(open));
+            hamburger.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
         });
         navMenu.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', () => {
                 navMenu.classList.remove('active');
                 hamburger.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+                hamburger.setAttribute('aria-label', '메뉴 열기');
             });
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+                navMenu.classList.remove('active');
+                hamburger.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+                hamburger.setAttribute('aria-label', '메뉴 열기');
+                hamburger.focus();
+            }
         });
 
         // ===== Reveal on scroll =====
