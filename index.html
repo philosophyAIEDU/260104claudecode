@@ -973,7 +973,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         function showcaseCardHtml(p, i) {
             return `
                 <article class="tool-card reveal">
-                    ${toolArtwork({ name: p.title, category: "함께 만드는 배움" })}
+                    ${showcaseArtwork({ name: p.title, category: "함께 만드는 배움" })}
                     <div class="tool-top">
                         <div class="tool-icon ${ICON_COLORS[i % ICON_COLORS.length]}"><i class="fas fa-rocket"></i></div>
                         <div class="tool-head">
@@ -1108,9 +1108,77 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
             });
         }
 
-        // Subject illustrations are stable across sorting and category filtering.
-        // The single locally hosted atlas contains 16 generated colored-pencil scenes.
+        // Each tool has its own scene. Match identity rather than category or display order.
+        // Values are zero-based scene indices; each sheet has eight used cells in a 3x3 grid.
+        const TOOL_ARTWORK = Object.freeze({
+            'philoenglishdictionary.netlify.app': 0,
+            'philoreading.netlify.app': 1,
+            'philolang.netlify.app': 2,
+            'philomath77.netlify.app': 3,
+            'philophysics1.netlify.app': 4,
+            'philophysics2.netlify.app': 5,
+            'philophysics5.netlify.app': 6,
+            'philoksnu.netlify.app': 7,
+            'philoalphafold.netlify.app': 8,
+            'philoanatomy.netlify.app': 9,
+            'philoatom.netlify.app': 10,
+            'philoearth.netlify.app': 11,
+            'philoeco.netlify.app': 12,
+            'philoedu.netlify.app': 13,
+            'philofable5.netlify.app': 14,
+            'philodiscussion.netlify.app': 15,
+            'philohistory.netlify.app': 16,
+            'philocareer.netlify.app': 17,
+            'philoailab.netlify.app': 18,
+            'philogo1.netlify.app': 19,
+            'philoenglish2.netlify.app': 20,
+            'philoyoutube.netlify.app': 21,
+            'philohr1.netlify.app': 22,
+            'philohr2.netlify.app': 23,
+            'philohr3.netlify.app': 24,
+            'philokoreanhistory.netlify.app': 25,
+            'philophysics3d.netlify.app': 26,
+            'philo2026htht.netlify.app': 27,
+            'philoacademy.netlify.app': 28,
+            'philoparking.netlify.app': 29,
+            'philoracing.netlify.app': 30,
+            'philogptphysics.netlify.app': 31,
+            'philofootball.netlify.app': 32,
+            'philosubscription.netlify.app': 33,
+            'philocodeteacher.netlify.app': 34,
+            'amobeenglish.netlify.app': 35,
+            'philojev.netlify.app': 36,
+            'philouniverseopus55.netlify.app': 37,
+            'philouniversegpt6sol.netlify.app': 38,
+            'philojev2.netlify.app': 39,
+        });
+
+        function getToolArtwork(t) {
+            let host = '';
+            try { host = new URL(String(t.url || '')).hostname.toLowerCase(); } catch {}
+            let scene = Object.hasOwn(TOOL_ARTWORK, host) ? TOOL_ARTWORK[host] : undefined;
+            if (scene === undefined) {
+                const known = DEFAULT_TOOLS.find(tool => tool.name === t.name);
+                if (known) scene = TOOL_ARTWORK[new URL(known.url).hostname];
+            }
+            return scene === undefined ? null : {
+                scene, sheet: Math.floor(scene / 8) + 1, tile: scene % 8,
+            };
+        }
+
         function toolArtwork(t) {
+            const artwork = getToolArtwork(t);
+            const label = escapeHtml(t.category || '함께 만드는 배움');
+            if (!artwork) {
+                // New CMS tools need their own commissioned scene, not another tool's image.
+                return `<div class="tool-art tool-art-placeholder" aria-hidden="true"><span>${escapeHtml(t.name || '새로운 도구')}</span><span class="art-category">${label}</span></div>`;
+            }
+            const { sheet, tile } = artwork;
+            return `<div class="tool-art art-tone-${artwork.scene % 4}" aria-hidden="true"><span class="tool-illustration tool-illustration-unique art-sheet-${sheet}" style="background-position:${(tile % 3) * 50}% ${Math.floor(tile / 3) * 50}%"></span><span class="art-category">${label}</span></div>`;
+        }
+
+        // User-created showcase projects retain the separate category illustration library.
+        function showcaseArtwork(t) {
             const name = String(t.name || '');
             const rules = [
                 [/천체|우주/, 15], [/축구/, 14], [/레이싱|주차/, 13],

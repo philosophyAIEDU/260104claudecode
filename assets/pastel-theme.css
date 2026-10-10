@@ -77,6 +77,13 @@ header, header.scrolled { background: #faf7eff5; border-bottom: 1px solid var(--
 .tool-art { position: relative; display: flex; justify-content: center; border-radius: 17px; overflow: hidden; margin: -8px -8px 20px; background: #e1eedf; }
 .art-tone-1 { background: #eee7f3; } .art-tone-2 { background: #f7e5d5; } .art-tone-3 { background: #e1eaf1; }
 .tool-illustration { display: block; width: 100%; aspect-ratio: 1; background-image: url('illustrations/tool-subjects.webp'); background-size: 400% 400%; background-repeat: no-repeat; }
+.tool-illustration-unique { background-size: 300% 300%; }
+.art-sheet-1 { background-image: url('illustrations/tools-01.webp'); }
+.art-sheet-2 { background-image: url('illustrations/tools-02.webp'); }
+.art-sheet-3 { background-image: url('illustrations/tools-03.webp'); }
+.art-sheet-4 { background-image: url('illustrations/tools-04.webp'); }
+.art-sheet-5 { background-image: url('illustrations/tools-05.webp'); }
+.tool-art-placeholder { aspect-ratio: 1; align-items: center; padding: 32px; background: #f4f1e8; text-align: center; color: var(--text-soft); }
 .art-category { position: absolute; bottom: 12px; left: 12px; font-size: 11px; font-weight: 600; background: #fffef5ed; padding: 4px 12px; border-radius: 999px; color: var(--ink); }
 .pastel-home .tool-tagline { font-family: var(--font-body); font-style: normal; font-size: 12px; line-height: 1.6; color: #657060; }
 .pastel-home .tool-card h3 { font-size: 17px; line-height: 1.5; }
