@@ -449,9 +449,9 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
 }
 
     </style>
-    <link rel="stylesheet" href="assets/space-theme.css">
+    <link rel="stylesheet" href="assets/pastel-theme.css">
 </head>
-<body class="space-home">
+<body class="pastel-home">
     <!-- ===== Header ===== -->
     <header id="header">
         <nav class="container">
@@ -481,7 +481,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         <div class="container">
             <div class="hero-layout">
                 <div class="hero-content">
-                    <span class="hero-badge">PHILOSOPHY AI EDUCATION · 함께 탐구하는 배움의 우주</span>
+                    <span class="hero-badge">PHILOSOPHY AI EDUCATION · 함께 배우고, 함께 자라요</span>
                     <h1>AI 시대,<br><em>교육자의 나침반</em><span class="hero-heading-small">사용법 너머의 질문을 함께 탐구합니다.</span></h1>
                     <p class="lead">수업에 바로 쓰는 AI 학습 도구와, 교육자들이 바이브코딩으로 직접 만든 프로젝트.
                         AI의 한계는 무엇이고 우리가 할 수 있는 일은 무엇인지 —
@@ -499,18 +499,13 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                     </div>
                 </div>
                 <figure class="hero-figure" id="heroFigure">
-                    <div class="planet-scene">
-                        <div class="planet-halo" aria-hidden="true"></div>
-                        <div class="orbit-line" aria-hidden="true"></div>
-                        <div class="earth-disc">
-                            <img src="assets/space/earth-blue-marble.jpg" alt="우주에서 바라본 푸른 지구 — NASA 아폴로 17호 사진" width="1280" height="1280" fetchpriority="high">
-                        </div>
-                        <span class="planet-label" aria-hidden="true">OUR PALE BLUE HOME</span>
+                    <div class="learning-portrait">
+                        <img src="assets/illustrations/learning-together.webp" alt="책과 노트북을 함께 살펴보며 배우는 세 교육자의 귀여운 색연필 캐리커처" width="1536" height="1024" fetchpriority="high">
                     </div>
-                    <figcaption class="planet-caption">CURIOSITY <span>●</span> LEARNING <span>●</span> TOGETHER</figcaption>
+                    <figcaption class="learning-caption"><span aria-hidden="true">✦</span> 좋은 질문에서 시작되는, 새로운 배움</figcaption>
                 </figure>
-                <nav class="explore-nav" aria-label="배움의 우주 탐색">
-                    <p class="explore-title">CHOOSE YOUR EXPLORATION</p>
+                <nav class="explore-nav" aria-label="배움의 공간 탐색">
+                    <p class="explore-title">오늘은 무엇을 함께 배워볼까요?</p>
                     <a class="explore-link" href="#tools"><span class="explore-number">01</span><span class="explore-name">필로소피 AI 툴<small>수업 · 학습 · 직접 만든 도구</small></span><span class="explore-arrow">↗</span></a>
                     <a class="explore-link" href="#showcase"><span class="explore-number">02</span><span class="explore-name">바이브코딩 쇼케이스<small>아이디어 · 실험 · 제작 과정</small></span><span class="explore-arrow">↗</span></a>
                     <a class="explore-link" href="community.html"><span class="explore-number">03</span><span class="explore-name">교육자 커뮤니티<small>질문 · 경험 · 함께 배우기</small></span><span class="explore-arrow">↗</span></a>
@@ -521,7 +516,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
             </div>
             <div class="observatory-note">
                 <span><i class="fas fa-compass" aria-hidden="true"></i> 도구보다 사람을, 정답보다 질문을.</span>
-                <span>지구 이미지 · <a href="https://images.nasa.gov/details/as17-148-22727" target="_blank" rel="noopener">NASA / Apollo 17</a></span>
+                <span>작은 호기심이 더 넓은 배움으로 이어집니다.</span>
             </div>
         </div>
     </section>
@@ -978,6 +973,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         function showcaseCardHtml(p, i) {
             return `
                 <article class="tool-card reveal">
+                    ${toolArtwork({ name: p.title, category: "함께 만드는 배움" })}
                     <div class="tool-top">
                         <div class="tool-icon ${ICON_COLORS[i % ICON_COLORS.length]}"><i class="fas fa-rocket"></i></div>
                         <div class="tool-head">
@@ -1112,9 +1108,29 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
             });
         }
 
+        // Subject illustrations are stable across sorting and category filtering.
+        // The single locally hosted atlas contains 16 generated colored-pencil scenes.
+        function toolArtwork(t) {
+            const name = String(t.name || '');
+            const rules = [
+                [/천체|우주/, 15], [/축구/, 14], [/레이싱|주차/, 13],
+                [/상권|구독|빅데이터/, 12], [/유튜브|영상/, 10], [/바둑|장기|체스/, 9],
+                [/단종/, 6], [/먹이사슬|생태/, 4], [/지구/, 3],
+                [/알파폴드|해부|원소/, 2], [/미분|물리|역학/, 1],
+                [/독서|영어|문장|사전|논문/, 0], [/토론|사고력/, 5],
+                [/커리어|진로/, 7], [/면접|사내|직무|교직원/, 11], [/코드|프롬프트|AI/, 8]
+            ];
+            const categoryTiles = { '언어·독서': 0, '수학·물리': 1, '과학·자연': 2,
+                '인문·사고력': 5, '진로·AI·게임': 8, '직장·HR': 11 };
+            const match = rules.find(([pattern]) => pattern.test(name));
+            const tile = match ? match[1] : (categoryTiles[t.category] ?? 8);
+            return `<div class="tool-art art-tone-${tile % 4}" aria-hidden="true"><span class="tool-illustration" style="background-position:${(tile % 4) * 100 / 3}% ${Math.floor(tile / 4) * 100 / 3}%"></span><span class="art-category">${escapeHtml(t.category || '함께 만드는 배움')}</span></div>`;
+        }
+
         function toolCardHtml(t, i) {
             return `
                 <article class="tool-card reveal">
+                    ${toolArtwork(t)}
                     <div class="tool-top">
                         <div class="tool-icon ${ICON_COLORS[i % ICON_COLORS.length]}"><i class="${escapeHtml(t.icon || 'fas fa-robot')}"></i></div>
                         <div class="tool-head">
@@ -1267,6 +1283,9 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
             loadSeoulEdu();
         }
 
+        allTools = DEFAULT_TOOLS;
+        renderToolsTabs();
+        renderAITools();
         initFirebase();
         initSeoulEdu();
     </script>
