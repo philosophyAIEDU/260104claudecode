@@ -4,6 +4,7 @@ Original AI-generated softly stylized colored-pencil caricatures created for Phi
 
 - `learning-together.webp`: three adult educators studying a book and laptop together; hero image.
 - `tools-01.webp` through `tools-05.webp`: five 3×3 atlases, each containing eight unique tool illustrations. The ninth stationery cell is unused. All 40 AI tools have a distinct scene.
+- `tools-06.webp`: classroom management and daily challenge verification scenes, mapped to `philoclassapp.netlify.app` and `philochallenge.netlify.app` (scenes 40–41). This sheet uses 37.5% square viewports at x=0% and x=60% to preserve the generated scenes' margins.
 - `tool-subjects.webp`: the previous 4×4 category atlas, retained only for user-created showcase projects.
 
 Atlas order (left to right, top to bottom): reading, mathematics/physics, life science/chemistry, geology, ecology, discussion, Joseon history, careers, coding/AI, board games, media, workplace learning, business analysis, driving, football, astronomy.
