@@ -159,6 +159,15 @@ service cloud.firestore {
         || (request.auth != null && resource.data.toUid == request.auth.uid);
     }
 
+    // 지식 자산 공간 — 읽기·쓰기 모두 관리자만 (knowledge-admin.html)
+    // knowledge_input: 지식 창고 / knowledge_output: 결과물 초고
+    match /knowledge_input/{docId} {
+      allow read, write: if isAdmin();
+    }
+    match /knowledge_output/{docId} {
+      allow read, write: if isAdmin();
+    }
+
     // 운영자 전용 콘텐츠 공간 — 읽기·쓰기 모두 관리자만 (contents-admin.html)
     // contents_input: 정제·태깅된 원천 콘텐츠 / contents_output: 이를 바탕으로 만든 결과물
     match /contents_input/{docId} {
