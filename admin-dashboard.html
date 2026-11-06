@@ -627,6 +627,21 @@
             </div>
         </div>
 
+        <!-- 후기 관리 (교육 후기 아카이브: reviews-admin.html) -->
+        <div class="reviews-mgmt-section" style="margin-bottom:3rem;">
+            <div class="table-header" style="border-radius:15px 15px 0 0; display:flex; justify-content:space-between; align-items:center; padding:1.5rem; flex-wrap:wrap; gap:.6rem;">
+                <span><i class="fas fa-star"></i> 후기 관리 <span id="reviewsAdminCount" style="font-size:.85rem; font-weight:400;"></span></span>
+                <span style="display:flex; gap:.6rem; flex-wrap:wrap;">
+                    <a href="reviews-admin.html" style="background:#fff; color:var(--primary-color); text-decoration:none; padding:.6rem 1.2rem; border-radius:8px; font-weight:700; font-size:.95rem;"><i class="fas fa-paste"></i> 후기 간편 등록</a>
+                    <a href="/reviews" target="_blank" rel="noopener" style="background:#fff; color:var(--primary-color); text-decoration:none; padding:.6rem 1.2rem; border-radius:8px; font-weight:700; font-size:.95rem;">공개 후기 페이지 ↗</a>
+                </span>
+            </div>
+            <div id="reviewsAdminContainer" style="background:#fff; border-radius:0 0 15px 15px; box-shadow:0 5px 20px var(--shadow); min-height:60px; padding:1rem 1.5rem; color:#555; font-size:.95rem;">
+                네이버 카페 후기를 붙여넣고 AI로 정리한 뒤 검토해 게시합니다. 공개 동의가 확인된 후기만 게시할 수 있습니다.
+                <div id="reviewsAdminStats" style="margin-top:.5rem;"></div>
+            </div>
+        </div>
+
         <!-- AI 툴 관리 -->
         <div class="tools-mgmt-section" style="margin-bottom:3rem;">
             <div class="table-header" style="border-radius:15px 15px 0 0; display:flex; justify-content:space-between; align-items:center; padding:1.5rem;">
@@ -836,6 +851,7 @@
                 loadToolsList();
                 loadReportsList();
                 loadContentsInput();
+                loadReviewStats();
                 document.getElementById('reportsRefreshBtn')?.addEventListener('click', loadReportsList);
                 document.getElementById('contentsInputRefreshBtn')?.addEventListener('click', loadContentsInput);
                 refreshTimer = setInterval(() => { loadDashboardData(); loadVisitorStats(); loadReportsList(); }, 5 * 60 * 1000);
@@ -880,6 +896,27 @@
                 });
             } catch (e) {
                 box.textContent = '불러오지 못했습니다: ' + e.message;
+            }
+        }
+
+
+        // 후기 관리 요약 (reviews 컬렉션 — 관리자만 전체 읽기 가능)
+        async function loadReviewStats() {
+            const box = document.getElementById('reviewsAdminStats');
+            if (!box) return;
+            try {
+                const snap = await window.getDocs(window.collection(db, 'reviews'));
+                const c = { draft: 0, published: 0, private: 0, pending: 0, featured: 0 };
+                snap.docs.forEach(d => {
+                    const r = d.data();
+                    if (c[r.status] !== undefined) c[r.status]++;
+                    if (r.consentStatus !== 'confirmed') c.pending++;
+                    if (r.featured && r.status === 'published') c.featured++;
+                });
+                document.getElementById('reviewsAdminCount').textContent = `(${snap.size}건)`;
+                box.textContent = `게시 ${c.published} · 임시저장 ${c.draft} · 비공개 ${c.private} · 공개 동의 확인 전 ${c.pending} · 메인 노출 대표 후기 ${c.featured}`;
+            } catch (e) {
+                box.textContent = '후기 통계를 불러오지 못했습니다 (firestore.rules 배포 여부를 확인하세요): ' + e.message;
             }
         }
 

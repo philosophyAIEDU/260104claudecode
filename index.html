@@ -3,11 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Philosophy AI Education — AI 시대, 교육자의 나침반</title>
-    <meta name="description" content="AI 사용법이라는 지도를 넘어, 길을 잃지 않는 나침반으로. AI의 한계와 가능성을 함께 고민하는, 교육자분들을 위한 AI 연구 채널입니다.">
-    <meta property="og:title" content="Philosophy AI Education — 교육자를 위한 AI 연구 채널">
-    <meta property="og:description" content="AI 사용법 너머의 질문을 함께 고민합니다. 학생에게 AI를 어떻게 가르칠지 고민하는 교육자를 위한 AI 연구 채널.">
+    <title>필로소피 AI 교육 — 교수님과 선생님을 위한 실습 중심 AI 교육 | AI 시대, 교육자의 나침반</title>
+    <meta name="description" content="필로소피 AI 교육은 교사·대학 교수 등 교육자를 위한 실습 중심 AI 교육 브랜드입니다. AI 리터러시, 교사 AI 직무연수, 바이브 코딩(Claude Code·GPT Codex), 교육 업무 자동화 강의. 경상국립대·경희대 대학원·전주교육청 등 강의.">
+    <link rel="canonical" href="https://philosophyaiedu.com/">
+    <meta property="og:site_name" content="필로소피 AI 교육">
+    <meta property="og:locale" content="ko_KR">
+    <meta property="og:url" content="https://philosophyaiedu.com/">
+    <meta property="og:image" content="https://philosophyaiedu.com/assets/web/edu-2607-gnu-2.jpg">
+    <meta property="og:title" content="필로소피 AI 교육 — 교수님과 선생님을 위한 실습 중심 AI 교육">
+    <meta property="og:description" content="AI 리터러시·바이브 코딩·교육 업무 자동화를 실습으로 배우는 교육자 대상 AI 교육. 강사 소개·교육 프로그램·강의 사례·후기를 확인하세요.">
     <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://philosophyaiedu.com/#organization", "name": "필로소피 AI 교육", "alternateName": "Philosophy AI Education", "url": "https://philosophyaiedu.com/", "logo": "https://philosophyaiedu.com/assets/mascot.jpg", "image": "https://philosophyaiedu.com/assets/mascot.jpg", "description": "필로소피 AI 교육은 초·중·고 교사와 대학 교수 등 교육자를 대상으로 생성형 AI 리터러시, 바이브 코딩(Claude Code·GPT Codex), 교육 업무 자동화를 실습 중심으로 가르치는 AI 교육 브랜드입니다.", "slogan": "AI 시대, 교육자의 나침반", "email": "dearname27@naver.com", "areaServed": {"@type": "Country", "name": "대한민국"}, "knowsAbout": ["생성형 AI 리터러시", "교육자를 위한 실무 AI 활용", "바이브 코딩 (Claude Code · GPT Codex)", "교육용 웹앱 제작", "교육행정 업무 자동화", "AI 에이전트 · 교육용 시스템 구축"], "sameAs": ["https://www.youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA", "https://cafe.naver.com/PHILOSOPHYai"]}, {"@type": "WebSite", "@id": "https://philosophyaiedu.com/#website", "url": "https://philosophyaiedu.com/", "name": "필로소피 AI 교육", "alternateName": "Philosophy AI Education", "inLanguage": "ko", "publisher": {"@id": "https://philosophyaiedu.com/#organization"}}]}</script>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23f2ebe0'/%3E%3Cpath d='M50 16 L57 43 L84 50 L57 57 L50 84 L43 57 L16 50 L43 43 Z' fill='%234a1556'/%3E%3C/svg%3E">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -448,8 +455,36 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
     .channels-inner { flex-direction: column; align-items: flex-start; }
 }
 
+
+/* ===== 신뢰 정보 섹션 (대표 강의 이력 · 전문 분야 · 후기) ===== */
+.hero-keywords { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; padding: 0; }
+.hero-keywords li { font-size: 12.5px; font-weight: 650; padding: 4px 12px; border-radius: 999px; background: #f4ead2; color: #5f4710; border: 1px solid #e3d3a8; }
+.hero-meta a { color: inherit; }
+.trust-band { background: #fffefa; border-bottom: 1px solid var(--line); }
+.trust-history { list-style: none; margin: 0 0 28px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.trust-history a { display: grid; gap: 2px; padding: 16px 18px; border-radius: 18px; background: var(--bg); border: 1px solid var(--line); color: var(--text); height: 100%; }
+.trust-history a:hover { border-color: var(--line-strong); }
+.trust-history time { font-size: 12px; font-weight: 700; color: #8a681d; }
+.trust-history b { font-size: 15.5px; color: var(--ink); }
+.trust-history span { font-size: 13px; line-height: 1.6; }
+.trust-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.trust-card { background: var(--bg); border: 1px solid var(--line); border-radius: 22px; padding: 22px; font-size: 14.5px; line-height: 1.75; }
+.trust-card h3 { font-size: 16px; color: var(--ink); margin-bottom: 8px; }
+.trust-card ul { margin: 0; padding-left: 18px; }
+.trust-card a { text-decoration: underline; text-underline-offset: 3px; }
+.trust-card .btn { text-decoration: none; margin: 6px 0 10px; }
+.trust-cta { background: #e7eee3; }
+.trust-link { display: block; font-size: 13.5px; }
+.trust-reviews { margin-top: 30px; }
+.trust-reviews-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+.trust-reviews-head h3 { font-size: 18px; color: var(--ink); }
+.trust-reviews-head a { font-size: 14px; font-weight: 600; }
+@media (max-width: 860px) {
+  .trust-history, .trust-grid { grid-template-columns: 1fr; }
+}
     </style>
     <link rel="stylesheet" href="assets/pastel-theme.css">
+    <link rel="stylesheet" href="assets/review-cards.css">
 </head>
 <body class="pastel-home">
     <!-- ===== Header ===== -->
@@ -457,6 +492,9 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         <nav class="container">
             <a href="#home" class="logo"><svg class="brand-orbit" viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="14" ry="9" transform="rotate(-35 16 16)" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="16" cy="16" r="4" fill="currentColor"/><circle cx="25" cy="7" r="2" fill="#9fc9ea"/></svg>Philosophy <em>AI</em><span class="logo-kr">필로소피 AI 교육</span></a>
             <ul class="nav-menu" id="navMenu">
+                <li><a href="/ai-instructor">강사 소개</a></li>
+                <li><a href="/programs">교육 프로그램</a></li>
+                <li><a href="/reviews">후기</a></li>
                 <li><a href="#tools">필로소피 AI 툴</a></li>
                 <li><a href="#showcase">바이브코딩 쇼케이스</a></li>
                 <li><a href="community.html">커뮤니티</a></li>
@@ -481,21 +519,23 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         <div class="container">
             <div class="hero-layout">
                 <div class="hero-content">
-                    <span class="hero-badge">PHILOSOPHY AI EDUCATION · 함께 배우고, 함께 자라요</span>
-                    <h1>AI 시대,<br><em>교육자의 나침반</em><span class="hero-heading-small">사용법 너머의 질문을 함께 탐구합니다.</span></h1>
-                    <p class="lead">수업에 바로 쓰는 AI 학습 도구와, 교육자들이 바이브코딩으로 직접 만든 프로젝트.
-                        AI의 한계는 무엇이고 우리가 할 수 있는 일은 무엇인지 —
-                        <strong>사용법 너머의 질문</strong>을 함께 고민하는 교육자를 위한 연구 채널입니다.</p>
+                    <span class="hero-badge">PHILOSOPHY AI EDUCATION · 교육자를 위한 실습 중심 AI 교육</span>
+                    <h1>AI 시대,<br><em>교육자의 나침반</em><span class="hero-heading-small">교수님과 선생님을 위한 실습 중심 AI 교육</span></h1>
+                    <p class="lead">필로소피 AI 교육은 교육자분들이 AI를 활용하여 수업을 개선하고, 반복적인 업무를 줄이며,
+                        <strong>자신만의 교육용 AI 시스템</strong>을 만들 수 있도록 돕습니다.</p>
+                    <ul class="hero-keywords" aria-label="핵심 분야">
+                        <li>AI 리터러시</li><li>교수자 AI 교육</li><li>교사 AI 직무연수</li><li>바이브 코딩</li><li>교육 업무 자동화</li>
+                    </ul>
                     <div class="hero-buttons">
-                        <a href="#tools" class="btn btn-primary">필로소피 AI 툴 보기</a>
-                        <a href="#showcase" class="btn btn-ghost">바이브코딩 쇼케이스 →</a>
+                        <a href="/ai-instructor" class="btn btn-primary" data-track="cta_instructor_click" data-track-label="hero">AI 강사 소개 보기</a>
+                        <a href="/education-inquiry#inquiry" class="btn btn-ghost" data-track="cta_inquiry_click" data-track-label="hero">강의 및 연수 문의하기 →</a>
                     </div>
                     <div class="hero-meta">
-                        <span>직접 만든 AI 학습 도구</span>
+                        <span>6개 기관 · 8회 강의 (공개 기록)</span>
                         <span class="dot">·</span>
-                        <span>교육 현장 중심</span>
+                        <span>실습 중심</span>
                         <span class="dot">·</span>
-                        <span>가입 없이 무료 사용</span>
+                        <a href="#tools">직접 만든 AI 학습 도구 무료 공개</a>
                     </div>
                 </div>
                 <figure class="hero-figure" id="heroFigure">
@@ -521,6 +561,52 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         </div>
     </section>
 
+    <!-- ===== 신뢰 정보: 대표 강의 이력 · 전문 분야 · 후기 미리보기 ===== -->
+    <section id="credentials" class="section-pad trust-band" aria-labelledby="trustTitle">
+        <div class="container">
+            <div class="section-head">
+                <span class="eyebrow">Teaching Record</span>
+                <h2 class="section-title" id="trustTitle">대학·교육청·학교에서 진행한 <em>실습 중심 AI 교육</em></h2>
+                <p class="section-sub">필로소피 AI 교육은 2025년 4월부터 교사·교육실무사·대학원생·연구자를 대상으로 AI 리터러시와 바이브 코딩을 가르쳐 왔습니다.</p>
+            </div>
+            <ol class="trust-history">
+                <li><a href="/case-studies#gnu-2026-physics"><time datetime="2026-07-27">2026.07</time><b>경상국립대학교</b><span>물리 정교사(1급) 자격 연수 · AI 리터러시</span></a></li>
+                <li><a href="/case-studies#toegyewon-2026-claude"><time datetime="2026-06-12">2026.06</time><b>퇴계원고등학교</b><span>전문적학습공동체 · 교육자를 위한 클로드 입문</span></a></li>
+                <li><a href="/case-studies#jeonju-2026-literacy"><time datetime="2026-06-05">2026.06</time><b>전주교육청</b><span>교육실무사 직무연수 · AI 리터러시 / 2026.04 바이브 코딩 입문</span></a></li>
+                <li><a href="/case-studies#khu-2026-vibe"><time datetime="2026-02-23">2026.02</time><b>경희대학교 대학원</b><span>Claude · GPT Codex 활용 바이브 코딩 특강</span></a></li>
+                <li><a href="/case-studies#snu-2025-finetuning"><time datetime="2025-07-07">2025.07</time><b>서울대학교 생산공학연구실</b><span>파인튜닝 수업</span></a></li>
+                <li><a href="/case-studies#gyeonggi-2025-hybrid"><time datetime="2025-04-30">2025.04</time><b>경기도청</b><span>하이브리드 AI 사용법 특강</span></a></li>
+            </ol>
+            <div class="trust-grid">
+                <div class="trust-card">
+                    <h3>이런 교육을 합니다</h3>
+                    <ul>
+                        <li><a href="/programs#ai-literacy">교육자를 위한 AI 리터러시</a></li>
+                        <li><a href="/programs#vibe-coding">교육자를 위한 바이브 코딩 (Claude Code · GPT Codex)</a></li>
+                        <li><a href="/programs#admin-automation">교육행정 업무 자동화</a></li>
+                        <li><a href="/programs#professor-ai">대학 교수자를 위한 AI 활용</a></li>
+                    </ul>
+                </div>
+                <div class="trust-card">
+                    <h3>이런 분들과 함께합니다</h3>
+                    <p>초·중·고 교사, 대학 교수 및 강사, 교육기관 담당자, 교육 관련 연구자, AI 활용에 관심 있는 교육자</p>
+                    <h3 style="margin-top:14px">이런 결과물을 만듭니다</h3>
+                    <p>수업용 웹앱 · AI 활용 기준표 · 업무 자동화 초안 — 강사가 만든 도구는 <a href="#tools">필로소피 AI 툴</a>에서 바로 써 보실 수 있습니다.</p>
+                </div>
+                <div class="trust-card trust-cta">
+                    <h3>강의를 문의하시려면</h3>
+                    <p>기관·대상·인원·희망 일정을 알려 주시면 교육 구성을 제안드립니다.</p>
+                    <a href="/education-inquiry#inquiry" class="btn btn-primary" data-track="cta_inquiry_click" data-track-label="home_trust">강의 및 연수 문의하기</a>
+                    <a href="/ai-instructor" class="trust-link">강사 소개 · 자주 받는 질문 →</a>
+                </div>
+            </div>
+            <div id="featuredReviews" class="trust-reviews" hidden>
+                <div class="trust-reviews-head"><h3>수강하신 분들의 후기</h3><a href="/reviews">후기 전체 보기 →</a></div>
+                <div class="rv-grid" id="featuredReviewsGrid"></div>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== Educator AI Tools ===== -->
     <!-- ===== 관리자 전용: 관리자 대시보드 바로가기 (관리자 로그인 시에만 표시) ===== -->
     <section id="adminQuick" class="section-pad admin-panel">
@@ -536,6 +622,9 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                 </a>
                 <a href="contents-admin.html" class="admin-ga-btn ghost">
                     <i class="fas fa-folder-open"></i> Contents Input / Output
+                </a>
+                <a href="reviews-admin.html" class="admin-ga-btn ghost">
+                    <i class="fas fa-paste"></i> 후기 간편 등록
                 </a>
             </div>
         </div>
@@ -1363,6 +1452,22 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         renderAITools();
         initFirebase();
         initSeoulEdu();
+    </script>
+    <script type="module">
+        // 대표 후기 (관리자가 지정 · 게시 · 공개 동의 확인된 후기만, 최대 6개). 없으면 영역을 숨깁니다.
+        import { fetchPublishedReviews } from './assets/js/firestore-public.mjs';
+        import { renderReviewCard, sortReviews } from './assets/js/review-core.mjs';
+        fetchPublishedReviews({ featuredOnly: true, limit: 6 }).then(list => {
+            const items = sortReviews(list).slice(0, 6);
+            if (!items.length) return;
+            document.getElementById('featuredReviewsGrid').innerHTML = items.map(r => renderReviewCard(r)).join('');
+            document.getElementById('featuredReviews').hidden = false;
+        }).catch(e => console.warn('대표 후기 불러오기 실패:', e));
+        // 성과 측정: data-track 링크 클릭을 GA4 이벤트로 기록
+        document.addEventListener('click', (e) => {
+            const el = e.target.closest && e.target.closest('[data-track]');
+            if (el && typeof window.gtag === 'function') window.gtag('event', el.dataset.track, { link_label: el.dataset.trackLabel || '', page_path: location.pathname });
+        });
     </script>
 </body>
 </html>

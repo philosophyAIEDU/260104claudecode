@@ -8,7 +8,19 @@
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "package.json",
+      "package-lock.json",
+      "tests/**",
+      "scripts/**",
+      "netlify/**",
+      "src/**",
+      "*.rules",
+      "*.py",
+      "*.sql"
     ]
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }

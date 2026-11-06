@@ -1,0 +1,3 @@
+node_modules/
+tests/e2e/output/
+tests/rules/node_modules
