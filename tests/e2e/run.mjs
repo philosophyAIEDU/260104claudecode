@@ -5,7 +5,7 @@ import { createRequire } from 'node:module';
 import { readFileSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { start } from './server.mjs';
+import { start, mockSummary } from './server.mjs';
 
 const require = createRequire(import.meta.url);
 const { chromium, devices } = require('playwright');
@@ -17,6 +17,7 @@ writeFileSync(join(out, 'reviews-store.json'), '[]');
 const { server, port } = await start(0);
 const BASE = `http://127.0.0.1:${port}`;
 const results = [];
+const geminiCalls = [];
 let failed = 0;
 async function t(name, fn) {
     try { await fn(); results.push(`✔ ${name}`); }
@@ -46,9 +47,17 @@ async function newContext(opts = {}, user = null) {
         const enc = (v) => typeof v === 'boolean' ? { booleanValue: v } : Array.isArray(v) ? { arrayValue: { values: v.map(enc) } } : (v && typeof v === 'object') ? { mapValue: { fields: Object.fromEntries(Object.entries(v).map(([k, x]) => [k, enc(x)])) } } : { stringValue: String(v ?? '') };
         route.fulfill({ contentType: 'application/json', body: JSON.stringify(rows.map(r => ({ document: { name: 'projects/p/databases/(default)/documents/reviews/' + r.id, fields: Object.fromEntries(Object.entries(r).map(([k, v]) => [k, enc(v)])) } }))) });
     });
-    await ctx.route(/fake-storage\.test/, route => route.fulfill({ contentType: 'image/png', body: PNG }));
+    // 가짜 Gemini API: 키 'bad-key'면 400, 그 외엔 원문 문장을 근거로 한 응답
+    await ctx.route(/generativelanguage\.googleapis\.com\/v1beta\/models\/([^:]+):generateContent/, (route, req) => {
+        const key = req.headers()['x-goog-api-key'];
+        geminiCalls.push({ url: req.url(), key });
+        if (key === 'bad-key') return route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ error: { message: 'API key not valid. Please pass a valid API key.' } }) });
+        const body = JSON.parse(req.postData());
+        const text = /<review>\n([\s\S]*)\n<\/review>/.exec(body.contents[0].parts[0].text)[1];
+        route.fulfill({ contentType: 'application/json', body: JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify(mockSummary(text)) }] }, finishReason: 'STOP' }], modelVersion: /models\/([^:]+)/.exec(req.url())[1] }) });
+    });
     // 그 밖의 외부 요청(GA, 폰트, CDN, 기존 Firebase 위젯)은 테스트에서 차단
-    await ctx.route(url => !url.href.startsWith(BASE) && !/gstatic\.com\/firebasejs|firestore\.googleapis|fake-storage/.test(url.href), route => route.abort());
+    await ctx.route(url => !url.href.startsWith(BASE) && !/gstatic\.com\/firebasejs|firestore\.googleapis|generativelanguage\.googleapis/.test(url.href), route => route.abort());
     return ctx;
 }
 
@@ -124,8 +133,6 @@ await t('관리자 이외 사용자: 후기 관리 화면 차단 + 저장 시도
         catch (e) { return e.code; }
     });
     assert(err === 'permission-denied', err);
-    const ai = await page.evaluate(async () => (await fetch('/.netlify/functions/review-ai', { method: 'POST', headers: { Authorization: 'Bearer user-token' }, body: JSON.stringify({ text: '충분히 긴 후기 원문입니다.' }) })).status);
-    assert(ai === 403, 'AI 함수 403: ' + ai);
     await ctx.close();
 });
 
@@ -164,41 +171,44 @@ async function paste(selector, { text = '', html = '', files = [] } = {}) {
     }, { selector, text, html, files: files.map(f => ({ ...f, b64: f.data.toString('base64') })) });
 }
 
-await t('후기 간편 등록 화면 구성: 원문·URL·작성자/익명·작성일·프로그램·이미지·4개 버튼', async () => {
-    for (const s of ['#fOriginal', '#fSourceUrl', 'input[name=authorMode][value=anon]', '#fReviewDate', '#fProgram', '#dropzone', '#aiBtn', '#previewBtn', '#saveDraftBtn', '#publishBtn'])
+await t('후기 간편 등록 화면 구성: 원문·URL·작성자/익명·작성일·프로그램·Gemini 키/모델·4개 버튼 (이미지 업로드 없음)', async () => {
+    assert(await ap.locator('#dropzone, #fileInput').count() === 0, '이미지 업로드 제거');
+    assert(await ap.getAttribute('#aiKey', 'type') === 'password', '키 입력 가림');
+    const models = await ap.locator('#aiModel option').evaluateAll(o => o.map(x => x.value));
+    assert(models[0] === 'gemini-3.8-flash' && models.includes('gemini-3.5-flash-lite'), models.join());
+    for (const s of ['#fOriginal', '#fSourceUrl', 'input[name=authorMode][value=anon]', '#fReviewDate', '#fProgram', '#aiKey', '#aiModel', '#aiBtn', '#previewBtn', '#saveDraftBtn', '#publishBtn'])
         assert(await ap.locator(s).count() === 1, s);
 });
 
-await t('텍스트 + 긴 글·여러 문단 붙여넣기: 줄바꿈·문단 유지, 이미지 함께 붙여넣기', async () => {
+await t('텍스트 + 긴 글·여러 문단 붙여넣기: 줄바꿈·문단 유지, 사진은 저장하지 않고 안내', async () => {
     await paste('#fOriginal', { text: LONG, files: [{ name: 'shot.png', type: 'image/png', data: PNG }] });
     const v = await ap.inputValue('#fOriginal');
     assert(v === LONG, '원문 그대로 유지');
     assert((v.match(/\n\n/g) || []).length >= 30, '문단 구분 유지');
-    await ap.waitForFunction(() => document.querySelectorAll('#imgList .img-item').length === 1);
-    assert(await ap.locator('#pasteNote').isVisible());
-});
-
-await t('링크로만 전달된 이미지는 가져오지 않고 파일 업로드 안내', async () => {
-    await paste('#dropzone', { html: '<p>후기</p><img src="https://cafe.pstatic.net/private.jpg">' });
     const note = await ap.locator('#pasteNote').innerText();
-    assert(/링크로만 전달/.test(note) && /파일로 올려/.test(note), note);
-    assert(await ap.locator('#imgList .img-item').count() === 1, '이미지 수 변화 없음');
+    assert(/사진은 저장하지 않습니다/.test(note), note);
 });
 
-await t('이미지 파일 업로드 · 여러 장 · 순서 변경 · 삭제', async () => {
-    await ap.setInputFiles('#fileInput', [{ name: 'a.png', mimeType: 'image/png', buffer: PNG }, { name: 'b.png', mimeType: 'image/png', buffer: PNG }]);
-    await ap.waitForFunction(() => document.querySelectorAll('#imgList .img-item').length === 3);
-    await ap.fill('#imgList .img-item:nth-child(3) input', '세 번째 이미지');
-    await ap.click('#imgList .img-item:nth-child(3) button[title="위로"]');
-    assert(await ap.inputValue('#imgList .img-item:nth-child(2) input') === '세 번째 이미지', '순서 변경');
-    await ap.click('#imgList .img-item:nth-child(1) button[title="삭제"]');
-    assert(await ap.locator('#imgList .img-item').count() === 2, '삭제');
+await t('AI 키 없이 정리 버튼 → 키 입력 안내 (API 호출 없음)', async () => {
+    await ap.click('#aiBtn');
+    await ap.waitForSelector('#aiMsg.msg-warn');
+    assert((await ap.locator('#aiMsg').innerText()).includes('API 키'));
+    assert(geminiCalls.length === 0);
+});
+
+await t('잘못된 API 키 → 오류 안내, 화면은 그대로', async () => {
+    await ap.fill('#aiKey', 'bad-key');
+    await ap.click('#aiBtn');
+    await ap.waitForFunction(() => /키가 올바르지/.test(document.getElementById('aiMsg').textContent));
+    assert(await ap.inputValue('#fTitle') === '', '항목 비어 있음');
 });
 
 await t('AI로 후기 정리하기: 항목 자동 채움 · 근거 문장 표시 · 원문 대조 하이라이트 · 자동 게시 안 됨', async () => {
     await ap.fill('#fSourceUrl', 'https://cafe.naver.com/PHILOSOPHYai/777');
     await ap.fill('#fReviewDate', '2026-06-20');
     await ap.fill('#fAuthorDisplay', '김○○ 선생님');
+    await ap.fill('#aiKey', 'AIza-good-key');
+    await ap.check('#aiKeyRemember');
     await ap.click('#aiBtn');
     await ap.waitForFunction(() => document.getElementById('fTitle').value.length > 0);
     assert(await ap.inputValue('#fTitle') === '코딩을 몰랐지만 AI를 활용해 앱을 완성한 후기');
@@ -208,6 +218,10 @@ await t('AI로 후기 정리하기: 항목 자동 채움 · 근거 문장 표시
     assert(await ap.locator('#origView mark').count() >= 2, '원문 하이라이트');
     assert((await ap.locator('#evConcern').innerText()).includes('근거'), '근거 문장');
     assert(storeReviews().length === 0, 'AI 정리만으로는 저장·게시되지 않음');
+    const last = geminiCalls[geminiCalls.length - 1];
+    assert(last.url.includes('/models/gemini-3.8-flash:generateContent') && last.key === 'AIza-good-key' && !last.url.includes('AIza'), '기본 모델·헤더 키');
+    assert(await ap.evaluate(() => localStorage.getItem('philo.reviewAdmin.geminiKey')) === 'AIza-good-key', '키 기억(선택)');
+    assert(!JSON.stringify(storeReviews()).includes('AIza'), '키는 DB에 저장 안 됨');
 });
 
 await t('공개 동의 확인 전에는 게시 불가 (원문은 보존)', async () => {
@@ -222,7 +236,6 @@ await t('미리보기: 카드와 상세(원문·정리 항목) 표시', async ()
     await ap.waitForSelector('#previewDlg[open]');
     const tx = await ap.locator('#previewDetail').innerText();
     assert(tx.includes('후기 원문') && tx.includes('교육 전 고민') && tx.includes('김○○ 선생님'), tx.slice(0, 200));
-    assert(await ap.locator('#previewDetail .rv-images img').count() === 2, '이미지 미리보기');
     await ap.click('#previewClose');
 });
 
@@ -233,7 +246,8 @@ await t('임시 저장 → 홈페이지에 표시되지 않음', async () => {
     const s = storeReviews();
     assert(s.length === 1 && s[0].status === 'draft', JSON.stringify(s.map(x => x.status)));
     assert(s[0].originalText === LONG.trim(), '원문 보존');
-    assert(s[0].images.length === 2 && s[0].images.every(i => i.url.startsWith('https://fake-storage.test/reviews/')), '이미지 업로드');
+    assert(Array.isArray(s[0].images) && s[0].images.length === 0, '이미지 저장 안 함');
+    assert(!JSON.stringify(s).includes('AIza'), 'API 키 미저장');
     slug = s[0].slug;
     assert((await fetch(BASE + '/reviews/' + slug)).status === 404);
 });
@@ -278,13 +292,15 @@ await t('중복 감지: 같은 카페 URL·유사 원문 경고', async () => {
     await ap.waitForFunction(() => /유사/.test(document.getElementById('dupWarn').innerText) && !document.getElementById('dupWarn').hidden, null, { timeout: 3000 });
 });
 
-await t('AI 사용 불가(API 키 미설정) 시 안내 + 수동 입력으로 게시', async () => {
-    await fetch(BASE + '/__fake/ai', { method: 'PUT', body: 'off' });
+await t('AI 없이(키 지움) 수동 입력으로 게시 + 모델 변경 기억', async () => {
+    await ap.click('#aiKeyForget');
+    assert(await ap.evaluate(() => localStorage.getItem('philo.reviewAdmin.geminiKey')) === null, '저장된 키 삭제');
+    await ap.selectOption('#aiModel', 'gemini-3.5-flash-lite');
+    assert(await ap.evaluate(() => localStorage.getItem('philo.reviewAdmin.geminiModel')) === 'gemini-3.5-flash-lite');
     await ap.click('#newBtn');
     await ap.fill('#fOriginal', '교육실무사 연수에서 공문 초안 만드는 법을 배웠습니다.\n\n개인정보를 지우고 쓰는 습관이 생겼습니다.');
     await ap.click('#aiBtn');
-    await ap.waitForSelector('#aiMsg.msg-warn');
-    assert((await ap.locator('#aiMsg').innerText()).includes('직접 입력'));
+    await ap.waitForFunction(() => /API 키/.test(document.getElementById('aiMsg').textContent));
     await ap.fill('#fTitle', '공문 초안 작성을 배운 교육실무사 연수 후기');
     await ap.fill('#fChange', '개인정보를 지우고 AI를 쓰는 습관이 생김');
     await ap.check('input[name=authorMode][value=anon]');
@@ -297,7 +313,6 @@ await t('AI 사용 불가(API 키 미설정) 시 안내 + 수동 입력으로 �
     assert(r && r.status === 'published' && r.anonymous && r.summaryOrigin === 'manual');
     const html = await (await fetch(BASE + '/reviews/' + r.slug)).text();
     assert(html.includes('익명') && !html.includes('교육 전 고민'), '없는 항목은 표시 안 함');
-    await fetch(BASE + '/__fake/ai', { method: 'PUT', body: 'mock' });
 });
 
 await t('후기 수정 및 다시 저장 (목록 → 편집 → 제목 변경 → 게시 유지)', async () => {

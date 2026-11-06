@@ -8,7 +8,6 @@ Disallow: /reviews-admin
 Disallow: /contents-admin
 Disallow: /knowledge-admin
 Disallow: /firebase-app
-Disallow: /.netlify/functions/review-ai
 Disallow: /node_modules/
 Disallow: /tests/
 

@@ -101,11 +101,11 @@ test('관리자 화면이 저장하는 전체 필드 구성(타임스탬프·가
     const now = serverTimestamp();
     await assertSucceeds(setDoc(doc(admin(), 'reviews', 'full'), base({
         status: 'published', consentStatus: 'confirmed', featured: true, summaryOrigin: 'ai_edited',
-        images: [{ url: 'https://firebasestorage.googleapis.com/x.webp', path: 'reviews/full/1.webp', alt: '앱 화면' }],
+        images: [],
         importBatch: 'import-2026-11-06-abcd', createdAt: now, updatedAt: now, publishedAt: now,
     })));
     await assertSucceeds(setDoc(doc(admin(), 'review_private', 'full'), {
         realName: '홍길동', contact: '010-0000-0000', institution: '○○고', institutionPublic: false,
-        consentNote: '카페 쪽지로 동의', memo: '', aiDraft: { title: 't', checks: {} }, updatedAt: now,
+        consentNote: '카페 쪽지로 동의', memo: '', aiDraft: { title: 't', checks: {}, model: 'gemini-3.8-flash' }, updatedAt: now,
     }));
 });

@@ -1,13 +1,10 @@
 {
   "name": "philosophy-ai-education-site",
   "private": true,
-  "description": "필로소피 AI 교육 정적 사이트 + Netlify 함수 (후기 SSR, AI 후기 정리, 사이트맵)",
+  "description": "필로소피 AI 교육 정적 사이트 + Netlify 함수 (후기 SSR, 사이트맵). 런타임 의존성 없음",
   "scripts": {
     "build:pages": "node scripts/build-pages.mjs",
     "test": "node --test tests/unit/*.test.mjs",
     "test:e2e": "node tests/e2e/run.mjs"
-  },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^1.6.0"
   }
 }

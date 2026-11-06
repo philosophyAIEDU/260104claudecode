@@ -19,8 +19,5 @@
       "*.py",
       "*.sql"
     ]
-  },
-  "storage": {
-    "rules": "storage.rules"
   }
 }
