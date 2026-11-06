@@ -177,6 +177,47 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // ===== 교육 후기 아카이브 (reviews-admin.html / reviews 공개 페이지) =====
+    // 공개 읽기: 게시(published) + 작성자 공개 동의 확인(confirmed)된 문서만. 그 외(임시저장·비공개·동의 전)는 관리자만.
+    // 쓰기: 관리자만. 동의가 확인되지 않은 후기는 'published'로 저장할 수 없음(AI 정리 결과 자동 공개 차단).
+    function validReview(d) {
+      return d.keys().hasOnly(['slug', 'title', 'authorDisplay', 'anonymous', 'authorType', 'program', 'categories',
+          'institution', 'reviewDate', 'concernBefore', 'memorablePractice', 'changeAfter', 'adminSummary',
+          'originalText', 'sourceUrl', 'images', 'consentStatus', 'status', 'featured', 'summaryOrigin',
+          'aiDraft', 'importBatch', 'createdAt', 'updatedAt', 'publishedAt'])
+        && d.slug is string && d.slug.matches('^[a-z0-9][a-z0-9-]{1,79}$')
+        && d.title is string && d.title.size() <= 120
+        && d.originalText is string && d.originalText.size() <= 20000
+        && d.status in ['draft', 'published', 'private']
+        && d.consentStatus in ['pending', 'confirmed', 'denied']
+        && (d.status != 'published'
+            || (d.consentStatus == 'confirmed' && d.title.size() >= 1 && d.originalText.size() >= 1))
+        && (!('authorDisplay' in d) || (d.authorDisplay is string && d.authorDisplay.size() <= 50))
+        && (!('anonymous' in d) || d.anonymous is bool)
+        && (!('featured' in d) || d.featured is bool)
+        && (!('authorType' in d) || d.authorType in ['', '교사', '교수', '교육담당자', '기타'])
+        && (!('categories' in d) || (d.categories is list && d.categories.size() <= 5))
+        && (!('institution' in d) || (d.institution is string && d.institution.size() <= 80))
+        && (!('reviewDate' in d) || (d.reviewDate is string && (d.reviewDate == '' || d.reviewDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'))))
+        && (!('concernBefore' in d) || (d.concernBefore is string && d.concernBefore.size() <= 1000))
+        && (!('memorablePractice' in d) || (d.memorablePractice is string && d.memorablePractice.size() <= 1000))
+        && (!('changeAfter' in d) || (d.changeAfter is string && d.changeAfter.size() <= 1000))
+        && (!('adminSummary' in d) || (d.adminSummary is string && d.adminSummary.size() <= 1000))
+        && (!('sourceUrl' in d) || (d.sourceUrl is string && d.sourceUrl.size() <= 500
+            && (d.sourceUrl == '' || d.sourceUrl.matches('^https?://.*'))))
+        && (!('images' in d) || (d.images is list && d.images.size() <= 12));
+    }
+    match /reviews/{reviewId} {
+      allow read: if isAdmin()
+        || (resource.data.status == 'published' && resource.data.consentStatus == 'confirmed');
+      allow create, update: if isAdmin() && validReview(request.resource.data);
+      allow delete: if isAdmin();
+    }
+    // 후기 비공개 정보 (실명·연락처·원래 소속·공개 동의 기록·운영 메모) — 관리자만 읽기/쓰기
+    match /review_private/{reviewId} {
+      allow read, write: if isAdmin();
+    }
+
     // 신고 — 로그인 사용자만 접수, 관리자만 열람/처리
     match /reports/{reportId} {
       allow read, delete: if isAdmin();

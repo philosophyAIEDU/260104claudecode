@@ -3,11 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>교육 문의 — Philosophy AI Education</title>
+    <title>AI 강의·연수 문의 — 교사·교수 대상 AI 교육 | 필로소피 AI 교육</title>
     <meta name="description" content="교육청·대학·학교·공공기관에서 진행한 AI 리터러시, 바이브 코딩 교육 이력과 필로소피 AI 봉사단 활동을 소개합니다. 강의·연수 문의를 남겨 주세요.">
     <meta property="og:title" content="교육 문의 — Philosophy AI Education">
     <meta property="og:description" content="AI 리터러시·바이브 코딩 교육 이력과 봉사단 활동. 강의와 연수 문의를 받습니다.">
     <meta property="og:type" content="website">
+    <link rel="canonical" href="https://philosophyaiedu.com/education-inquiry">
+    <meta property="og:url" content="https://philosophyaiedu.com/education-inquiry">
+    <meta property="og:image" content="https://philosophyaiedu.com/assets/web/edu-2607-gnu-2.jpg">
+    <meta property="og:site_name" content="필로소피 AI 교육">
+    <meta property="og:locale" content="ko_KR">
+    <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "ContactPage", "@id": "https://philosophyaiedu.com/education-inquiry#webpage", "url": "https://philosophyaiedu.com/education-inquiry", "name": "교육 문의 — 필로소피 AI 교육", "inLanguage": "ko", "about": {"@id": "https://philosophyaiedu.com/#organization"}}, {"@type": "Organization", "@id": "https://philosophyaiedu.com/#organization", "name": "필로소피 AI 교육", "alternateName": "Philosophy AI Education", "url": "https://philosophyaiedu.com/", "email": "dearname27@naver.com", "sameAs": ["https://www.youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA", "https://cafe.naver.com/PHILOSOPHYai"]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "홈", "item": "https://philosophyaiedu.com/"}, {"@type": "ListItem", "position": 2, "name": "교육 문의", "item": "https://philosophyaiedu.com/education-inquiry"}]}]}</script>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23f2ebe0'/%3E%3Cpath d='M50 16 L57 43 L84 50 L57 57 L50 84 L43 57 L16 50 L43 43 Z' fill='%234a1556'/%3E%3C/svg%3E">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -485,6 +491,23 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
 
     </style>
     <link rel="stylesheet" href="assets/pastel-theme.css">
+    <link rel="stylesheet" href="assets/review-cards.css">
+    <script type="module">
+        // 후기 아카이브(reviews 컬렉션)에 게시된 후기가 있으면 우선 보여 줍니다 (대표 후기 → 최신 순, 최대 6개).
+        // 없으면 기존 '강연 후기' 게시판 미리보기가 그대로 동작합니다.
+        import { fetchPublishedReviews } from './assets/js/firestore-public.mjs';
+        import { renderReviewCard, sortReviews } from './assets/js/review-core.mjs';
+        fetchPublishedReviews({ limit: 50 }).then(list => {
+            if (!list.length) return;
+            const items = [...sortReviews(list.filter(r => r.featured)), ...sortReviews(list.filter(r => !r.featured))].slice(0, 6);
+            window.__archiveReviewsShown = true;
+            document.getElementById('reviewsGrid').innerHTML = items.map(r => renderReviewCard(r)).join('');
+            document.getElementById('reviewsGrid').classList.add('rv-grid');
+            document.getElementById('reviews').hidden = false;
+            const more = document.getElementById('reviewsMoreLink');
+            if (more) more.href = '/reviews';
+        }).catch(e => console.warn('후기 아카이브 불러오기 실패:', e));
+    </script>
 </head>
 <body>
     <!-- ===== Header ===== -->
@@ -492,6 +515,10 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         <nav class="container">
             <a href="index.html" class="logo">Philosophy <em>AI</em><span class="logo-kr">필로소피 AI 교육</span></a>
             <ul class="nav-menu" id="navMenu">
+                <li><a href="/ai-instructor">강사 소개</a></li>
+                <li><a href="/programs">교육 프로그램</a></li>
+                <li><a href="/case-studies">교육 사례</a></li>
+                <li><a href="/reviews">후기</a></li>
                 <li><a href="index.html#tools">필로소피 AI 툴</a></li>
                 <li><a href="index.html#showcase">바이브코딩 쇼케이스</a></li>
                 <li><a href="community.html">커뮤니티</a></li>
@@ -525,6 +552,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                     <div class="page-hero-buttons">
                         <a href="#inquiry" class="btn btn-primary"><i class="fas fa-paper-plane"></i> 교육 문의하기</a>
                         <a href="#history" class="btn btn-ghost">교육 이력 먼저 보기 →</a>
+                        <a href="/programs" class="btn btn-ghost">교육 프로그램 →</a>
                     </div>
                 </div>
                 <div class="hero-figure">
@@ -552,7 +580,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                 <div class="reviews-loading"><i class="fas fa-spinner fa-spin"></i> 후기를 불러오는 중...</div>
             </div>
             <div class="reviews-more reveal">
-                <a href="community.html?cat=%EA%B0%95%EC%97%B0%20%ED%9B%84%EA%B8%B0" class="btn btn-outline-quiet">
+                <a href="community.html?cat=%EA%B0%95%EC%97%B0%20%ED%9B%84%EA%B8%B0" class="btn btn-outline-quiet" id="reviewsMoreLink">
                     <i class="fas fa-comments"></i> 후기 더 보기
                 </a>
             </div>
@@ -568,8 +596,8 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                     <div class="label">진행한 교육·연수</div>
                 </div>
                 <div class="cred-item">
-                    <div class="num">7<small>곳</small></div>
-                    <div class="label">교육 기관·기업</div>
+                    <div class="num">6<small>곳</small></div>
+                    <div class="label">강의한 기관</div>
                 </div>
                 <div class="cred-item">
                     <div class="num">4<small>곳</small></div>
@@ -962,6 +990,8 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                                 <option value="바이브 코딩 (입문)">바이브 코딩 (입문)</option>
                                 <option value="바이브 코딩 (심화·프로젝트)">바이브 코딩 (심화·프로젝트)</option>
                                 <option value="교육자 대상 직무연수">교육자 대상 직무연수</option>
+                                <option value="교육행정 업무 자동화">교육행정 업무 자동화</option>
+                                <option value="대학 교수자를 위한 AI 활용">대학 교수자를 위한 AI 활용</option>
                                 <option value="학생 대상 AI 수업">학생 대상 AI 수업</option>
                                 <option value="연구실·기업 특강 (파인튜닝 등)">연구실·기업 특강 (파인튜닝 등)</option>
                                 <option value="아직 정하지 못했습니다 / 상담 희망">아직 정하지 못했습니다 / 상담 희망</option>
@@ -976,6 +1006,19 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                                 <label for="people">예상 인원<span class="opt">(선택)</span></label>
                                 <input type="text" id="people" name="people" placeholder="예) 교사 30명">
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="referral">필로소피 AI 교육을 어떻게 알게 되셨나요?<span class="opt">(선택)</span></label>
+                            <select id="referral" name="referral">
+                                <option value="">선택하지 않음</option>
+                                <option value="유튜브">유튜브</option>
+                                <option value="네이버 카페">네이버 카페</option>
+                                <option value="구글 검색">구글 검색</option>
+                                <option value="네이버 검색">네이버 검색</option>
+                                <option value="ChatGPT 등 AI 추천">ChatGPT 등 AI 추천</option>
+                                <option value="지인 추천">지인 추천</option>
+                                <option value="기타">기타</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="message">문의 내용</label>
@@ -1026,6 +1069,10 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                         <a href="index.html#showcase">바이브코딩 쇼케이스</a>
                         <a href="community.html">교육자 커뮤니티 게시판</a>
                         <a href="education-inquiry.html">교육 문의</a>
+                        <a href="/ai-instructor">AI 강사 소개</a>
+                        <a href="/programs">교육 프로그램</a>
+                        <a href="/case-studies">교육 사례</a>
+                        <a href="/insights/">AI 교육 칼럼</a>
                     </div>
                     <div class="footer-col">
                         <h4>교육 문의</h4>
@@ -1139,6 +1186,17 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
             setTimeout(() => { copyMailText.textContent = '메일 주소 복사하기'; }, 2500);
         });
 
+        // ===== 프로그램 페이지에서 넘어온 희망 주제 미리 선택 (?topic=) =====
+        (function prefillTopic() {
+            const t = new URLSearchParams(location.search).get('topic');
+            if (!t) return;
+            const sel = document.getElementById('topic');
+            const v = t.trim().slice(0, 60);
+            let opt = [...sel.options].find(o => o.value === v);
+            if (!opt) { opt = document.createElement('option'); opt.value = v; opt.textContent = v; sel.insertBefore(opt, sel.firstChild); }
+            sel.value = v;
+        })();
+
         // ===== 교육 문의 폼 =====
         const inquiryForm = document.getElementById('inquiryForm');
         const successMessage = document.getElementById('successMessage');
@@ -1193,6 +1251,9 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                 const name = val('name'), org = val('org'), email = val('email');
                 const phone = val('phone'), topic = val('topic');
                 const schedule = val('schedule'), people = val('people'), message = val('message');
+                const referral = val('referral');
+                // 성과 측정: 문의 양식 제출(메일 창 열기)과 유입 경로만 GA4에 기록 — 이름·연락처 등 개인정보는 보내지 않음
+                if (typeof gtag === 'function') gtag('event', 'inquiry_submit', { referral_source: referral || '(미선택)', topic });
 
                 const subject = `[교육 문의] ${org} ${name}님 — ${topic}`;
                 const body =
@@ -1202,7 +1263,8 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                     `■ 연락처: ${phone || '-'}\n` +
                     `■ 희망 교육 주제: ${topic}\n` +
                     `■ 희망 일정: ${schedule || '-'}\n` +
-                    `■ 예상 인원: ${people || '-'}\n\n` +
+                    `■ 예상 인원: ${people || '-'}\n` +
+                    `■ 알게 된 경로: ${referral || '-'}\n\n` +
                     `■ 문의 내용\n${message}\n\n` +
                     `— Philosophy AI Education 교육 문의 페이지에서 보냄`;
                 window.location.href =
@@ -1263,6 +1325,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                 .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
         async function loadReviews() {
+            if (window.__archiveReviewsShown) return; // 새 후기 아카이브가 우선
             try {
                 const q = window.fsQuery(
                     window.fsCollection(db, 'community_posts'),
@@ -1271,6 +1334,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                     window.fsLimit(6)
                 );
                 const snap = await window.fsGetDocs(q);
+                if (window.__archiveReviewsShown) return;
                 renderReviews(snap.docs.map(d => ({ id: d.id, ...d.data() })));
             } catch (e) {
                 console.error('강연 후기 불러오기 오류:', e);
@@ -1278,6 +1342,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
             }
         }
         function showReviewsError() {
+            if (window.__archiveReviewsShown) return;
             const section = document.getElementById('reviews');
             const grid = document.getElementById('reviewsGrid');
             if (section) section.hidden = true;

@@ -1,0 +1,15 @@
+# 필로소피 AI 교육 — https://philosophyaiedu.com
+# 공개 페이지는 모든 검색엔진·AI 크롤러에 열려 있습니다.
+# 관리자·로그인 페이지는 색인하지 않습니다 (해당 페이지에는 noindex 도 함께 적용).
+User-agent: *
+Allow: /
+Disallow: /admin-dashboard
+Disallow: /reviews-admin
+Disallow: /contents-admin
+Disallow: /knowledge-admin
+Disallow: /firebase-app
+Disallow: /.netlify/functions/review-ai
+Disallow: /node_modules/
+Disallow: /tests/
+
+Sitemap: https://philosophyaiedu.com/sitemap.xml

@@ -1,0 +1,8 @@
+[
+  {"id":"t1","slug":"teacher-vibe-coding-2026-test","title":"[테스트] 코딩을 몰랐지만 앱을 완성한 후기","status":"published","consentStatus":"confirmed","featured":true,
+   "authorDisplay":"테스트 교사","anonymous":false,"authorType":"교사","program":"vibe-coding","categories":["vibe-coding","teacher-training"],
+   "reviewDate":"2026-04-12","concernBefore":"코딩 경험 부족","memorablePractice":"AI와 함께 앱 만들기","changeAfter":"언급 없음",
+   "originalText":"테스트용 원문입니다.\n\n두 번째 문단 <script>alert(1)</script>","adminSummary":"","sourceUrl":"https://cafe.naver.com/PHILOSOPHYai/1","images":[]},
+  {"id":"t2","slug":"draft-hidden-2026-test","title":"임시저장 후기","status":"draft","consentStatus":"confirmed","originalText":"보이면 안 됨"},
+  {"id":"t3","slug":"no-consent-2026-test","title":"동의 없음","status":"published","consentStatus":"pending","originalText":"보이면 안 됨"}
+]

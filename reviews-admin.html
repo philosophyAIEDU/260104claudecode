@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>후기 관리 — 관리자 | 필로소피 AI 교육</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/review-cards.css">
+<style>
+  body { background: #f6f4ee; }
+  .adm-header { background: var(--ink); color: #eef2ee; }
+  .adm-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; flex-wrap: wrap; }
+  .adm-header a { color: #f4ead2; }
+  .adm-header h1 { color: #fff; font-size: 18px; margin: 0; letter-spacing: 0; }
+  .adm-who { font-size: 13px; display: flex; gap: 10px; align-items: center; }
+  .adm-who button { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.4); border-radius: 999px; padding: 4px 12px; cursor: pointer; font: inherit; }
+  .gate { min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 24px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 20px 0 18px; border-bottom: 1px solid var(--line); }
+  .tab { background: transparent; border: 0; border-bottom: 3px solid transparent; padding: 10px 14px; font: inherit; font-weight: 700; color: var(--muted); cursor: pointer; }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--gold); }
+  .panel[hidden] { display: none; }
+  .ed-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .box { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin-bottom: 16px; }
+  .box > h2 { font-size: 16px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .box > h2 small { font-weight: 500; color: var(--muted); font-size: 12.5px; }
+  label.f { display: block; font-size: 13px; font-weight: 700; color: var(--ink); margin: 12px 0 4px; }
+  label.f .opt { font-weight: 500; color: var(--muted); }
+  .hint { font-size: 12.5px; color: var(--muted); margin: 4px 0 0; }
+  input[type=text], input[type=url], input[type=date], input[type=search], select, textarea {
+    width: 100%; font: inherit; font-size: 15px; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: #fff; color: var(--ink); }
+  textarea { min-height: 120px; resize: vertical; line-height: 1.7; }
+  #fOriginal { min-height: 320px; white-space: pre-wrap; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 4px; }
+  .checks label { font-size: 14px; display: inline-flex; gap: 6px; align-items: center; }
+  .seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 999px; overflow: hidden; }
+  .seg label { padding: 6px 14px; font-size: 14px; cursor: pointer; }
+  .seg input { position: absolute; opacity: 0; }
+  .seg input:checked + span { font-weight: 800; color: var(--primary-dark); }
+  .seg label:has(input:checked) { background: var(--sage); }
+  .actions { position: sticky; bottom: 0; z-index: 5; background: rgba(246,244,238,.97); border-top: 1px solid var(--line); padding: 12px 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .actions .btn { min-height: 44px; padding: 10px 18px; font-size: 14.5px; }
+  .btn-ai { background: #eee6f4; color: #4b3a63; border-color: #d9cbe6; }
+  .btn-danger { background: #fff; color: #a3352a; border-color: #e3b9b2; }
+  .btn[disabled] { opacity: .55; cursor: not-allowed; }
+  .msg { border-radius: 12px; padding: 10px 14px; font-size: 14px; margin: 10px 0; }
+  .msg[hidden] { display: none; }
+  .msg-info { background: var(--sage); color: var(--primary-dark); }
+  .msg-warn { background: #fff4d6; color: #6b4e0b; border: 1px solid #ecd796; }
+  .msg-err { background: #fde8e4; color: #8a2b20; border: 1px solid #f0c2b9; }
+  .msg ul { margin: 6px 0 0; padding-left: 18px; }
+  .orig-view { white-space: pre-wrap; background: #fffdf6; border: 1px solid var(--gold-line); border-radius: 12px; padding: 14px; max-height: 420px; overflow: auto; font-size: 14.5px; line-height: 1.8; color: var(--ink); }
+  .orig-view mark { background: #fbe7a6; border-radius: 3px; padding: 0 2px; }
+  .ai-badge { font-size: 11.5px; font-weight: 800; background: #eee6f4; color: #4b3a63; border-radius: 999px; padding: 2px 9px; }
+  .ok-badge { font-size: 11.5px; font-weight: 800; background: var(--sage); color: var(--primary-dark); border-radius: 999px; padding: 2px 9px; }
+  .ev { font-size: 12.5px; color: var(--muted); margin: 4px 0 0; }
+  .ev.bad { color: #8a2b20; }
+  .dropzone { border: 2px dashed var(--line-strong); border-radius: 14px; padding: 18px; text-align: center; color: var(--muted); font-size: 14px; background: #fff; cursor: pointer; }
+  .dropzone.drag, .dropzone:focus { border-color: var(--primary); background: var(--sage); outline: none; }
+  .img-list { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 10px; }
+  .img-item { display: grid; grid-template-columns: 84px 1fr auto; gap: 10px; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 8px; }
+  .img-item img { width: 84px; height: 64px; object-fit: cover; border-radius: 8px; }
+  .img-item input { font-size: 13.5px; padding: 6px 8px; }
+  .img-btns { display: flex; gap: 4px; }
+  .img-btns button { width: 34px; height: 34px; border: 1px solid var(--line-strong); background: #fff; border-radius: 8px; cursor: pointer; font-size: 15px; }
+  .list-filters { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .rv-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; }
+  .rv-row h3 { font-size: 16px; margin: 0 0 4px; }
+  .rv-row .meta { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+  .pill { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 1px 9px; background: var(--bg-soft); color: var(--muted); }
+  .pill-published { background: var(--sage); color: var(--primary-dark); }
+  .pill-draft { background: #fff4d6; color: #6b4e0b; }
+  .pill-private { background: #ececec; color: #555; }
+  .pill-consent-confirmed { background: #e3f0ff; color: #1f4f80; }
+  .pill-consent-pending, .pill-consent-denied { background: #fde8e4; color: #8a2b20; }
+  .row-btns { display: flex; flex-wrap: wrap; gap: 6px; align-items: start; justify-content: flex-end; }
+  .row-btns button { font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line-strong); background: #fff; cursor: pointer; }
+  table.imp { width: 100%; border-collapse: collapse; font-size: 13.5px; background: #fff; }
+  table.imp th, table.imp td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+  table.imp td.t { max-width: 360px; white-space: pre-wrap; }
+  dialog { border: 0; border-radius: 18px; padding: 0; width: min(920px, 96vw); max-height: 92vh; box-shadow: 0 30px 80px rgba(0,0,0,.25); }
+  dialog::backdrop { background: rgba(20, 30, 25, .5); }
+  .dlg-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #fff; z-index: 1; }
+  .dlg-body { padding: 18px; background: var(--bg); }
+  .tpl { white-space: pre-wrap; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px; font-size: 14.5px; }
+  @media (max-width: 900px) {
+    .ed-grid, .row2, .list-filters { grid-template-columns: 1fr; }
+    .rv-row { grid-template-columns: 1fr; }
+    .row-btns { justify-content: flex-start; }
+    #fOriginal { min-height: 240px; }
+  }
+</style>
+</head>
+<body>
+<header class="adm-header">
+  <div class="wrap">
+    <h1>후기 관리 <span style="font-weight:500;font-size:13px;opacity:.8">· 관리자 전용</span></h1>
+    <div class="adm-who"><a href="/admin-dashboard.html">← 관리자 대시보드</a><span id="who"></span><button id="logoutBtn" hidden>로그아웃</button></div>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <section id="gate" class="gate">
+    <h2>관리자 전용 페이지입니다</h2>
+    <p class="muted">후기 등록·수정은 관리자 계정으로 로그인해야 할 수 있습니다.</p>
+    <button id="loginBtn" class="btn btn-primary" type="button">Google 계정으로 로그인</button>
+    <p id="denied" class="msg msg-err" hidden>이 계정에는 접근 권한이 없습니다. 관리자 계정으로 다시 로그인해 주세요.</p>
+    <p class="small"><a href="/">← 홈으로</a></p>
+  </section>
+
+  <div id="app" hidden>
+    <div class="tabs" role="tablist" aria-label="후기 관리 메뉴">
+      <button class="tab" role="tab" id="tab-editor" aria-controls="panel-editor" aria-selected="true">후기 간편 등록</button>
+      <button class="tab" role="tab" id="tab-list" aria-controls="panel-list" aria-selected="false">후기 목록 <span id="listCount"></span></button>
+      <button class="tab" role="tab" id="tab-import" aria-controls="panel-import" aria-selected="false">일괄 가져오기 · 내보내기</button>
+      <button class="tab" role="tab" id="tab-guide" aria-controls="panel-guide" aria-selected="false">후기 요청 가이드</button>
+    </div>
+
+    <!-- ===================== 후기 간편 등록 ===================== -->
+    <section id="panel-editor" class="panel" role="tabpanel" aria-labelledby="tab-editor">
+      <div id="editingNote" class="msg msg-info" hidden></div>
+      <div id="dupWarn" class="msg msg-warn" hidden role="status"></div>
+      <div id="edMsg" class="msg" hidden role="status"></div>
+      <div class="ed-grid">
+        <div>
+          <div class="box">
+            <h2>1. 후기 원문 붙여넣기 <small>네이버 카페 글을 복사해 그대로 붙여넣으세요. 줄바꿈·문단이 유지됩니다.</small></h2>
+            <label class="f" for="fOriginal">후기 원문 <span class="opt">(작성자가 쓴 글 그대로 — 고치지 마세요)</span></label>
+            <textarea id="fOriginal" placeholder="여기에 후기 원문을 붙여넣으세요 (Ctrl+V). 사진이 함께 복사되면 아래 이미지 목록에 자동으로 추가됩니다."></textarea>
+            <p class="hint"><span id="origCount">0</span>자 · 최대 20,000자</p>
+            <div id="pasteNote" class="msg msg-warn" hidden></div>
+            <label class="f" for="fSourceUrl">네이버 카페 원본 게시글 URL <span class="opt">(선택)</span></label>
+            <input type="url" id="fSourceUrl" placeholder="https://cafe.naver.com/PHILOSOPHYai/123" maxlength="500">
+          </div>
+
+          <div class="box">
+            <h2>2. 작성자 · 교육 정보</h2>
+            <span class="f" style="display:block;font-size:13px;font-weight:700;margin-top:4px">작성자 표시</span>
+            <div class="seg" role="radiogroup" aria-label="작성자 표시 방식">
+              <label><input type="radio" name="authorMode" value="name" checked><span>이름 표시</span></label>
+              <label><input type="radio" name="authorMode" value="anon"><span>익명</span></label>
+            </div>
+            <div class="row2">
+              <div><label class="f" for="fAuthorDisplay">공개 표시 이름</label><input type="text" id="fAuthorDisplay" maxlength="50" placeholder="예) 김○○ 선생님, 카페 닉네임"></div>
+              <div><label class="f" for="fAuthorType">작성자 유형</label>
+                <select id="fAuthorType"><option value="">선택 안 함</option><option>교사</option><option>교수</option><option>교육담당자</option><option>기타</option></select></div>
+            </div>
+            <div class="row2">
+              <div><label class="f" for="fReviewDate">후기 작성일 <span class="opt">(원본 게시일)</span></label><input type="date" id="fReviewDate"></div>
+              <div><label class="f" for="fProgram">교육 프로그램</label><select id="fProgram"></select></div>
+            </div>
+            <label class="f">분류 <span class="opt">(후기 페이지 필터)</span></label>
+            <div class="checks" id="fCategories"></div>
+            <div class="row2">
+              <div><label class="f" for="fInstitution">교육기관명 <span class="opt">(선택)</span></label><input type="text" id="fInstitution" maxlength="80" placeholder="예) ○○교육청 직무연수"></div>
+              <div><label class="f">&nbsp;</label><label class="checks"><input type="checkbox" id="fInstitutionPublic"> 기관명 공개 허가를 받았습니다</label></div>
+            </div>
+            <p class="hint">공개 허가가 없으면 기관명은 비공개 정보로만 저장되고 홈페이지에 표시되지 않습니다.</p>
+          </div>
+
+          <div class="box">
+            <h2>3. 개인정보 · 공개 동의 <small>이 영역은 관리자만 볼 수 있게 별도 저장됩니다</small></h2>
+            <label class="f" for="fConsent">작성자 공개 동의</label>
+            <select id="fConsent">
+              <option value="pending">확인 전 — 게시할 수 없음</option>
+              <option value="confirmed">공개 동의를 확인함</option>
+              <option value="denied">공개를 원하지 않음</option>
+            </select>
+            <label class="f" for="fConsentNote">동의 확인 기록 <span class="opt">(언제·어떻게 확인했는지)</span></label>
+            <input type="text" id="fConsentNote" maxlength="300" placeholder="예) 2026-11-05 카페 쪽지로 홈페이지 게시 동의 확인">
+            <div class="row2">
+              <div><label class="f" for="fRealName">작성자 실명 <span class="opt">(비공개)</span></label><input type="text" id="fRealName" maxlength="50"></div>
+              <div><label class="f" for="fContact">연락처 <span class="opt">(비공개)</span></label><input type="text" id="fContact" maxlength="100"></div>
+            </div>
+            <label class="f" for="fMemo">운영 메모 <span class="opt">(비공개)</span></label>
+            <input type="text" id="fMemo" maxlength="500">
+          </div>
+
+          <div class="box">
+            <h2>4. 이미지 첨부 <small>업로드 · 클립보드 붙여넣기(Ctrl+V) · 여러 장 · 순서 변경</small></h2>
+            <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="이미지 추가: 클릭해 파일 선택, 또는 여기에 붙여넣기·끌어놓기">
+              이미지를 끌어놓거나, 이 상자를 선택하고 <b>Ctrl+V</b>로 붙여넣거나, <u>클릭해 파일 선택</u>
+              <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden>
+            </div>
+            <p class="hint">이미지는 업로드 전에 긴 변 1600px로 줄이고 위치정보(EXIF)를 제거합니다. 얼굴·이름표·학생 정보가 보이면 가린 뒤 올려 주세요. 홈페이지에는 이미지와 함께 반드시 원문 텍스트가 표시됩니다.</p>
+            <ul class="img-list" id="imgList"></ul>
+          </div>
+        </div>
+
+        <div>
+          <div class="box">
+            <h2>5. 정리 항목 <span id="aiState"></span><small>AI 정리 결과는 초안입니다. 원문과 비교해 고친 뒤 게시하세요.</small></h2>
+            <div id="aiMsg" class="msg" hidden role="status"></div>
+            <label class="f" for="fTitle">후기 제목</label>
+            <input type="text" id="fTitle" maxlength="120">
+            <label class="f" for="fConcern">교육 전 고민</label>
+            <textarea id="fConcern" maxlength="1000" rows="2"></textarea><p class="ev" id="evConcern"></p>
+            <label class="f" for="fPractice">인상 깊었던 실습</label>
+            <textarea id="fPractice" maxlength="1000" rows="2"></textarea><p class="ev" id="evPractice"></p>
+            <label class="f" for="fChange">교육 후 변화</label>
+            <textarea id="fChange" maxlength="1000" rows="2"></textarea><p class="ev" id="evChange"></p>
+            <p class="hint">원문에 없는 항목은 비워 두거나 ‘언급 없음’으로 두세요. 홈페이지에는 표시되지 않습니다.</p>
+            <label class="f" for="fSummary">운영자 요약 <span class="opt">(원문과 구분되어 ‘운영자 요약’으로 표시)</span></label>
+            <textarea id="fSummary" maxlength="1000" rows="3"></textarea>
+          </div>
+
+          <div class="box">
+            <h2>원문과 비교하기 <small>노란 표시 = AI가 근거로 든 원문 문장</small></h2>
+            <div class="orig-view" id="origView" aria-live="polite"><span class="muted">원문을 붙여넣으면 여기에 표시됩니다.</span></div>
+          </div>
+
+          <div class="box">
+            <h2>6. 게시 설정</h2>
+            <label class="f" for="fSlug">고유 주소</label>
+            <div style="display:flex;gap:6px;align-items:center"><span class="small muted">/reviews/</span><input type="text" id="fSlug" maxlength="80" pattern="[a-z0-9][a-z0-9-]{1,79}"><button type="button" class="btn btn-ghost" id="slugBtn" style="min-height:40px;padding:6px 12px">자동</button></div>
+            <p class="hint" id="slugHint">영문 소문자·숫자·하이픈. 게시 후에는 바꾸지 않는 것이 좋습니다(주소가 바뀜).</p>
+            <label class="f" for="fStatus">게시 상태</label>
+            <select id="fStatus"><option value="draft">임시저장</option><option value="published">게시</option><option value="private">비공개</option></select>
+            <label class="checks" style="margin-top:12px"><input type="checkbox" id="fFeatured"> 대표 후기로 지정 (메인 페이지에 노출, 3~6개 권장)</label>
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-ai" id="aiBtn">✦ AI로 후기 정리하기</button>
+        <button type="button" class="btn btn-ghost" id="previewBtn">미리보기</button>
+        <button type="button" class="btn btn-gold" id="saveDraftBtn">임시 저장</button>
+        <button type="button" class="btn btn-primary" id="publishBtn">홈페이지에 게시하기</button>
+        <button type="button" class="btn btn-ghost" id="newBtn">새 후기</button>
+      </div>
+    </section>
+
+    <!-- ===================== 후기 목록 ===================== -->
+    <section id="panel-list" class="panel" role="tabpanel" aria-labelledby="tab-list" hidden>
+      <div class="list-filters">
+        <input type="search" id="lq" placeholder="제목·원문·작성자 검색" aria-label="후기 검색">
+        <select id="lStatus" aria-label="게시 상태"><option value="">상태 전체</option><option value="draft">임시저장</option><option value="published">게시</option><option value="private">비공개</option></select>
+        <select id="lConsent" aria-label="공개 동의"><option value="">동의 전체</option><option value="pending">확인 전</option><option value="confirmed">동의 확인</option><option value="denied">공개 거부</option></select>
+        <select id="lProgram" aria-label="교육 프로그램"><option value="">프로그램 전체</option></select>
+        <select id="lFeatured" aria-label="대표 후기"><option value="">대표 여부 전체</option><option value="1">대표 후기만</option></select>
+      </div>
+      <p class="hint" id="featuredCount"></p>
+      <div id="listBox"><p class="muted">불러오는 중…</p></div>
+    </section>
+
+    <!-- ===================== 일괄 가져오기 · 내보내기 ===================== -->
+    <section id="panel-import" class="panel" role="tabpanel" aria-labelledby="tab-import" hidden>
+      <div class="box">
+        <h2>CSV / JSON 일괄 가져오기 <small>모든 후기는 ‘임시저장 · 동의 확인 전’으로 들어오며, 목록에서 하나씩 검토해 게시합니다</small></h2>
+        <p class="small">필수 열: <b>원문</b>(originalText). 선택 열: <b>원본 URL</b>(sourceUrl), <b>작성일</b>(reviewDate), <b>작성자</b>(authorDisplay), <b>교육 프로그램</b>(program), 제목(title), 작성자 유형(authorType).</p>
+        <p><button type="button" class="btn btn-ghost" id="tplCsvBtn">CSV 서식 내려받기</button> <button type="button" class="btn btn-ghost" id="tplJsonBtn">JSON 서식 내려받기</button></p>
+        <label class="f" for="importFile">파일 선택 (.csv / .json)</label>
+        <input type="file" id="importFile" accept=".csv,.json,text/csv,application/json">
+        <label class="f" for="importText">또는 내용을 직접 붙여넣기</label>
+        <textarea id="importText" rows="6" placeholder="원문,원본 URL,작성일,작성자,교육 프로그램&#10;&quot;후기 원문...&quot;,https://cafe.naver.com/...,2026-06-05,익명,AI 리터러시"></textarea>
+        <p><button type="button" class="btn btn-ghost" id="importParseBtn">내용 확인하기</button></p>
+        <div id="importMsg" class="msg" hidden></div>
+        <div id="importPreview"></div>
+        <p><button type="button" class="btn btn-primary" id="importSaveBtn" hidden>선택한 후기를 임시저장으로 가져오기</button></p>
+      </div>
+      <div class="box">
+        <h2>기존 ‘강연 후기’ 게시판 글 가져오기 <small>커뮤니티 게시판의 강연 후기를 새 후기 아카이브의 임시저장으로 복사합니다 (원본 글은 그대로 유지)</small></h2>
+        <button type="button" class="btn btn-ghost" id="legacyBtn">강연 후기 불러오기</button>
+        <div id="legacyMsg" class="msg" hidden></div>
+      </div>
+      <div class="box">
+        <h2>내보내기 (백업)</h2>
+        <p class="small">공개용 후기 데이터를 내려받습니다. 실명·연락처 등 비공개 정보는 ‘비공개 정보 포함’을 선택한 경우에만 JSON에 포함됩니다 — 파일을 안전하게 보관하세요.</p>
+        <label class="checks"><input type="checkbox" id="exportPrivate"> 비공개 정보 포함 (JSON만)</label>
+        <p><button type="button" class="btn btn-ghost" id="exportJsonBtn">JSON 내보내기</button> <button type="button" class="btn btn-ghost" id="exportCsvBtn">CSV 내보내기</button></p>
+      </div>
+    </section>
+
+    <!-- ===================== 후기 요청 가이드 ===================== -->
+    <section id="panel-guide" class="panel" role="tabpanel" aria-labelledby="tab-guide" hidden>
+      <div class="box">
+        <h2>수강자에게 보내는 후기 요청 문구 <small>세 가지 질문에 답하면 ‘고민 → 실습 → 변화’가 자연스럽게 드러납니다</small></h2>
+        <div class="tpl" id="tplText">안녕하세요, 필로소피 AI 교육입니다. 강의에 함께해 주셔서 감사합니다.
+다음 교육을 고민하시는 선생님들께 도움이 되도록, 편하게 몇 줄 남겨 주시면 큰 힘이 됩니다.
+
+1. 교육을 시작하기 전에 어떤 상황(고민)이었나요?
+2. 같이 해 본 것 중 기억에 남는 실습이 있나요?
+3. 지금은 무엇이 달라졌나요? (달라진 점이 없다면 솔직하게 적어 주셔도 됩니다)
+
+남겨 주신 후기를 필로소피 AI 교육 홈페이지(philosophyaiedu.com/reviews)에 원문 그대로 옮겨도 될까요?
+ - 이름 표시: 실명 / 닉네임 / 익명 중 원하시는 방식
+ - 소속 기관명 표시: 허용 / 비허용
+동의해 주신 범위 안에서만 게시하고, 원하시면 언제든 내려 드립니다.</div>
+        <p><button type="button" class="btn btn-ghost" id="copyTplBtn">문구 복사</button></p>
+      </div>
+      <div class="box">
+        <h2>네이버 카페 후기 옮기는 순서</h2>
+        <ol class="small">
+          <li>작성자에게 홈페이지 게시 동의(이름 표시 방식·기관명 공개 여부)를 받습니다. 받은 날짜와 방법을 ‘동의 확인 기록’에 적습니다.</li>
+          <li>카페 글 본문을 드래그해 복사(Ctrl+C)하고 ‘후기 원문’에 붙여넣습니다. 글 주소를 ‘원본 URL’에 붙여넣습니다.</li>
+          <li>사진은 함께 복사되면 자동으로 들어옵니다. 들어오지 않으면 사진을 PC에 저장한 뒤 파일로 올립니다. (카페 이미지 주소는 외부에서 막혀 있어 가져오지 않습니다)</li>
+          <li>‘AI로 후기 정리하기’ → 원문 비교 패널에서 근거 문장을 확인하고 정리 항목을 고칩니다.</li>
+          <li>‘미리보기’로 홈페이지 모습을 확인하고, ‘홈페이지에 게시하기’를 누릅니다.</li>
+        </ol>
+        <p class="small">원문은 오탈자도 고치지 않는 것이 원칙입니다. 실명·학교명·연락처가 원문에 있으면 작성자와 상의해 ○○ 처리한 뒤 게시하세요.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<dialog id="previewDlg" aria-labelledby="previewTitle">
+  <div class="dlg-head"><strong id="previewTitle">홈페이지 미리보기</strong><button type="button" class="btn btn-ghost" id="previewClose" style="min-height:36px;padding:4px 14px">닫기</button></div>
+  <div class="dlg-body">
+    <p class="small muted">목록 카드</p>
+    <div class="rv-grid" id="previewCard"></div>
+    <p class="small muted" style="margin-top:20px">상세 페이지</p>
+    <div id="previewDetail" style="background:var(--bg);"></div>
+  </div>
+</dialog>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where, writeBatch, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js';
+import * as RC from '/assets/js/review-core.mjs';
+
+// 기존 사이트와 같은 Firebase 프로젝트·같은 관리자 기준(firestore.rules isAdmin)을 사용합니다.
+const firebaseConfig = {
+    projectId: 'philosophyaiedumain', appId: '1:791707583638:web:b86d59d52a20330baaaeb7',
+    storageBucket: 'philosophyaiedumain.firebasestorage.app', apiKey: 'AIzaSyBylDxamogm1_g2URVxGQFz_c05pOWqjEI',
+    authDomain: 'philosophyaiedumain.firebaseapp.com', messagingSenderId: '791707583638',
+};
+const ADMIN_EMAIL = 'warmcomfortforyou@gmail.com';
+const AI_ENDPOINT = '/.netlify/functions/review-ai';
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+let storage = null;
+try { storage = getStorage(app); } catch (e) { console.warn('Storage 초기화 실패:', e); }
+
+const $ = (id) => document.getElementById(id);
+const esc = RC.escapeHtml;
+
+// ───────── 상태 ─────────
+let all = [];            // 전체 후기 (관리자 읽기)
+let current = null;      // 편집 중인 후기 {id, isNew, createdAt, publishedAt, ...}
+let images = [];         // [{key, url?, path?, blob?, previewUrl, alt}]
+let removedPaths = [];   // 저장 시 Storage에서 지울 경로
+let aiDraft = null;      // 마지막 AI 정리 결과 (비공개 문서에 별도 보관)
+let aiChecks = {};
+let dirty = false;
+
+// ───────── 인증 ─────────
+$('loginBtn').addEventListener('click', async () => {
+    try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (e) { console.error(e); }
+});
+$('logoutBtn').addEventListener('click', () => signOut(auth));
+onAuthStateChanged(auth, (user) => {
+    const ok = !!user && user.email === ADMIN_EMAIL && user.emailVerified !== false;
+    $('gate').hidden = ok;
+    $('app').hidden = !ok;
+    $('denied').hidden = !(user && !ok);
+    $('loginBtn').textContent = user && !ok ? '다른 계정으로 로그인' : 'Google 계정으로 로그인';
+    $('logoutBtn').hidden = !user;
+    $('who').textContent = user ? user.email : '';
+    if (ok && !all.length) { initForm(); loadAll(); }
+});
+
+// ───────── 탭 ─────────
+const tabs = ['editor', 'list', 'import', 'guide'];
+function showTab(name) {
+    tabs.forEach(t => {
+        $('tab-' + t).setAttribute('aria-selected', String(t === name));
+        $('panel-' + t).hidden = t !== name;
+    });
+}
+tabs.forEach(t => $('tab-' + t).addEventListener('click', () => showTab(t)));
+
+// ───────── 폼 초기화 ─────────
+function initForm() {
+    $('fProgram').innerHTML = '<option value="">선택</option>' + RC.PROGRAMS.map(p => `<option value="${p.key}">${esc(p.label)}</option>`).join('');
+    $('lProgram').innerHTML = '<option value="">프로그램 전체</option>' + RC.PROGRAMS.map(p => `<option value="${p.key}">${esc(p.label)}</option>`).join('');
+    $('fCategories').innerHTML = RC.CATEGORIES.map(c => `<label><input type="checkbox" value="${c.key}"> ${esc(c.label)}</label>`).join('');
+    newReview();
+}
+
+function newDocId() { return doc(collection(db, 'reviews')).id; }
+
+function newReview() {
+    current = { id: newDocId(), isNew: true };
+    images.forEach(im => im.previewUrl && im.blob && URL.revokeObjectURL(im.previewUrl));
+    images = []; removedPaths = []; aiDraft = null; aiChecks = {};
+    for (const id of ['fOriginal', 'fSourceUrl', 'fAuthorDisplay', 'fReviewDate', 'fInstitution', 'fConsentNote', 'fRealName', 'fContact', 'fMemo', 'fTitle', 'fConcern', 'fPractice', 'fChange', 'fSummary', 'fSlug']) $(id).value = '';
+    $('fAuthorType').value = ''; $('fProgram').value = ''; $('fConsent').value = 'pending'; $('fStatus').value = 'draft';
+    $('fFeatured').checked = false; $('fInstitutionPublic').checked = false;
+    document.querySelector('input[name=authorMode][value=name]').checked = true;
+    $('fCategories').querySelectorAll('input').forEach(i => { i.checked = false; });
+    $('fSlug').disabled = false;
+    ['edMsg', 'aiMsg', 'dupWarn', 'pasteNote', 'editingNote'].forEach(id => { $(id).hidden = true; });
+    $('aiState').innerHTML = '';
+    ['evConcern', 'evPractice', 'evChange'].forEach(id => { $(id).textContent = ''; });
+    renderImages(); renderOrigView(); updateCount();
+    dirty = false;
+}
+
+// ───────── 폼 ↔ 데이터 ─────────
+function readForm() {
+    const anonymous = document.querySelector('input[name=authorMode]:checked').value === 'anon';
+    const cats = [...$('fCategories').querySelectorAll('input:checked')].map(i => i.value);
+    const institution = $('fInstitution').value.trim();
+    const clean = (v) => { const s = String(v || '').trim(); return s === RC.NOT_MENTIONED ? '' : s; };
+    return {
+        id: current.id,
+        slug: RC.sanitizeSlug($('fSlug').value),
+        title: $('fTitle').value.trim(),
+        authorDisplay: anonymous ? '' : $('fAuthorDisplay').value.trim(),
+        anonymous,
+        authorType: $('fAuthorType').value,
+        program: $('fProgram').value,
+        categories: cats,
+        institution: $('fInstitutionPublic').checked ? institution : '',
+        reviewDate: $('fReviewDate').value || '',
+        concernBefore: clean($('fConcern').value),
+        memorablePractice: clean($('fPractice').value),
+        changeAfter: clean($('fChange').value),
+        adminSummary: $('fSummary').value.trim(),
+        originalText: RC.cleanPastedText($('fOriginal').value),
+        sourceUrl: RC.safeUrl($('fSourceUrl').value),
+        consentStatus: $('fConsent').value,
+        status: $('fStatus').value,
+        featured: $('fFeatured').checked,
+        _private: {
+            realName: $('fRealName').value.trim(), contact: $('fContact').value.trim(),
+            institution, institutionPublic: $('fInstitutionPublic').checked,
+            consentNote: $('fConsentNote').value.trim(), memo: $('fMemo').value.trim(),
+        },
+    };
+}
+
+function fillForm(r, priv = {}) {
+    $('fOriginal').value = r.originalText || '';
+    $('fSourceUrl').value = r.sourceUrl || '';
+    document.querySelector(`input[name=authorMode][value=${r.anonymous ? 'anon' : 'name'}]`).checked = true;
+    $('fAuthorDisplay').value = r.authorDisplay || '';
+    $('fAuthorType').value = r.authorType || '';
+    $('fReviewDate').value = r.reviewDate || '';
+    $('fProgram').value = r.program || '';
+    $('fCategories').querySelectorAll('input').forEach(i => { i.checked = (r.categories || []).includes(i.value); });
+    $('fInstitution').value = priv.institution || r.institution || '';
+    $('fInstitutionPublic').checked = !!(priv.institutionPublic || r.institution);
+    $('fConsent').value = r.consentStatus || 'pending';
+    $('fConsentNote').value = priv.consentNote || '';
+    $('fRealName').value = priv.realName || '';
+    $('fContact').value = priv.contact || '';
+    $('fMemo').value = priv.memo || '';
+    $('fTitle').value = r.title || '';
+    $('fConcern').value = r.concernBefore || '';
+    $('fPractice').value = r.memorablePractice || '';
+    $('fChange').value = r.changeAfter || '';
+    $('fSummary').value = r.adminSummary || '';
+    $('fSlug').value = r.slug || '';
+    $('fStatus').value = r.status || 'draft';
+    $('fFeatured').checked = !!r.featured;
+    $('fSlug').disabled = !!r.publishedAt;
+    $('slugHint').textContent = r.publishedAt ? '게시된 적이 있는 후기라 주소를 고정했습니다 (검색엔진·공유 링크 보호).' : '영문 소문자·숫자·하이픈. 게시 후에는 바꾸지 않는 것이 좋습니다(주소가 바뀜).';
+    images = (r.images || []).map((im, i) => ({ key: 'e' + i + Date.now(), url: im.url, path: im.path || '', alt: im.alt || '', previewUrl: im.url }));
+    aiDraft = priv.aiDraft || null; aiChecks = (aiDraft && aiDraft.checks) || {};
+    renderImages(); renderOrigView(); updateCount(); showEvidence();
+}
+
+// ───────── 원문 입력 · 붙여넣기 ─────────
+function updateCount() { $('origCount').textContent = $('fOriginal').value.length.toLocaleString(); }
+$('fOriginal').addEventListener('input', () => { dirty = true; updateCount(); renderOrigView(); scheduleDupCheck(); });
+$('fSourceUrl').addEventListener('change', () => { dirty = true; checkDuplicates(); });
+
+// 붙여넣기: 텍스트는 브라우저 기본 동작(줄바꿈 보존)으로 들어가고, 실제 이미지 데이터만 추가로 가져옵니다.
+async function handlePaste(e, { textTarget } = {}) {
+    const cd = e.clipboardData;
+    if (!cd) return;
+    const files = [...(cd.files || [])].filter(f => /^image\//.test(f.type));
+    const html = cd.getData('text/html') || '';
+    const plain = cd.getData('text/plain') || '';
+    // HTML 안의 data: 이미지는 실제 데이터이므로 가져올 수 있음. http(s) 이미지는 원본 서버에서 막혀 있어 가져오지 않음
+    const dataImgs = [...html.matchAll(/<img[^>]+src=["'](data:image\/(?:png|jpe?g|webp|gif);base64,[^"']+)["']/gi)].map(m => m[1]);
+    const remoteImgs = [...html.matchAll(/<img[^>]+src=["'](https?:[^"']+)["']/gi)].length;
+    if (!textTarget && !files.length && !dataImgs.length) {
+        e.preventDefault();
+        showMsg('pasteNote', 'warn', remoteImgs
+            ? `붙여넣은 내용의 이미지 ${remoteImgs}개는 링크로만 전달되어 가져올 수 없습니다. 네이버 카페 이미지는 외부 접근이 제한됩니다 — 사진을 PC에 저장한 뒤 파일로 올려 주세요.`
+            : '붙여넣은 내용에 이미지 데이터가 없습니다. 이미지를 복사(이미지 위에서 우클릭 → 이미지 복사)하거나 파일로 올려 주세요.');
+        return;
+    }
+    if (!textTarget || (!plain && (files.length || dataImgs.length))) e.preventDefault();
+    if (textTarget && !plain && html) {
+        // 일부 환경에서 서식 있는 글만 복사될 때: HTML을 텍스트로 변환 (태그는 모두 제거, 실행되지 않음)
+        e.preventDefault();
+        const tmp = new DOMParser().parseFromString(html, 'text/html');
+        tmp.querySelectorAll('br').forEach(b => b.replaceWith('\n'));
+        tmp.querySelectorAll('p,div,li,h1,h2,h3,h4').forEach(b => b.append('\n'));
+        insertAtCursor(textTarget, RC.cleanPastedText(tmp.body.textContent || ''));
+    }
+    let added = 0;
+    for (const f of files) { await addImageBlob(f); added++; }
+    for (const d of dataImgs) { try { await addImageBlob(await (await fetch(d)).blob()); added++; } catch { /* 무시 */ } }
+    const notes = [];
+    if (added) notes.push(`이미지 ${added}장을 붙여넣은 내용에서 가져왔습니다. 아래 ‘이미지 첨부’에서 확인하세요.`);
+    if (remoteImgs && remoteImgs > dataImgs.length) {
+        notes.push(`붙여넣은 글에 이미지 ${remoteImgs}개가 링크로만 들어 있어 가져오지 않았습니다. 네이버 카페 이미지는 외부 접근이 제한됩니다 — 사진을 PC에 저장한 뒤 ‘이미지 첨부’에서 파일로 올려 주세요.`);
+    }
+    if (notes.length) { $('pasteNote').innerHTML = notes.map(esc).join('<br>'); $('pasteNote').hidden = false; }
+}
+function insertAtCursor(ta, text) {
+    const s = ta.selectionStart ?? ta.value.length, e2 = ta.selectionEnd ?? ta.value.length;
+    ta.value = ta.value.slice(0, s) + text + ta.value.slice(e2);
+    ta.dispatchEvent(new Event('input'));
+}
+$('fOriginal').addEventListener('paste', (e) => handlePaste(e, { textTarget: $('fOriginal') }));
+
+// ───────── 이미지 ─────────
+const dz = $('dropzone');
+dz.addEventListener('click', () => $('fileInput').click());
+dz.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('fileInput').click(); } });
+dz.addEventListener('paste', (e) => handlePaste(e));
+dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+dz.addEventListener('drop', async (e) => {
+    e.preventDefault(); dz.classList.remove('drag');
+    for (const f of [...e.dataTransfer.files].filter(f => /^image\//.test(f.type))) await addImageBlob(f);
+});
+$('fileInput').addEventListener('change', async (e) => {
+    for (const f of [...e.target.files]) await addImageBlob(f);
+    e.target.value = '';
+});
+
+/** 긴 변 1600px로 줄이고 다시 인코딩 → EXIF(위치정보 등) 제거 */
+async function processImage(blob) {
+    if (!/^image\/(jpeg|png|webp|gif)$/.test(blob.type)) throw new Error('지원하지 않는 이미지 형식입니다 (JPG·PNG·WebP·GIF).');
+    if (blob.size > 20 * 1024 * 1024) throw new Error('20MB보다 큰 이미지는 올릴 수 없습니다.');
+    try {
+        const bmp = await createImageBitmap(blob);
+        const s = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+        const w = Math.round(bmp.width * s), h = Math.round(bmp.height * s);
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        c.getContext('2d').drawImage(bmp, 0, 0, w, h);
+        const out = await new Promise(res => c.toBlob(res, 'image/webp', 0.85)) || await new Promise(res => c.toBlob(res, 'image/jpeg', 0.85));
+        if (out) return out;
+    } catch (e) { console.warn('이미지 변환 실패, 원본 사용:', e); }
+    return blob;
+}
+async function addImageBlob(file) {
+    if (images.length >= RC.LIMITS.images) { showMsg('edMsg', 'warn', `이미지는 최대 ${RC.LIMITS.images}장까지 첨부할 수 있습니다.`); return; }
+    try {
+        const blob = await processImage(file);
+        images.push({ key: 'n' + Math.random().toString(36).slice(2), blob, previewUrl: URL.createObjectURL(blob), alt: '' });
+        dirty = true; renderImages();
+    } catch (e) { showMsg('edMsg', 'err', e.message); }
+}
+function renderImages() {
+    const ul = $('imgList');
+    ul.replaceChildren();
+    images.forEach((im, i) => {
+        const li = document.createElement('li'); li.className = 'img-item';
+        const img = document.createElement('img'); img.src = im.previewUrl; img.alt = '';
+        const alt = document.createElement('input'); alt.type = 'text'; alt.maxLength = RC.LIMITS.alt;
+        alt.placeholder = '이미지 설명 (대체 텍스트, 예: 연수에서 만든 퀴즈 앱 화면)'; alt.value = im.alt || '';
+        alt.setAttribute('aria-label', `${i + 1}번째 이미지 설명`);
+        alt.addEventListener('input', () => { im.alt = alt.value; dirty = true; });
+        const btns = document.createElement('div'); btns.className = 'img-btns';
+        const mk = (label, title, fn, dis) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.title = title; b.setAttribute('aria-label', `${i + 1}번째 이미지 ${title}`); b.disabled = !!dis; b.addEventListener('click', fn); return b; };
+        btns.append(
+            mk('↑', '위로', () => { [images[i - 1], images[i]] = [images[i], images[i - 1]]; dirty = true; renderImages(); }, i === 0),
+            mk('↓', '아래로', () => { [images[i + 1], images[i]] = [images[i], images[i + 1]]; dirty = true; renderImages(); }, i === images.length - 1),
+            mk('✕', '삭제', () => { if (im.path) removedPaths.push(im.path); if (im.blob) URL.revokeObjectURL(im.previewUrl); images.splice(i, 1); dirty = true; renderImages(); }),
+        );
+        li.append(img, alt, btns);
+        ul.appendChild(li);
+    });
+}
+async function uploadPendingImages(reviewId) {
+    const out = [];
+    for (const im of images) {
+        if (im.blob && !im.url) {
+            if (!storage) throw new Error('Firebase Storage를 사용할 수 없습니다. Firebase 콘솔에서 Storage를 시작하고 storage.rules를 배포해 주세요.');
+            const ext = im.blob.type === 'image/webp' ? 'webp' : im.blob.type === 'image/png' ? 'png' : im.blob.type === 'image/gif' ? 'gif' : 'jpg';
+            const path = `reviews/${reviewId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const r = ref(storage, path);
+            await uploadBytes(r, im.blob, { contentType: im.blob.type });
+            im.url = await getDownloadURL(r); im.path = path;
+        }
+        out.push({ url: im.url, path: im.path || '', alt: String(im.alt || '').slice(0, RC.LIMITS.alt) });
+    }
+    return out;
+}
+
+// ───────── 원문 비교 보기 ─────────
+function renderOrigView() {
+    const text = $('fOriginal').value;
+    const box = $('origView');
+    if (!text.trim()) { box.innerHTML = '<span class="muted">원문을 붙여넣으면 여기에 표시됩니다.</span>'; return; }
+    let html = esc(text);
+    const evs = Object.values(aiChecks || {}).map(c => c && c.evidence).filter(Boolean).sort((a, b) => b.length - a.length);
+    for (const ev of evs) {
+        const e = esc(ev);
+        if (e && html.includes(e)) html = html.split(e).join(`<mark>${e}</mark>`);
+    }
+    box.innerHTML = html;
+}
+function showEvidence() {
+    const map = { concernBefore: 'evConcern', memorablePractice: 'evPractice', changeAfter: 'evChange' };
+    for (const [k, id] of Object.entries(map)) {
+        const c = aiChecks[k];
+        const el = $(id);
+        el.className = 'ev';
+        if (!c) { el.textContent = ''; continue; }
+        if (c.verified) el.textContent = `근거: “${c.evidence}”`;
+        else { el.textContent = '원문에서 근거를 찾지 못한 항목입니다 (언급 없음).'; }
+    }
+}
+
+// ───────── 중복 감지 ─────────
+let dupTimer = null;
+function scheduleDupCheck() { clearTimeout(dupTimer); dupTimer = setTimeout(checkDuplicates, 600); }
+function checkDuplicates() {
+    const cand = { id: current.id, sourceUrl: $('fSourceUrl').value, originalText: $('fOriginal').value };
+    const d = RC.findDuplicates(cand, all);
+    const box = $('dupWarn');
+    if (!d.length) { box.hidden = true; return d; }
+    box.innerHTML = '<b>중복 등록이 의심됩니다.</b><ul>' + d.slice(0, 5).map(x =>
+        `<li>${x.reason === 'url' ? '같은 원본 URL' : `원문 ${Math.round(x.score * 100)}% 유사`}: ${esc(x.title || '(제목 없음)')} <button type="button" class="btn btn-ghost" data-open="${esc(x.id)}" style="min-height:30px;padding:2px 10px;font-size:13px">열기</button></li>`).join('') + '</ul>';
+    box.hidden = false;
+    box.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => openReview(b.dataset.open)));
+    return d;
+}
+
+// ───────── AI 정리 ─────────
+$('aiBtn').addEventListener('click', async () => {
+    const text = RC.cleanPastedText($('fOriginal').value);
+    if (text.length < 10) { showMsg('aiMsg', 'warn', '후기 원문을 먼저 붙여넣어 주세요 (10자 이상).'); return; }
+    const hasManual = ['fTitle', 'fConcern', 'fPractice', 'fChange', 'fSummary'].some(id => $(id).value.trim());
+    if (hasManual && !confirm('이미 입력된 정리 항목이 있습니다. AI 정리 결과로 덮어쓸까요? (원문은 바뀌지 않습니다)')) return;
+    const btn = $('aiBtn'); btn.disabled = true; btn.textContent = 'AI가 정리하는 중…';
+    showMsg('aiMsg', 'info', 'AI가 원문을 읽고 항목을 정리하고 있습니다. 10~20초 정도 걸릴 수 있습니다.');
+    try {
+        const token = await auth.currentUser.getIdToken();
+        const res = await fetch(AI_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify({ text }) });
+        let data = {};
+        try { data = await res.json(); } catch { /* 함수가 없거나 HTML 응답 */ }
+        if (!res.ok) {
+            const m = data.error === 'ai_not_configured' ? 'AI 정리 기능이 아직 설정되지 않았습니다. 아래 항목을 직접 입력해 게시할 수 있습니다.'
+                : res.status === 404 ? 'AI 정리 서버(Netlify 함수)에 연결할 수 없습니다. 항목을 직접 입력해 주세요.'
+                : (data.message || `AI 정리 실패 (${res.status}). 항목을 직접 입력해 주세요.`);
+            showMsg('aiMsg', 'warn', m);
+            return;
+        }
+        const d = data.draft || {};
+        $('fTitle').value = d.title || '';
+        $('fConcern').value = d.concernBefore || RC.NOT_MENTIONED;
+        $('fPractice').value = d.memorablePractice || RC.NOT_MENTIONED;
+        $('fChange').value = d.changeAfter || RC.NOT_MENTIONED;
+        $('fSummary').value = d.summary || '';
+        if (d.program && !$('fProgram').value) $('fProgram').value = d.program;
+        if (d.authorType && !$('fAuthorType').value) $('fAuthorType').value = d.authorType;
+        const anyCat = [...$('fCategories').querySelectorAll('input')].some(i => i.checked);
+        if (!anyCat) $('fCategories').querySelectorAll('input').forEach(i => { i.checked = (d.categories || []).includes(i.value); });
+        aiChecks = data.checks || {};
+        aiDraft = { ...d, checks: aiChecks, warnings: data.warnings || [], model: data.model || '', generatedAt: data.generatedAt || new Date().toISOString() };
+        $('aiState').innerHTML = '<span class="ai-badge">AI 초안</span>';
+        const w = data.warnings || [];
+        showMsg('aiMsg', w.length ? 'warn' : 'info', 'AI 정리 초안을 채웠습니다. 오른쪽 원문 비교에서 근거를 확인하고 필요한 부분을 고쳐 주세요. 자동으로 게시되지 않습니다.' + (w.length ? '<ul>' + w.map(x => `<li>${esc(x)}</li>`).join('') + '</ul>' : ''), true);
+        if (!$('fSlug').value) autoSlug();
+        renderOrigView(); showEvidence(); dirty = true;
+    } catch (e) {
+        console.error(e);
+        showMsg('aiMsg', 'warn', 'AI 정리 서버에 연결하지 못했습니다. 항목을 직접 입력해 게시할 수 있습니다.');
+    } finally {
+        btn.disabled = false; btn.textContent = '✦ AI로 후기 정리하기';
+    }
+});
+
+// ───────── 슬러그 ─────────
+function autoSlug() {
+    const f = readForm();
+    $('fSlug').value = RC.makeSlug(f, current.id.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5) || undefined);
+}
+$('slugBtn').addEventListener('click', () => { if (!$('fSlug').disabled) autoSlug(); });
+
+// ───────── 미리보기 ─────────
+$('previewBtn').addEventListener('click', () => {
+    const f = readForm();
+    if (!f.slug) { autoSlug(); f.slug = $('fSlug').value; }
+    $('previewCard').innerHTML = RC.renderReviewCard(f, { basePath: '#' });
+    $('previewDetail').innerHTML = RC.renderReviewDetail(f);
+    // 업로드 전 이미지(blob:)는 공개 렌더러가 통과시키지 않으므로 미리보기에서만 직접 붙입니다
+    if (images.length) {
+        const wrap = document.createElement('div'); wrap.className = 'rv-images';
+        images.forEach(im => { const fig = document.createElement('figure'); const img = document.createElement('img'); img.src = im.url || im.previewUrl; img.alt = im.alt || '후기 첨부 이미지'; fig.appendChild(img); wrap.appendChild(fig); });
+        const art = $('previewDetail').querySelector('.rv-detail');
+        const old = art.querySelector('.rv-images'); if (old) old.remove();
+        art.appendChild(wrap);
+    }
+    const chk = RC.publishCheck(f);
+    if (!chk.ok || chk.warnings.length) {
+        const p = document.createElement('div'); p.className = 'msg ' + (chk.ok ? 'msg-warn' : 'msg-err');
+        p.innerHTML = (chk.ok ? '게시 전 확인할 점' : '아직 게시할 수 없습니다') + '<ul>' + [...chk.errors, ...chk.warnings].map(x => `<li>${esc(x)}</li>`).join('') + '</ul>';
+        $('previewCard').before(p);
+        $('previewDlg').addEventListener('close', () => p.remove(), { once: true });
+    }
+    $('previewDlg').showModal();
+});
+$('previewClose').addEventListener('click', () => $('previewDlg').close());
+
+// ───────── 저장 ─────────
+function showMsg(id, kind, text, isHtml = false) {
+    const el = $(id);
+    el.className = 'msg msg-' + kind;
+    if (isHtml) el.innerHTML = text; else el.textContent = text;
+    el.hidden = false;
+}
+
+async function save(targetStatus) {
+    const f = readForm();
+    if (!f.originalText) { showMsg('edMsg', 'err', '후기 원문을 입력해 주세요. 원문은 반드시 보존됩니다.'); return false; }
+    if (f.originalText.length > RC.LIMITS.originalText) { showMsg('edMsg', 'err', `원문이 ${RC.LIMITS.originalText}자를 넘습니다.`); return false; }
+    if (!f.slug) { autoSlug(); f.slug = $('fSlug').value; }
+    if (!f.title) f.title = targetStatus === 'published' ? '' : '(제목 미입력) ' + f.originalText.replace(/\s+/g, ' ').slice(0, 30);
+    // 슬러그 중복
+    const clash = all.find(r => r.id !== f.id && r.slug === f.slug);
+    if (clash) { showMsg('edMsg', 'err', `고유 주소 “${f.slug}”를 다른 후기(${clash.title})가 쓰고 있습니다. 주소를 바꿔 주세요.`); return false; }
+    f.status = targetStatus;
+    if (targetStatus === 'published') {
+        const chk = RC.publishCheck(f);
+        if (!chk.ok) { showMsg('edMsg', 'err', '게시할 수 없습니다:<ul>' + chk.errors.map(x => `<li>${esc(x)}</li>`).join('') + '</ul>', true); return false; }
+        if (chk.warnings.length && !confirm('게시 전에 확인해 주세요:\n\n- ' + chk.warnings.join('\n- ') + '\n\n그래도 게시할까요?')) return false;
+    }
+    const dups = checkDuplicates();
+    if (dups.length && current.isNew && !confirm(`비슷한 후기가 이미 ${dups.length}건 있습니다 (${dups[0].reason === 'url' ? '같은 원본 URL' : '유사한 원문'}).\n그래도 새로 저장할까요?`)) return false;
+
+    const btns = ['saveDraftBtn', 'publishBtn'].map($); btns.forEach(b => { b.disabled = true; });
+    try {
+        const imgs = await uploadPendingImages(f.id);
+        let summaryOrigin = 'manual';
+        if (aiDraft) {
+            const same = (a, b) => String(a || '').trim() === String(b || '').trim() || (!String(b || '').trim() && String(a) === RC.NOT_MENTIONED);
+            summaryOrigin = (same(aiDraft.concernBefore, f.concernBefore) && same(aiDraft.memorablePractice, f.memorablePractice) && same(aiDraft.changeAfter, f.changeAfter) && same(aiDraft.summary, f.adminSummary) && same(aiDraft.title, f.title)) ? 'ai' : 'ai_edited';
+        }
+        const now = serverTimestamp();
+        const pub = {
+            slug: f.slug, title: f.title, authorDisplay: f.authorDisplay, anonymous: f.anonymous, authorType: f.authorType,
+            program: f.program, categories: f.categories, institution: f.institution, reviewDate: f.reviewDate,
+            concernBefore: f.concernBefore, memorablePractice: f.memorablePractice, changeAfter: f.changeAfter,
+            adminSummary: f.adminSummary, originalText: f.originalText, sourceUrl: f.sourceUrl, images: imgs,
+            consentStatus: f.consentStatus, status: f.status, featured: f.featured, summaryOrigin,
+            createdAt: current.createdAt || now, updatedAt: now,
+        };
+        if (current.importBatch) pub.importBatch = current.importBatch;
+        if (current.publishedAt) pub.publishedAt = current.publishedAt;
+        else if (f.status === 'published') pub.publishedAt = now;
+        const priv = { ...f._private, aiDraft: aiDraft || null, updatedAt: now };
+        await setDoc(doc(db, 'reviews', f.id), pub);
+        await setDoc(doc(db, 'review_private', f.id), priv);
+        for (const p of removedPaths) { try { await deleteObject(ref(storage, p)); } catch (e) { console.warn('이미지 삭제 실패(무시):', p, e); } }
+        removedPaths = [];
+        current.isNew = false;
+        await loadAll();
+        const saved = all.find(r => r.id === f.id);
+        if (saved) { current.createdAt = saved.createdAt; current.publishedAt = saved.publishedAt; }
+        $('fStatus').value = f.status;
+        if (f.status === 'published') $('fSlug').disabled = true;
+        dirty = false;
+        showMsg('edMsg', 'info', f.status === 'published'
+            ? `홈페이지에 게시했습니다: <a href="/reviews/${encodeURIComponent(f.slug)}" target="_blank" rel="noopener">/reviews/${esc(f.slug)}</a> (페이지 캐시로 반영까지 최대 5분 걸릴 수 있습니다)`
+            : f.status === 'private' ? '비공개로 저장했습니다. 홈페이지에 표시되지 않습니다.' : '임시 저장했습니다. 홈페이지에는 표시되지 않습니다.', true);
+        return true;
+    } catch (e) {
+        console.error(e);
+        showMsg('edMsg', 'err', '저장하지 못했습니다: ' + (e.code === 'permission-denied' ? '권한이 없거나 입력값이 규칙에 맞지 않습니다 (게시하려면 공개 동의 확인이 필요합니다).' : e.message));
+        return false;
+    } finally { btns.forEach(b => { b.disabled = false; }); }
+}
+// 임시 저장: 홈페이지에 표시하지 않고 저장 (상태에서 '비공개'를 고른 경우 비공개로 저장)
+$('saveDraftBtn').addEventListener('click', () => {
+    const wasPublished = all.some(r => r.id === current.id && r.status === 'published');
+    if (wasPublished && !confirm('현재 홈페이지에 게시 중인 후기입니다. 임시 저장하면 홈페이지에서 내려갑니다.\n(게시 상태로 내용만 고치려면 ‘홈페이지에 게시하기’를 누르세요)\n계속할까요?')) return;
+    save($('fStatus').value === 'private' ? 'private' : 'draft');
+});
+$('publishBtn').addEventListener('click', () => save('published'));
+$('newBtn').addEventListener('click', () => { if (!dirty || confirm('저장하지 않은 내용이 있습니다. 새 후기를 시작할까요?')) newReview(); });
+document.querySelectorAll('#panel-editor input, #panel-editor textarea, #panel-editor select').forEach(el => el.addEventListener('change', () => { dirty = true; }));
+window.addEventListener('beforeunload', (e) => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+// ───────── 목록 ─────────
+async function loadAll() {
+    try {
+        const snap = await getDocs(collection(db, 'reviews'));
+        all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        all.sort((a, b) => (tsMs(b.updatedAt) - tsMs(a.updatedAt)));
+        renderList();
+    } catch (e) {
+        console.error(e);
+        $('listBox').textContent = '후기 목록을 불러오지 못했습니다: ' + e.message;
+    }
+}
+const tsMs = (t) => (t && typeof t.toMillis === 'function') ? t.toMillis() : (t && t.seconds ? t.seconds * 1000 : (typeof t === 'number' ? t : 0));
+['lq', 'lStatus', 'lConsent', 'lProgram', 'lFeatured'].forEach(id => $(id).addEventListener('input', renderList));
+function renderList() {
+    $('listCount').textContent = `(${all.length})`;
+    const q = $('lq').value.trim().toLowerCase();
+    const st = $('lStatus').value, cs = $('lConsent').value, pg = $('lProgram').value, ft = $('lFeatured').value;
+    const rows = all.filter(r => (!st || r.status === st) && (!cs || r.consentStatus === cs) && (!pg || r.program === pg) && (!ft || r.featured)
+        && (!q || [r.title, r.originalText, r.authorDisplay, r.slug].some(v => String(v || '').toLowerCase().includes(q))));
+    const feat = all.filter(r => r.featured && r.status === 'published' && r.consentStatus === 'confirmed').length;
+    $('featuredCount').textContent = `메인 페이지에 노출되는 대표 후기: ${feat}개 (권장 3~6개)`;
+    const box = $('listBox');
+    if (!rows.length) { box.innerHTML = '<p class="muted">조건에 맞는 후기가 없습니다.</p>'; return; }
+    box.innerHTML = rows.map(r => `
+      <div class="rv-row">
+        <div>
+          <h3>${esc(r.title || '(제목 없음)')}</h3>
+          <div class="meta">
+            <span class="pill pill-${esc(r.status)}">${esc(RC.STATUSES[r.status] || r.status)}</span>
+            <span class="pill pill-consent-${esc(r.consentStatus)}">${esc(RC.CONSENT[r.consentStatus] || '')}</span>
+            ${r.featured ? '<span class="pill" style="background:#f4ead2;color:#5f4710">대표</span>' : ''}
+            ${r.summaryOrigin && r.summaryOrigin !== 'manual' ? `<span class="pill">${r.summaryOrigin === 'ai' ? 'AI 정리(미수정)' : 'AI 정리+수정'}</span>` : ''}
+            <span>${esc(RC.displayAuthor(r))}</span><span>${esc(RC.programLabel(r.program) || '프로그램 미지정')}</span><span>${esc(RC.formatDate(r.reviewDate) || '작성일 미입력')}</span>
+            ${r.importBatch ? '<span>일괄 가져오기</span>' : ''}
+          </div>
+          <p class="small muted" style="margin:6px 0 0">${esc(String(r.originalText || '').replace(/\s+/g, ' ').slice(0, 120))}</p>
+        </div>
+        <div class="row-btns">
+          <button type="button" data-act="edit" data-id="${esc(r.id)}">편집</button>
+          ${r.status === 'published' ? `<a class="small" href="/reviews/${encodeURIComponent(r.slug)}" target="_blank" rel="noopener" style="padding:6px 4px">보기 ↗</a>` : ''}
+          <button type="button" data-act="${r.status === 'published' ? 'private' : 'publish'}" data-id="${esc(r.id)}">${r.status === 'published' ? '비공개 전환' : '게시'}</button>
+          <button type="button" data-act="feature" data-id="${esc(r.id)}">${r.featured ? '대표 해제' : '대표 지정'}</button>
+          <button type="button" data-act="delete" data-id="${esc(r.id)}" style="color:#a3352a">삭제</button>
+        </div>
+      </div>`).join('');
+    box.querySelectorAll('button[data-act]').forEach(b => b.addEventListener('click', () => rowAction(b.dataset.act, b.dataset.id)));
+}
+
+async function openReview(id) {
+    if (dirty && !confirm('저장하지 않은 내용이 있습니다. 이 후기를 열까요?')) return;
+    const r = all.find(x => x.id === id);
+    if (!r) return;
+    let priv = {};
+    try { const s = await getDoc(doc(db, 'review_private', id)); if (s.exists()) priv = s.data(); } catch (e) { console.warn(e); }
+    newReview();
+    current = { id, isNew: false, createdAt: r.createdAt, publishedAt: r.publishedAt, importBatch: r.importBatch };
+    fillForm(r, priv);
+    $('aiState').innerHTML = priv.aiDraft ? '<span class="ai-badge">AI 초안 기록 있음</span>' : '';
+    showMsg('editingNote', 'info', `편집 중: ${r.title || '(제목 없음)'} — ${RC.STATUSES[r.status] || ''}`);
+    showTab('editor'); dirty = false; window.scrollTo(0, 0);
+}
+
+async function rowAction(act, id) {
+    const r = all.find(x => x.id === id);
+    if (!r) return;
+    if (act === 'edit') return openReview(id);
+    try {
+        if (act === 'delete') {
+            if (!confirm(`“${r.title}” 후기를 완전히 삭제할까요? 되돌릴 수 없습니다.\n(홈페이지에서만 내리려면 ‘비공개 전환’을 사용하세요)`)) return;
+            for (const im of r.images || []) { if (im.path && storage) { try { await deleteObject(ref(storage, im.path)); } catch { /* 무시 */ } } }
+            await deleteDoc(doc(db, 'review_private', id)).catch(() => {});
+            await deleteDoc(doc(db, 'reviews', id));
+        } else {
+            const upd = { ...stripId(r), updatedAt: serverTimestamp() };
+            if (act === 'private') upd.status = 'private';
+            if (act === 'feature') upd.featured = !r.featured;
+            if (act === 'publish') {
+                const chk = RC.publishCheck({ ...r, status: 'published' });
+                if (!chk.ok) { alert('게시할 수 없습니다:\n- ' + chk.errors.join('\n- ') + '\n\n편집 화면에서 보완해 주세요.'); return openReview(id); }
+                upd.status = 'published';
+                if (!r.publishedAt) upd.publishedAt = serverTimestamp();
+            }
+            if (act === 'feature' && upd.featured && !(r.status === 'published' && r.consentStatus === 'confirmed')) alert('대표 후기로 지정했습니다. 게시 상태가 되어야 메인 페이지에 표시됩니다.');
+            await setDoc(doc(db, 'reviews', id), upd);
+        }
+        await loadAll();
+    } catch (e) { alert('처리하지 못했습니다: ' + e.message); }
+}
+const stripId = (r) => { const { id, ...rest } = r; return rest; };
+
+// ───────── 일괄 가져오기 ─────────
+let importItems = [];
+$('importFile').addEventListener('change', async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    $('importText').value = await f.text();
+    parseImportText(/\.json$/i.test(f.name) ? 'json' : 'csv');
+});
+$('importParseBtn').addEventListener('click', () => parseImportText());
+function parseImportText(fmt) {
+    const { items, errors } = RC.parseImport($('importText').value, fmt);
+    importItems = items.map((it, i) => {
+        const dupsExisting = RC.findDuplicates(it, all);
+        const dupsBatch = RC.findDuplicates(it, items.slice(0, i).map((x, j) => ({ ...x, id: 'batch' + j, title: `가져오기 ${j + 1}번` })));
+        const dup = [...dupsExisting, ...dupsBatch][0];
+        return { ...it, _dup: dup, _include: !dup };
+    });
+    const msg = $('importMsg');
+    msg.className = 'msg ' + (errors.length ? 'msg-warn' : 'msg-info');
+    msg.innerHTML = `${importItems.length}건을 읽었습니다.` + (errors.length ? '<ul>' + errors.map(x => `<li>${esc(x)}</li>`).join('') + '</ul>' : '');
+    msg.hidden = false;
+    $('importPreview').innerHTML = importItems.length ? `<div style="overflow:auto"><table class="imp"><thead><tr><th>가져오기</th><th>원문</th><th>작성자</th><th>작성일</th><th>프로그램</th><th>원본 URL</th><th>확인</th></tr></thead><tbody>${importItems.map((it, i) => `
+      <tr><td><input type="checkbox" data-i="${i}" ${it._include ? 'checked' : ''} aria-label="${i + 1}번 가져오기"></td>
+      <td class="t">${esc(it.originalText.slice(0, 160))}${it.originalText.length > 160 ? '…' : ''}</td>
+      <td>${esc(it.anonymous ? '익명' : it.authorDisplay)}</td><td>${esc(it.reviewDate)}</td><td>${esc(RC.programLabel(it.program))}</td>
+      <td>${it.sourceUrl ? `<a href="${esc(it.sourceUrl)}" target="_blank" rel="noopener">링크</a>` : ''}</td>
+      <td>${it._dup ? `<span class="pill pill-consent-pending">중복 의심: ${esc(it._dup.title)}</span>` : '<span class="ok-badge">새 후기</span>'}</td></tr>`).join('')}</tbody></table></div>` : '';
+    $('importPreview').querySelectorAll('input[data-i]').forEach(c => c.addEventListener('change', () => { importItems[c.dataset.i]._include = c.checked; }));
+    $('importSaveBtn').hidden = !importItems.length;
+}
+$('importSaveBtn').addEventListener('click', async () => {
+    const chosen = importItems.filter(x => x._include);
+    if (!chosen.length) { alert('가져올 후기를 선택해 주세요.'); return; }
+    const batchId = 'import-' + new Date().toISOString().slice(0, 10) + '-' + Math.random().toString(36).slice(2, 6);
+    const btn = $('importSaveBtn'); btn.disabled = true;
+    try {
+        for (let i = 0; i < chosen.length; i += 200) {
+            const b = writeBatch(db);
+            for (const it of chosen.slice(i, i + 200)) {
+                const id = newDocId();
+                const now = serverTimestamp();
+                b.set(doc(db, 'reviews', id), {
+                    slug: RC.makeSlug(it, id.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5)),
+                    title: it.title || '(제목 미입력) ' + it.originalText.replace(/\s+/g, ' ').slice(0, 30),
+                    authorDisplay: it.anonymous ? '' : it.authorDisplay, anonymous: it.anonymous, authorType: it.authorType,
+                    program: it.program, categories: [], institution: '', reviewDate: it.reviewDate,
+                    concernBefore: '', memorablePractice: '', changeAfter: '', adminSummary: '',
+                    originalText: it.originalText, sourceUrl: it.sourceUrl, images: [],
+                    consentStatus: 'pending', status: 'draft', featured: false, summaryOrigin: 'manual',
+                    importBatch: batchId, createdAt: now, updatedAt: now,
+                });
+            }
+            await b.commit();
+        }
+        showMsg('importMsg', 'info', `${chosen.length}건을 임시저장으로 가져왔습니다. ‘후기 목록’에서 상태=임시저장으로 걸러 하나씩 검토·동의 확인 후 게시하세요.`);
+        importItems = []; $('importPreview').innerHTML = ''; $('importSaveBtn').hidden = true; $('importText').value = '';
+        await loadAll();
+    } catch (e) { showMsg('importMsg', 'err', '가져오지 못했습니다: ' + e.message); }
+    finally { btn.disabled = false; }
+});
+function download(name, text, type) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type }));
+    a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+$('tplCsvBtn').addEventListener('click', () => download('reviews-template.csv', RC.toCsv([{ originalText: '후기 원문을 여기에 (줄바꿈 가능)', sourceUrl: 'https://cafe.naver.com/PHILOSOPHYai/123', reviewDate: '2026-06-05', authorDisplay: '익명', program: 'AI 리터러시' }], ['originalText', 'sourceUrl', 'reviewDate', 'authorDisplay', 'program']), 'text/csv'));
+$('tplJsonBtn').addEventListener('click', () => download('reviews-template.json', JSON.stringify({ reviews: [{ originalText: '후기 원문', sourceUrl: 'https://cafe.naver.com/PHILOSOPHYai/123', reviewDate: '2026-06-05', authorDisplay: '익명', program: 'vibe-coding' }] }, null, 2), 'application/json'));
+
+const EXPORT_COLS = ['id', 'slug', 'status', 'consentStatus', 'featured', 'title', 'authorDisplay', 'anonymous', 'authorType', 'program', 'categories', 'institution', 'reviewDate', 'concernBefore', 'memorablePractice', 'changeAfter', 'adminSummary', 'originalText', 'sourceUrl', 'summaryOrigin'];
+const plain = (r) => { const o = {}; for (const k of EXPORT_COLS) o[k] = r[k] ?? ''; o.images = (r.images || []).map(i => ({ url: i.url, alt: i.alt })); return o; };
+$('exportJsonBtn').addEventListener('click', async () => {
+    let rows = all.map(plain);
+    if ($('exportPrivate').checked) {
+        if (!confirm('실명·연락처 등 비공개 정보가 파일에 포함됩니다. 안전한 곳에 보관하세요. 계속할까요?')) return;
+        rows = await Promise.all(rows.map(async r => { const s = await getDoc(doc(db, 'review_private', r.id)); return { ...r, private: s.exists() ? s.data() : null }; }));
+    }
+    download(`reviews-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ exportedAt: new Date().toISOString(), reviews: rows }, null, 2), 'application/json');
+});
+$('exportCsvBtn').addEventListener('click', () => download(`reviews-backup-${new Date().toISOString().slice(0, 10)}.csv`, RC.toCsv(all.map(plain), EXPORT_COLS), 'text/csv'));
+
+// ───────── 기존 '강연 후기' 게시판 → 임시저장 ─────────
+$('legacyBtn').addEventListener('click', async () => {
+    try {
+        const snap = await getDocs(query(collection(db, 'community_posts'), where('category', '==', '강연 후기')));
+        const posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        let added = 0, skipped = 0;
+        const b = writeBatch(db);
+        for (const p of posts) {
+            const text = RC.cleanPastedText(p.content);
+            if (!text || RC.findDuplicates({ originalText: text }, all).length) { skipped++; continue; }
+            const id = newDocId(), now = serverTimestamp();
+            const date = p.createdAt && p.createdAt.toDate ? p.createdAt.toDate().toISOString().slice(0, 10) : '';
+            b.set(doc(db, 'reviews', id), {
+                slug: RC.makeSlug({ reviewDate: date }, id.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5)),
+                title: String(p.title || '').slice(0, 120), authorDisplay: String(p.authorName || '').slice(0, 50), anonymous: !p.authorName,
+                authorType: '', program: '', categories: [], institution: '', reviewDate: '',
+                concernBefore: '', memorablePractice: '', changeAfter: '', adminSummary: '',
+                originalText: text.slice(0, RC.LIMITS.originalText), sourceUrl: '', images: [],
+                consentStatus: 'pending', status: 'draft', featured: false, summaryOrigin: 'manual',
+                importBatch: 'legacy-community', createdAt: now, updatedAt: now,
+            });
+            b.set(doc(db, 'review_private', id), { institution: String(p.authorAffiliation || ''), memo: `커뮤니티 강연 후기 게시글(${p.id})에서 복사. 게시판 등록일 ${date || '미상'} — 원본 후기 작성일은 따로 확인 필요`, updatedAt: now });
+            added++;
+        }
+        if (added) await b.commit();
+        showMsg('legacyMsg', 'info', `강연 후기 ${posts.length}건 중 ${added}건을 임시저장으로 복사했습니다${skipped ? ` (${skipped}건은 이미 있거나 내용이 없어 건너뜀)` : ''}. 원래 게시판 글은 그대로입니다.`);
+        await loadAll();
+    } catch (e) { showMsg('legacyMsg', 'err', '불러오지 못했습니다: ' + e.message); }
+});
+
+$('copyTplBtn').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText($('tplText').textContent); $('copyTplBtn').textContent = '복사했습니다'; }
+    catch { $('copyTplBtn').textContent = '복사 실패 — 직접 선택해 복사하세요'; }
+    setTimeout(() => { $('copyTplBtn').textContent = '문구 복사'; }, 2500);
+});
+</script>
+</body>
+</html>

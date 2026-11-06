@@ -1,0 +1,41 @@
+/* 후기 카드·상세 공용 스타일 (review-core.mjs 렌더 결과)
+   메인 페이지·교육 문의 페이지·후기 페이지·관리자 미리보기에서 함께 사용합니다. */
+:root { --rv-surface: #fffefa; --rv-line: #e5e0d2; --rv-ink: #203e34; --rv-muted: #66706a; --rv-gold: #8a681d; --rv-gold-soft: #f4ead2; --rv-sage: #e7eee3; --rv-soft: #f3efe4; }
+/* Reviews (공용 — review-core.mjs 렌더 결과) */
+.rv-filter { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; padding: 0; list-style: none; }
+.rv-filter a, .rv-filter button { display: inline-block; padding: 8px 16px; border-radius: 999px; border: 1px solid #cfc6b0; background: var(--rv-surface); color: #3f5248; font-weight: 600; font-size: 14px; text-decoration: none; cursor: pointer; font-family: inherit; }
+.rv-filter [aria-current="true"], .rv-filter [aria-pressed="true"] { background: #315b4c; color: #fffefa; border-color: #315b4c; }
+.rv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.rv-card { background: var(--rv-surface); border: 1px solid var(--rv-line); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+.rv-card[hidden] { display: none; }
+.rv-card-title { font-size: 18px; margin: 0; }
+.rv-card-title a { color: var(--rv-ink); text-decoration: none; }
+.rv-card-title a:hover { text-decoration: underline; }
+.rv-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.rv-tag { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 2px 10px; background: var(--rv-sage); color: #244839; }
+.rv-tag-program { background: var(--rv-gold-soft); color: #5f4710; }
+.rv-story { margin: 0; display: grid; gap: 8px; }
+.rv-story-row { display: grid; gap: 2px; }
+.rv-story dt { font-size: 12.5px; font-weight: 700; color: var(--rv-gold); }
+.rv-story dd { margin: 0; font-size: 15px; }
+.rv-excerpt { font-size: 14.5px; color: var(--rv-muted); margin: 0; }
+.rv-summary { margin: 0; font-size: 14.5px; }
+.rv-label { display: inline-block; font-size: 11.5px; font-weight: 700; background: var(--rv-soft); border-radius: 6px; padding: 1px 7px; margin-right: 6px; color: var(--rv-muted); }
+.rv-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13.5px; color: var(--rv-muted); margin-top: auto; }
+.rv-more { font-size: 14px; font-weight: 700; text-decoration: none; }
+.rv-empty { background: var(--rv-surface); border: 1px dashed #cfc6b0; border-radius: 18px; padding: 28px; text-align: center; color: var(--rv-muted); }
+.rv-detail h1 { margin-top: 10px; }
+.rv-detail-meta { display: flex; flex-wrap: wrap; gap: 8px 26px; margin: 0 0 26px; font-size: 14.5px; }
+.rv-detail-meta dt { font-weight: 700; color: var(--rv-muted); font-size: 12.5px; }
+.rv-detail-meta dd { margin: 0; color: var(--rv-ink); }
+.rv-detail-story, .rv-detail-summary, .rv-original { background: var(--rv-surface); border: 1px solid var(--rv-line); border-radius: 18px; padding: 22px 24px; margin-bottom: 20px; }
+.rv-detail h2 { font-size: 19px; }
+.rv-detail h2 small { display: block; font-size: 13px; font-weight: 500; color: var(--rv-muted); margin-top: 2px; }
+.rv-original { border-left: 4px solid var(--rv-gold); }
+.rv-original-text { margin: 0; font-size: 16.5px; line-height: 1.9; color: var(--rv-ink); }
+.rv-source { margin: 14px 0 0; font-weight: 700; }
+.rv-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.rv-images figure { margin: 0; }
+.rv-images img { border-radius: 12px; border: 1px solid var(--rv-line); }
+.trust-note { font-size: 14px; color: var(--rv-muted); background: var(--rv-soft); border-radius: 12px; padding: 14px 18px; }
+
