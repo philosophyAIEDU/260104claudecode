@@ -5,7 +5,7 @@
 
 ## 2026-11 고도화: 강사 브랜드 · SEO/AEO/GEO · 후기 아카이브
 - 새 공개 페이지: `/ai-instructor`(AI 강사 소개) · `/programs`(교육 프로그램) · `/case-studies`(기관별 교육 사례) · `/reviews`(수강 후기, 서버 렌더링) · `/insights/`(AI 교육 칼럼)
-- 관리자: `reviews-admin.html` — 후기 간편 등록(네이버 카페 글 붙여넣기 → AI 정리 → 검토 → 게시), 목록·비공개 전환·대표 지정, CSV/JSON 가져오기·내보내기
+- 관리자: `reviews-admin.html` — 후기 간편 등록(네이버 카페 글 붙여넣기 → Gemini AI 정리(관리자가 API 키 입력) → 검토 → 게시, 텍스트만 저장), 목록·비공개 전환·대표 지정, CSV/JSON 가져오기·내보내기
 - 사실 데이터는 `src/site/data.mjs` 한곳에서 관리 → `npm run build:pages`로 정적 페이지·JSON-LD·`llms.txt`·`sitemap.xml` 재생성
 - 테스트: `npm test`(단위) · `npm run test:e2e`(Playwright) · `cd tests/rules && npm install && npm test`(Firestore 규칙)
 - 자세한 내용: [고도화 보고서](docs/SEO-AEO-GEO-REPORT.md) · [후기 등록·카페 후기 이전 가이드](docs/reviews-admin-guide.md)

@@ -1,6 +1,8 @@
 # 필로소피 AI 교육 홈페이지 고도화 보고서 (SEO · AEO · GEO)
 
-작업일: 2026-11-06 · 브랜치: `claude/bold-archimedes-lu91yu` · **프로덕션 배포는 하지 않았습니다.**
+작업일: 2026-11-06 · 브랜치: `claude/bold-archimedes-lu91yu`
+
+> **2026-11-06 변경**: Firebase 무료 요금제 유지를 위해 Storage(이미지 업로드)를 제거했고, AI 정리는 관리자가 화면에 직접 입력한 **Gemini API 키**로 브라우저에서 호출합니다(`gemini-3.8-flash` 기본 / `gemini-3.5-flash-lite`). Anthropic 함수·Netlify 환경변수는 더 이상 필요 없습니다.
 
 목표: 교수·교사·교육기관 담당자가 검색엔진이나 ChatGPT·Claude·Gemini에 “교육자 대상 AI 강사”를 물었을 때,
 필로소피 AI 교육을 정확히 설명할 수 있는 **검증 가능한 사실**(누구의 어떤 문제를 어떻게 푸는지 · 실제 강의 이력 · 후기 · 문의 방법)을
@@ -32,16 +34,17 @@
 - `education-inquiry.html` — canonical·JSON-LD, 내비/푸터 링크, **“필로소피 AI 교육을 어떻게 알게 되셨나요?”**(선택), `?topic=` 주제 자동 선택, 주제 2개 추가, GA `inquiry_submit` 이벤트(유입 경로·주제만, 개인정보 미전송), 기관 수 6곳, 후기 아카이브 우선 표시(없으면 기존 ‘강연 후기’ 미리보기 그대로)
 - `admin-dashboard.html` — **후기 관리** 섹션(후기 간편 등록 링크 + 게시/임시/비공개/동의 전/대표 집계)
 - `firestore.rules` — `reviews`, `review_private` 규칙 추가 (기존 규칙 변경 없음)
-- `firebase.json` — Storage 규칙 연결, 호스팅 제외 목록에 개발 파일 추가
+- `firebase.json` — 호스팅 제외 목록에 개발 파일 추가
 - `netlify.toml` — 관리자 페이지 `X-Robots-Tag: noindex`, `/reviews`·`/reviews/:slug`·`/sitemap.xml` 함수 연결, `node_modules`·`tests` 비공개
 
 **새 파일**
 - 공개 페이지: `ai-instructor.html`(/ai-instructor), `programs.html`(/programs), `case-studies.html`(/case-studies), `insights/index.html` + 칼럼 4편, `reviews.html`(함수가 없는 호스팅용 대체), `404.html`
 - 관리자: `reviews-admin.html` (후기 간편 등록 · 목록 · 일괄 가져오기/내보내기 · 후기 요청 가이드)
-- Netlify 함수: `netlify/functions/reviews.mjs`(후기 SSR), `review-ai.mjs`(AI 정리, 관리자 전용), `sitemap.mjs`
+- Netlify 함수: `netlify/functions/reviews.mjs`(후기 SSR), `sitemap.mjs`
+- AI 정리: `assets/js/gemini-review.mjs` (Gemini API, 관리자 브라우저에서 호출 — 키는 관리자 입력)
 - 공용 모듈: `assets/js/review-core.mjs`(렌더링·XSS 방어·중복 감지·CSV/JSON·검증), `assets/js/firestore-public.mjs`(공개 후기 읽기), `assets/js/*-reviews*.m?js`
 - 사실 데이터·생성기: `src/site/data.mjs`(브랜드 소개·이력·프로그램·FAQ의 단일 출처), `insights.mjs`, `pages.mjs`, `layout.mjs`, `seo.mjs`, `scripts/build-pages.mjs`
-- `robots.txt`, `sitemap.xml`(대체용), `llms.txt`, `storage.rules`, `assets/site.css`, `assets/review-cards.css`, `assets/site.js`
+- `robots.txt`, `sitemap.xml`(대체용), `llms.txt`, `assets/site.css`, `assets/review-cards.css`, `assets/site.js`
 - 테스트: `tests/unit`, `tests/e2e`, `tests/rules` · 문서: `docs/reviews-admin-guide.md`, 이 보고서, `docs/screenshots/`
 
 ## 3. SEO · AEO · GEO 개선 내용
@@ -77,31 +80,31 @@
 
 ## 5. 후기 등록 방법 · 6. 네이버 카페 후기 이전 방법
 → **[docs/reviews-admin-guide.md](reviews-admin-guide.md)** 참고. 요약:
-카페 글 복사 → `reviews-admin.html`에 붙여넣기(문단·줄바꿈 유지, 이미지 데이터 자동 첨부) → AI로 정리(근거 문장 하이라이트, 근거 없는 항목은 ‘언급 없음’) →
+카페 글 복사 → `reviews-admin.html`에 붙여넣기(문단·줄바꿈 유지, 텍스트만 저장) → Gemini로 정리(근거 문장 하이라이트, 근거 없는 항목은 ‘언급 없음’) →
 원문과 비교·수정 → 공개 동의 확인 → 미리보기 → 홈페이지에 게시(`/reviews/<고유주소>`). 여러 건은 CSV/JSON으로 임시저장 후 하나씩 검토.
 
 AI 환각 방지 장치: ① 항목마다 원문 근거 문장 요구 → ② 서버가 근거가 원문에 실제로 있는지 확인, 없으면 ‘언급 없음’으로 되돌리고 경고 → ③ 결과는 초안으로만 채움 → ④ 동의 확인 전 게시 불가(서버 규칙) → ⑤ AI 초안은 비공개 문서에 별도 보관, 공개 문서엔 `summaryOrigin`(manual/ai/ai_edited)만 기록.
 
 ## 7. Firebase 관련 변경
 - **Firestore** `reviews` (공개 읽기 = `status=='published' && consentStatus=='confirmed'`만, 쓰기 = 관리자만, 필드·길이·URL·슬러그 형식 검증, 동의 전 게시 금지) / `review_private` (관리자만 읽기·쓰기 — 실명·연락처·원 소속·동의 기록·메모·AI 초안)
-- **Storage** `storage.rules` 신규: `reviews/{id}/{file}` 공개 읽기, 관리자만 5MB 이하 이미지 업로드·삭제, 나머지 전부 차단
+- **Storage는 사용하지 않습니다** (무료 Spark 요금제 그대로). 후기는 텍스트만 저장합니다.
 - 기존 컬렉션·규칙·데이터·관리자 계정·인증 방식 변경 없음. 데이터 이전·삭제 없음(기존 ‘강연 후기’ 글은 복사만 가능)
 - 새 인덱스 불필요(등호 조건 쿼리만 사용)
-- **배포 필요**: `firebase deploy --only firestore:rules,storage` (Storage는 콘솔에서 먼저 시작)
+- **배포 필요**: `firebase deploy --only firestore:rules`
 
 ## 8. 테스트 결과 (모두 통과)
 
 | 테스트 | 명령 | 결과 |
 | --- | --- | --- |
-| 단위 (렌더링·XSS·중복·CSV/JSON·AI 후처리·SSR·사이트맵) | `npm test` | **22/22** |
+| 단위 (렌더링·XSS·중복·CSV/JSON·Gemini 요청/오류/환각 방지·SSR·사이트맵) | `npm test` | **23/23** |
 | 보안 규칙 (Firestore 에뮬레이터) | `cd tests/rules && npm install && npm test` | **8/8** |
-| 브라우저 E2E (Playwright, 가짜 Firebase·가짜 AI) | `npm run test:e2e` | **42/42** |
+| 브라우저 E2E (Playwright, 가짜 Firebase·가짜 Gemini) | `npm run test:e2e` | **42/42** |
 
-요청하신 11개 상황: ① 텍스트 붙여넣기 ② 긴 글·여러 문단(30+문단, 줄바꿈 보존) ③ AI 정리 결과 생성(근거 하이라이트) ④ AI 미설정 시 수동 등록·게시 ⑤ 수정·임시 저장 ⑥ 이미지 첨부(붙여넣기·업로드·여러 장·순서·삭제, 링크 이미지 안내) ⑦ 홈페이지 게시(목록·고유 URL·메인 대표 후기) ⑧ 비공개 전환(404) ⑨ 중복 감지(같은 URL 모바일/PC·유사 원문, CSV 일괄 중복) ⑩ 모바일 관리자 화면 ⑪ 관리자 이외 사용자 차단(화면·Firestore 규칙·AI 함수 403) — **모두 통과**.
+요청하신 11개 상황: ① 텍스트 붙여넣기 ② 긴 글·여러 문단(30+문단, 줄바꿈 보존) ③ AI 정리 결과 생성(근거 하이라이트) ④ AI 미설정 시 수동 등록·게시 ⑤ 수정·임시 저장 ⑥ 사진이 섞인 붙여넣기(텍스트만 저장·안내 — 이미지 기능은 요청에 따라 제거) ⑦ 홈페이지 게시(목록·고유 URL·메인 대표 후기) ⑧ 비공개 전환(404) ⑨ 중복 감지(같은 URL 모바일/PC·유사 원문, CSV 일괄 중복) ⑩ 모바일 관리자 화면 ⑪ 관리자 이외 사용자 차단(화면·Firestore 규칙). 추가: Gemini 키 미입력·잘못된 키 안내, 키 기억/삭제, 키가 DB에 저장되지 않음 — **모두 통과**.
 
 추가로 확인: 공개 9개 페이지 200·lang·title·description·H1·JSON-LD 유효·alt, 기존 메인 섹션 유지, 기존 관리자 대시보드 정상 로드, 기존 규칙 회귀(커뮤니티 글쓰기·강연 후기 관리자 전용·ai_tools·지식 공간), robots·sitemap·noindex.
 
-**한계**: 실제 Firebase 로그인·실제 Anthropic API·Netlify 배포 환경에서는 실행하지 못했습니다(작업 환경 제약). AI 호출 형식은 SDK 문서 기준이며, 배포 후 실제 키로 1회 시험해 주세요. Netlify 함수 기본 시간 제한(10초)에 걸리면 `effort: 'low'`가 이미 적용되어 있으므로 `ANTHROPIC_MODEL`을 더 빠른 모델로 바꿀 수 있습니다.
+**한계**: 실제 Firebase 로그인·실제 Gemini API·Netlify 배포 환경에서는 실행하지 못했습니다(작업 환경 제약). Gemini 요청 형식(`v1beta/models/{모델}:generateContent`, `x-goog-api-key`, `responseJsonSchema`)은 공개 API 형식을 따랐고, 모델이 JSON 스키마 지정을 거부하면 스키마를 프롬프트에 넣어 자동 재시도합니다. 모델 이름(`gemini-3.8-flash`, `gemini-3.5-flash-lite`)은 요청하신 이름을 그대로 넣었으며, 실제로 없는 이름이면 ‘모델을 찾을 수 없습니다’ 안내가 뜨니 ‘직접 입력…’으로 바꿔 주세요. 배포 후 실제 키로 1회 시험해 주세요.
 
 ## 9. 검색엔진 등록에 필요한 추가 작업 (운영자)
 1. 브랜치 검토 후 배포 → `https://philosophyaiedu.com/robots.txt`, `/sitemap.xml`, `/reviews` 응답 확인
@@ -110,7 +113,7 @@ AI 환각 방지 장치: ① 항목마다 원문 근거 문장 요구 → ② �
 4. 리치 결과 테스트(search.google.com/test/rich-results)로 각 페이지 구조화 데이터 확인
 5. **채널 소개 통일**: 유튜브 채널 정보·네이버 카페 소개에 위 ‘소개 한 줄’과 홈페이지 링크(`/ai-instructor`)를 같은 날 반영. 영상 설명란에 관련 칼럼·프로그램 링크
 6. GA4에서 이벤트 `cta_inquiry_click`, `cta_instructor_click`, `inquiry_submit`(파라미터 `referral_source`)를 맞춤 측정기준·주요 이벤트로 등록
-7. Firebase 규칙 배포, Storage 시작, Netlify 환경변수(`ANTHROPIC_API_KEY`) 설정
+7. Firebase 규칙 배포(`firebase deploy --only firestore:rules`), Gemini API 키 발급 후 후기 관리 화면에 입력
 
 ### 성과 측정 · 월 1회 점검 루틴
 - GA4: 검색 유입(소스/매체 google·naver organic), `/ai-instructor`·`/programs`·`/reviews` 페이지뷰, CTA 클릭, `inquiry_submit`의 `referral_source` 분포

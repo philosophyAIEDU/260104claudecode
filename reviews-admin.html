@@ -90,6 +90,11 @@
     .rv-row { grid-template-columns: 1fr; }
     .row-btns { justify-content: flex-start; }
     #fOriginal { min-height: 240px; }
+    .actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 8px 0; }
+    .actions .btn { min-height: 40px; padding: 6px 8px; font-size: 13.5px; }
+    #publishBtn { grid-column: span 2; }
+    #who { display: none; }
+    .adm-header h1 span { display: none; }
   }
 </style>
 </head>
@@ -128,7 +133,7 @@
           <div class="box">
             <h2>1. 후기 원문 붙여넣기 <small>네이버 카페 글을 복사해 그대로 붙여넣으세요. 줄바꿈·문단이 유지됩니다.</small></h2>
             <label class="f" for="fOriginal">후기 원문 <span class="opt">(작성자가 쓴 글 그대로 — 고치지 마세요)</span></label>
-            <textarea id="fOriginal" placeholder="여기에 후기 원문을 붙여넣으세요 (Ctrl+V). 사진이 함께 복사되면 아래 이미지 목록에 자동으로 추가됩니다."></textarea>
+            <textarea id="fOriginal" placeholder="여기에 후기 원문을 붙여넣으세요 (Ctrl+V). 텍스트만 저장되며 사진은 옮기지 않습니다."></textarea>
             <p class="hint"><span id="origCount">0</span>자 · 최대 20,000자</p>
             <div id="pasteNote" class="msg msg-warn" hidden></div>
             <label class="f" for="fSourceUrl">네이버 카페 원본 게시글 URL <span class="opt">(선택)</span></label>
@@ -178,14 +183,16 @@
             <input type="text" id="fMemo" maxlength="500">
           </div>
 
-          <div class="box">
-            <h2>4. 이미지 첨부 <small>업로드 · 클립보드 붙여넣기(Ctrl+V) · 여러 장 · 순서 변경</small></h2>
-            <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="이미지 추가: 클릭해 파일 선택, 또는 여기에 붙여넣기·끌어놓기">
-              이미지를 끌어놓거나, 이 상자를 선택하고 <b>Ctrl+V</b>로 붙여넣거나, <u>클릭해 파일 선택</u>
-              <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden>
-            </div>
-            <p class="hint">이미지는 업로드 전에 긴 변 1600px로 줄이고 위치정보(EXIF)를 제거합니다. 얼굴·이름표·학생 정보가 보이면 가린 뒤 올려 주세요. 홈페이지에는 이미지와 함께 반드시 원문 텍스트가 표시됩니다.</p>
-            <ul class="img-list" id="imgList"></ul>
+          <div class="box" id="aiSettings">
+            <h2>4. AI 정리 설정 <small>Google Gemini API 키는 이 브라우저에서만 쓰이고 홈페이지·데이터베이스에 저장되지 않습니다</small></h2>
+            <label class="f" for="aiKey">Gemini API 키</label>
+            <div style="display:flex;gap:6px"><input type="password" id="aiKey" autocomplete="off" spellcheck="false" placeholder="Google AI Studio에서 발급한 키 (AIza...)"><button type="button" class="btn btn-ghost" id="aiKeyShow" style="min-height:40px;padding:6px 12px">보기</button></div>
+            <label class="checks" style="margin-top:8px"><input type="checkbox" id="aiKeyRemember"> 이 브라우저에 키 기억하기 <span class="opt" style="font-weight:500;color:var(--muted)">(공용 PC에서는 체크하지 마세요)</span></label>
+            <label class="f" for="aiModel">모델</label>
+            <select id="aiModel"></select>
+            <input type="text" id="aiModelCustom" maxlength="80" placeholder="모델 이름 직접 입력 (예: gemini-3.8-flash)" hidden style="margin-top:6px">
+            <p class="hint">키 발급: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio → Get API key</a>. 키가 없어도 아래 항목을 직접 입력해 게시할 수 있습니다. 후기 원문은 정리를 위해 Google Gemini API로 전송됩니다.</p>
+            <p class="hint"><button type="button" class="btn btn-ghost" id="aiKeyForget" style="min-height:34px;padding:4px 12px;font-size:13px">저장된 키 지우기</button></p>
           </div>
         </div>
 
@@ -225,9 +232,9 @@
       <div class="actions">
         <button type="button" class="btn btn-ai" id="aiBtn">✦ AI로 후기 정리하기</button>
         <button type="button" class="btn btn-ghost" id="previewBtn">미리보기</button>
+        <button type="button" class="btn btn-ghost" id="newBtn">새 후기</button>
         <button type="button" class="btn btn-gold" id="saveDraftBtn">임시 저장</button>
         <button type="button" class="btn btn-primary" id="publishBtn">홈페이지에 게시하기</button>
-        <button type="button" class="btn btn-ghost" id="newBtn">새 후기</button>
       </div>
     </section>
 
@@ -318,23 +325,20 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where, writeBatch, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js';
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js';
 import * as RC from '/assets/js/review-core.mjs';
+import { summarizeWithGemini, GEMINI_MODELS, DEFAULT_MODEL } from '/assets/js/gemini-review.mjs';
 
 // 기존 사이트와 같은 Firebase 프로젝트·같은 관리자 기준(firestore.rules isAdmin)을 사용합니다.
 const firebaseConfig = {
     projectId: 'philosophyaiedumain', appId: '1:791707583638:web:b86d59d52a20330baaaeb7',
-    storageBucket: 'philosophyaiedumain.firebasestorage.app', apiKey: 'AIzaSyBylDxamogm1_g2URVxGQFz_c05pOWqjEI',
+    apiKey: 'AIzaSyBylDxamogm1_g2URVxGQFz_c05pOWqjEI',
     authDomain: 'philosophyaiedumain.firebaseapp.com', messagingSenderId: '791707583638',
 };
 const ADMIN_EMAIL = 'warmcomfortforyou@gmail.com';
-const AI_ENDPOINT = '/.netlify/functions/review-ai';
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-let storage = null;
-try { storage = getStorage(app); } catch (e) { console.warn('Storage 초기화 실패:', e); }
 
 const $ = (id) => document.getElementById(id);
 const esc = RC.escapeHtml;
@@ -342,8 +346,6 @@ const esc = RC.escapeHtml;
 // ───────── 상태 ─────────
 let all = [];            // 전체 후기 (관리자 읽기)
 let current = null;      // 편집 중인 후기 {id, isNew, createdAt, publishedAt, ...}
-let images = [];         // [{key, url?, path?, blob?, previewUrl, alt}]
-let removedPaths = [];   // 저장 시 Storage에서 지울 경로
 let aiDraft = null;      // 마지막 AI 정리 결과 (비공개 문서에 별도 보관)
 let aiChecks = {};
 let dirty = false;
@@ -386,8 +388,7 @@ function newDocId() { return doc(collection(db, 'reviews')).id; }
 
 function newReview() {
     current = { id: newDocId(), isNew: true };
-    images.forEach(im => im.previewUrl && im.blob && URL.revokeObjectURL(im.previewUrl));
-    images = []; removedPaths = []; aiDraft = null; aiChecks = {};
+    aiDraft = null; aiChecks = {};
     for (const id of ['fOriginal', 'fSourceUrl', 'fAuthorDisplay', 'fReviewDate', 'fInstitution', 'fConsentNote', 'fRealName', 'fContact', 'fMemo', 'fTitle', 'fConcern', 'fPractice', 'fChange', 'fSummary', 'fSlug']) $(id).value = '';
     $('fAuthorType').value = ''; $('fProgram').value = ''; $('fConsent').value = 'pending'; $('fStatus').value = 'draft';
     $('fFeatured').checked = false; $('fInstitutionPublic').checked = false;
@@ -397,7 +398,7 @@ function newReview() {
     ['edMsg', 'aiMsg', 'dupWarn', 'pasteNote', 'editingNote'].forEach(id => { $(id).hidden = true; });
     $('aiState').innerHTML = '';
     ['evConcern', 'evPractice', 'evChange'].forEach(id => { $(id).textContent = ''; });
-    renderImages(); renderOrigView(); updateCount();
+    renderOrigView(); updateCount();
     dirty = false;
 }
 
@@ -461,9 +462,8 @@ function fillForm(r, priv = {}) {
     $('fFeatured').checked = !!r.featured;
     $('fSlug').disabled = !!r.publishedAt;
     $('slugHint').textContent = r.publishedAt ? '게시된 적이 있는 후기라 주소를 고정했습니다 (검색엔진·공유 링크 보호).' : '영문 소문자·숫자·하이픈. 게시 후에는 바꾸지 않는 것이 좋습니다(주소가 바뀜).';
-    images = (r.images || []).map((im, i) => ({ key: 'e' + i + Date.now(), url: im.url, path: im.path || '', alt: im.alt || '', previewUrl: im.url }));
     aiDraft = priv.aiDraft || null; aiChecks = (aiDraft && aiDraft.checks) || {};
-    renderImages(); renderOrigView(); updateCount(); showEvidence();
+    renderOrigView(); updateCount(); showEvidence();
 }
 
 // ───────── 원문 입력 · 붙여넣기 ─────────
@@ -471,124 +471,33 @@ function updateCount() { $('origCount').textContent = $('fOriginal').value.lengt
 $('fOriginal').addEventListener('input', () => { dirty = true; updateCount(); renderOrigView(); scheduleDupCheck(); });
 $('fSourceUrl').addEventListener('change', () => { dirty = true; checkDuplicates(); });
 
-// 붙여넣기: 텍스트는 브라우저 기본 동작(줄바꿈 보존)으로 들어가고, 실제 이미지 데이터만 추가로 가져옵니다.
-async function handlePaste(e, { textTarget } = {}) {
+// 붙여넣기: 텍스트는 브라우저 기본 동작(줄바꿈 보존)으로 들어갑니다. 사진은 저장하지 않습니다(텍스트만 보관).
+function handlePaste(e) {
     const cd = e.clipboardData;
     if (!cd) return;
-    const files = [...(cd.files || [])].filter(f => /^image\//.test(f.type));
+    const ta = $('fOriginal');
     const html = cd.getData('text/html') || '';
     const plain = cd.getData('text/plain') || '';
-    // HTML 안의 data: 이미지는 실제 데이터이므로 가져올 수 있음. http(s) 이미지는 원본 서버에서 막혀 있어 가져오지 않음
-    const dataImgs = [...html.matchAll(/<img[^>]+src=["'](data:image\/(?:png|jpe?g|webp|gif);base64,[^"']+)["']/gi)].map(m => m[1]);
-    const remoteImgs = [...html.matchAll(/<img[^>]+src=["'](https?:[^"']+)["']/gi)].length;
-    if (!textTarget && !files.length && !dataImgs.length) {
+    const imgCount = [...(cd.files || [])].filter(f => /^image\//.test(f.type)).length + (html.match(/<img\b/gi) || []).length;
+    if (!plain && html) {
+        // 서식 있는 글만 복사된 경우: HTML을 텍스트로 변환 (태그는 모두 제거되어 실행되지 않음)
         e.preventDefault();
-        showMsg('pasteNote', 'warn', remoteImgs
-            ? `붙여넣은 내용의 이미지 ${remoteImgs}개는 링크로만 전달되어 가져올 수 없습니다. 네이버 카페 이미지는 외부 접근이 제한됩니다 — 사진을 PC에 저장한 뒤 파일로 올려 주세요.`
-            : '붙여넣은 내용에 이미지 데이터가 없습니다. 이미지를 복사(이미지 위에서 우클릭 → 이미지 복사)하거나 파일로 올려 주세요.');
-        return;
-    }
-    if (!textTarget || (!plain && (files.length || dataImgs.length))) e.preventDefault();
-    if (textTarget && !plain && html) {
-        // 일부 환경에서 서식 있는 글만 복사될 때: HTML을 텍스트로 변환 (태그는 모두 제거, 실행되지 않음)
+        const doc2 = new DOMParser().parseFromString(html, 'text/html');
+        doc2.querySelectorAll('br').forEach(b => b.replaceWith('\n'));
+        doc2.querySelectorAll('p,div,li,h1,h2,h3,h4').forEach(b => b.append('\n'));
+        insertAtCursor(ta, RC.cleanPastedText(doc2.body.textContent || ''));
+    } else if (!plain) {
         e.preventDefault();
-        const tmp = new DOMParser().parseFromString(html, 'text/html');
-        tmp.querySelectorAll('br').forEach(b => b.replaceWith('\n'));
-        tmp.querySelectorAll('p,div,li,h1,h2,h3,h4').forEach(b => b.append('\n'));
-        insertAtCursor(textTarget, RC.cleanPastedText(tmp.body.textContent || ''));
     }
-    let added = 0;
-    for (const f of files) { await addImageBlob(f); added++; }
-    for (const d of dataImgs) { try { await addImageBlob(await (await fetch(d)).blob()); added++; } catch { /* 무시 */ } }
-    const notes = [];
-    if (added) notes.push(`이미지 ${added}장을 붙여넣은 내용에서 가져왔습니다. 아래 ‘이미지 첨부’에서 확인하세요.`);
-    if (remoteImgs && remoteImgs > dataImgs.length) {
-        notes.push(`붙여넣은 글에 이미지 ${remoteImgs}개가 링크로만 들어 있어 가져오지 않았습니다. 네이버 카페 이미지는 외부 접근이 제한됩니다 — 사진을 PC에 저장한 뒤 ‘이미지 첨부’에서 파일로 올려 주세요.`);
-    }
-    if (notes.length) { $('pasteNote').innerHTML = notes.map(esc).join('<br>'); $('pasteNote').hidden = false; }
+    if (imgCount) showMsg('pasteNote', 'warn', `붙여넣은 내용에 사진 ${imgCount}개가 있었지만 사진은 저장하지 않습니다. 후기 글(텍스트)만 옮겨졌습니다.`);
+    else $('pasteNote').hidden = true;
 }
 function insertAtCursor(ta, text) {
     const s = ta.selectionStart ?? ta.value.length, e2 = ta.selectionEnd ?? ta.value.length;
     ta.value = ta.value.slice(0, s) + text + ta.value.slice(e2);
     ta.dispatchEvent(new Event('input'));
 }
-$('fOriginal').addEventListener('paste', (e) => handlePaste(e, { textTarget: $('fOriginal') }));
-
-// ───────── 이미지 ─────────
-const dz = $('dropzone');
-dz.addEventListener('click', () => $('fileInput').click());
-dz.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('fileInput').click(); } });
-dz.addEventListener('paste', (e) => handlePaste(e));
-dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
-dz.addEventListener('drop', async (e) => {
-    e.preventDefault(); dz.classList.remove('drag');
-    for (const f of [...e.dataTransfer.files].filter(f => /^image\//.test(f.type))) await addImageBlob(f);
-});
-$('fileInput').addEventListener('change', async (e) => {
-    for (const f of [...e.target.files]) await addImageBlob(f);
-    e.target.value = '';
-});
-
-/** 긴 변 1600px로 줄이고 다시 인코딩 → EXIF(위치정보 등) 제거 */
-async function processImage(blob) {
-    if (!/^image\/(jpeg|png|webp|gif)$/.test(blob.type)) throw new Error('지원하지 않는 이미지 형식입니다 (JPG·PNG·WebP·GIF).');
-    if (blob.size > 20 * 1024 * 1024) throw new Error('20MB보다 큰 이미지는 올릴 수 없습니다.');
-    try {
-        const bmp = await createImageBitmap(blob);
-        const s = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
-        const w = Math.round(bmp.width * s), h = Math.round(bmp.height * s);
-        const c = document.createElement('canvas'); c.width = w; c.height = h;
-        c.getContext('2d').drawImage(bmp, 0, 0, w, h);
-        const out = await new Promise(res => c.toBlob(res, 'image/webp', 0.85)) || await new Promise(res => c.toBlob(res, 'image/jpeg', 0.85));
-        if (out) return out;
-    } catch (e) { console.warn('이미지 변환 실패, 원본 사용:', e); }
-    return blob;
-}
-async function addImageBlob(file) {
-    if (images.length >= RC.LIMITS.images) { showMsg('edMsg', 'warn', `이미지는 최대 ${RC.LIMITS.images}장까지 첨부할 수 있습니다.`); return; }
-    try {
-        const blob = await processImage(file);
-        images.push({ key: 'n' + Math.random().toString(36).slice(2), blob, previewUrl: URL.createObjectURL(blob), alt: '' });
-        dirty = true; renderImages();
-    } catch (e) { showMsg('edMsg', 'err', e.message); }
-}
-function renderImages() {
-    const ul = $('imgList');
-    ul.replaceChildren();
-    images.forEach((im, i) => {
-        const li = document.createElement('li'); li.className = 'img-item';
-        const img = document.createElement('img'); img.src = im.previewUrl; img.alt = '';
-        const alt = document.createElement('input'); alt.type = 'text'; alt.maxLength = RC.LIMITS.alt;
-        alt.placeholder = '이미지 설명 (대체 텍스트, 예: 연수에서 만든 퀴즈 앱 화면)'; alt.value = im.alt || '';
-        alt.setAttribute('aria-label', `${i + 1}번째 이미지 설명`);
-        alt.addEventListener('input', () => { im.alt = alt.value; dirty = true; });
-        const btns = document.createElement('div'); btns.className = 'img-btns';
-        const mk = (label, title, fn, dis) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.title = title; b.setAttribute('aria-label', `${i + 1}번째 이미지 ${title}`); b.disabled = !!dis; b.addEventListener('click', fn); return b; };
-        btns.append(
-            mk('↑', '위로', () => { [images[i - 1], images[i]] = [images[i], images[i - 1]]; dirty = true; renderImages(); }, i === 0),
-            mk('↓', '아래로', () => { [images[i + 1], images[i]] = [images[i], images[i + 1]]; dirty = true; renderImages(); }, i === images.length - 1),
-            mk('✕', '삭제', () => { if (im.path) removedPaths.push(im.path); if (im.blob) URL.revokeObjectURL(im.previewUrl); images.splice(i, 1); dirty = true; renderImages(); }),
-        );
-        li.append(img, alt, btns);
-        ul.appendChild(li);
-    });
-}
-async function uploadPendingImages(reviewId) {
-    const out = [];
-    for (const im of images) {
-        if (im.blob && !im.url) {
-            if (!storage) throw new Error('Firebase Storage를 사용할 수 없습니다. Firebase 콘솔에서 Storage를 시작하고 storage.rules를 배포해 주세요.');
-            const ext = im.blob.type === 'image/webp' ? 'webp' : im.blob.type === 'image/png' ? 'png' : im.blob.type === 'image/gif' ? 'gif' : 'jpg';
-            const path = `reviews/${reviewId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-            const r = ref(storage, path);
-            await uploadBytes(r, im.blob, { contentType: im.blob.type });
-            im.url = await getDownloadURL(r); im.path = path;
-        }
-        out.push({ url: im.url, path: im.path || '', alt: String(im.alt || '').slice(0, RC.LIMITS.alt) });
-    }
-    return out;
-}
+$('fOriginal').addEventListener('paste', handlePaste);
 
 // ───────── 원문 비교 보기 ─────────
 function renderOrigView() {
@@ -630,26 +539,55 @@ function checkDuplicates() {
     return d;
 }
 
+// ───────── AI 설정 (Gemini API 키 · 모델) ─────────
+// 키는 화면 입력값으로만 쓰고, '기억하기'를 선택한 경우에만 이 브라우저 localStorage에 둡니다.
+// Firestore·홈페이지 코드·서버로는 보내지 않습니다 (Gemini API 호출에만 사용).
+const LS_KEY = 'philo.reviewAdmin.geminiKey', LS_MODEL = 'philo.reviewAdmin.geminiModel';
+const lsGet = (k) => { try { return localStorage.getItem(k) || ''; } catch { return ''; } };
+const lsSet = (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch { /* 무시 */ } };
+(function initAiSettings() {
+    $('aiModel').innerHTML = GEMINI_MODELS.map(m => `<option value="${esc(m.id)}">${esc(m.label)}</option>`).join('') + '<option value="__custom">직접 입력…</option>';
+    const savedModel = lsGet(LS_MODEL) || DEFAULT_MODEL;
+    if (GEMINI_MODELS.some(m => m.id === savedModel)) $('aiModel').value = savedModel;
+    else { $('aiModel').value = '__custom'; $('aiModelCustom').value = savedModel; $('aiModelCustom').hidden = false; }
+    const savedKey = lsGet(LS_KEY);
+    if (savedKey) { $('aiKey').value = savedKey; $('aiKeyRemember').checked = true; }
+    $('aiModel').addEventListener('change', () => {
+        $('aiModelCustom').hidden = $('aiModel').value !== '__custom';
+        lsSet(LS_MODEL, currentModel());
+    });
+    $('aiModelCustom').addEventListener('change', () => lsSet(LS_MODEL, currentModel()));
+    $('aiKeyShow').addEventListener('click', () => {
+        const show = $('aiKey').type === 'password';
+        $('aiKey').type = show ? 'text' : 'password';
+        $('aiKeyShow').textContent = show ? '숨기기' : '보기';
+    });
+    $('aiKeyRemember').addEventListener('change', rememberKey);
+    $('aiKeyForget').addEventListener('click', () => {
+        lsSet(LS_KEY, ''); $('aiKey').value = ''; $('aiKeyRemember').checked = false;
+        showMsg('aiMsg', 'info', '이 브라우저에 저장된 Gemini API 키를 지웠습니다.');
+    });
+})();
+function currentModel() {
+    return $('aiModel').value === '__custom' ? ($('aiModelCustom').value.trim() || DEFAULT_MODEL) : $('aiModel').value;
+}
+function rememberKey() { lsSet(LS_KEY, $('aiKeyRemember').checked ? $('aiKey').value.trim() : ''); }
+
 // ───────── AI 정리 ─────────
 $('aiBtn').addEventListener('click', async () => {
     const text = RC.cleanPastedText($('fOriginal').value);
     if (text.length < 10) { showMsg('aiMsg', 'warn', '후기 원문을 먼저 붙여넣어 주세요 (10자 이상).'); return; }
     const hasManual = ['fTitle', 'fConcern', 'fPractice', 'fChange', 'fSummary'].some(id => $(id).value.trim());
     if (hasManual && !confirm('이미 입력된 정리 항목이 있습니다. AI 정리 결과로 덮어쓸까요? (원문은 바뀌지 않습니다)')) return;
+    const apiKey = $('aiKey').value.trim();
+    if (!apiKey) { showMsg('aiMsg', 'warn', 'Gemini API 키를 ‘4. AI 정리 설정’에 입력해 주세요. 키가 없어도 항목을 직접 입력해 게시할 수 있습니다.'); $('aiKey').focus(); return; }
+    rememberKey();
     const btn = $('aiBtn'); btn.disabled = true; btn.textContent = 'AI가 정리하는 중…';
-    showMsg('aiMsg', 'info', 'AI가 원문을 읽고 항목을 정리하고 있습니다. 10~20초 정도 걸릴 수 있습니다.');
+    showMsg('aiMsg', 'info', `Gemini(${esc(currentModel())})가 원문을 읽고 항목을 정리하고 있습니다. 잠시만 기다려 주세요.`, true);
     try {
-        const token = await auth.currentUser.getIdToken();
-        const res = await fetch(AI_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify({ text }) });
-        let data = {};
-        try { data = await res.json(); } catch { /* 함수가 없거나 HTML 응답 */ }
-        if (!res.ok) {
-            const m = data.error === 'ai_not_configured' ? 'AI 정리 기능이 아직 설정되지 않았습니다. 아래 항목을 직접 입력해 게시할 수 있습니다.'
-                : res.status === 404 ? 'AI 정리 서버(Netlify 함수)에 연결할 수 없습니다. 항목을 직접 입력해 주세요.'
-                : (data.message || `AI 정리 실패 (${res.status}). 항목을 직접 입력해 주세요.`);
-            showMsg('aiMsg', 'warn', m);
-            return;
-        }
+        let data;
+        try { data = await summarizeWithGemini({ apiKey, model: currentModel(), text }); }
+        catch (err) { showMsg('aiMsg', 'warn', (err && err.message) || 'AI 정리 중 오류가 발생했습니다. 항목을 직접 입력해 주세요.'); return; }
         const d = data.draft || {};
         $('fTitle').value = d.title || '';
         $('fConcern').value = d.concernBefore || RC.NOT_MENTIONED;
@@ -669,7 +607,7 @@ $('aiBtn').addEventListener('click', async () => {
         renderOrigView(); showEvidence(); dirty = true;
     } catch (e) {
         console.error(e);
-        showMsg('aiMsg', 'warn', 'AI 정리 서버에 연결하지 못했습니다. 항목을 직접 입력해 게시할 수 있습니다.');
+        showMsg('aiMsg', 'warn', 'AI 정리 결과를 화면에 넣는 중 문제가 생겼습니다. 항목을 직접 입력해 주세요.');
     } finally {
         btn.disabled = false; btn.textContent = '✦ AI로 후기 정리하기';
     }
@@ -688,14 +626,6 @@ $('previewBtn').addEventListener('click', () => {
     if (!f.slug) { autoSlug(); f.slug = $('fSlug').value; }
     $('previewCard').innerHTML = RC.renderReviewCard(f, { basePath: '#' });
     $('previewDetail').innerHTML = RC.renderReviewDetail(f);
-    // 업로드 전 이미지(blob:)는 공개 렌더러가 통과시키지 않으므로 미리보기에서만 직접 붙입니다
-    if (images.length) {
-        const wrap = document.createElement('div'); wrap.className = 'rv-images';
-        images.forEach(im => { const fig = document.createElement('figure'); const img = document.createElement('img'); img.src = im.url || im.previewUrl; img.alt = im.alt || '후기 첨부 이미지'; fig.appendChild(img); wrap.appendChild(fig); });
-        const art = $('previewDetail').querySelector('.rv-detail');
-        const old = art.querySelector('.rv-images'); if (old) old.remove();
-        art.appendChild(wrap);
-    }
     const chk = RC.publishCheck(f);
     if (!chk.ok || chk.warnings.length) {
         const p = document.createElement('div'); p.className = 'msg ' + (chk.ok ? 'msg-warn' : 'msg-err');
@@ -735,7 +665,6 @@ async function save(targetStatus) {
 
     const btns = ['saveDraftBtn', 'publishBtn'].map($); btns.forEach(b => { b.disabled = true; });
     try {
-        const imgs = await uploadPendingImages(f.id);
         let summaryOrigin = 'manual';
         if (aiDraft) {
             const same = (a, b) => String(a || '').trim() === String(b || '').trim() || (!String(b || '').trim() && String(a) === RC.NOT_MENTIONED);
@@ -746,7 +675,7 @@ async function save(targetStatus) {
             slug: f.slug, title: f.title, authorDisplay: f.authorDisplay, anonymous: f.anonymous, authorType: f.authorType,
             program: f.program, categories: f.categories, institution: f.institution, reviewDate: f.reviewDate,
             concernBefore: f.concernBefore, memorablePractice: f.memorablePractice, changeAfter: f.changeAfter,
-            adminSummary: f.adminSummary, originalText: f.originalText, sourceUrl: f.sourceUrl, images: imgs,
+            adminSummary: f.adminSummary, originalText: f.originalText, sourceUrl: f.sourceUrl, images: [],
             consentStatus: f.consentStatus, status: f.status, featured: f.featured, summaryOrigin,
             createdAt: current.createdAt || now, updatedAt: now,
         };
@@ -756,8 +685,6 @@ async function save(targetStatus) {
         const priv = { ...f._private, aiDraft: aiDraft || null, updatedAt: now };
         await setDoc(doc(db, 'reviews', f.id), pub);
         await setDoc(doc(db, 'review_private', f.id), priv);
-        for (const p of removedPaths) { try { await deleteObject(ref(storage, p)); } catch (e) { console.warn('이미지 삭제 실패(무시):', p, e); } }
-        removedPaths = [];
         current.isNew = false;
         await loadAll();
         const saved = all.find(r => r.id === f.id);
@@ -856,7 +783,6 @@ async function rowAction(act, id) {
     try {
         if (act === 'delete') {
             if (!confirm(`“${r.title}” 후기를 완전히 삭제할까요? 되돌릴 수 없습니다.\n(홈페이지에서만 내리려면 ‘비공개 전환’을 사용하세요)`)) return;
-            for (const im of r.images || []) { if (im.path && storage) { try { await deleteObject(ref(storage, im.path)); } catch { /* 무시 */ } } }
             await deleteDoc(doc(db, 'review_private', id)).catch(() => {});
             await deleteDoc(doc(db, 'reviews', id));
         } else {
