@@ -252,7 +252,7 @@ export function buildFaq(rs = null) {
         },
         {
             q: '수강생들은 어떤 변화를 이야기하나요?',
-            a: `공개된 후기 ${rs.total}건 가운데 ${rs.mentions.find(m => m.key === 'nocode').count}건은 코딩·개발 경험이 없었다고 밝혔고, ${rs.mentions.find(m => m.key === 'deploy').count}건은 배포까지 했다고, ${rs.mentions.find(m => m.key === 'confidence').count}건은 자신감이나 '할 수 있다'는 생각을 언급했습니다. 챌린지 인증 웹앱, 자막 편집기, 숏폼 편집기, 하루 회고 앱처럼 각자 쓰려는 도구를 수업에서 직접 만들었다는 내용이 많습니다. (원문 키워드 기준으로 센 수치)`,
+            a: `공개된 후기 ${rs.total}건 가운데 ${rs.mentions.find(m => m.key === 'nocode').count}건은 코딩·개발 경험이 없었다고 밝혔고, ${rs.mentions.find(m => m.key === 'deploy').count}건은 배포까지 했다고, ${rs.mentions.find(m => m.key === 'care').count}건은 막히는 사람을 한 명씩 챙겨 줬다고, ${rs.mentions.find(m => m.key === 'confidence').count}건은 자신감이나 '할 수 있다'는 생각을 언급했습니다. 챌린지 인증 웹앱, 자막 편집기, 숏폼 편집기, 하루 회고 앱처럼 각자 쓰려는 도구를 수업에서 직접 만들었다는 내용이 많습니다. (원문 키워드 기준으로 센 수치)`,
         },
     ] : [];
     return [

@@ -111,13 +111,14 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
         assert((await page.locator('.hero-slogan').innerText()) === 'AI 시대, 교수님의 든든한 교육 파트너.');
         assert(await page.locator('.hero-profile img[src="assets/mascot.jpg"]').count() === 1, '캐릭터 프로필');
         const facts = await page.locator('.hero-profile-facts').innerText();
-        for (const f of ['전문 분야', '교육 대상', '강의 이력', '교육 철학', '8개 기관·단체 12회']) assert(facts.includes(f), f);
+        for (const f of ['전문 분야', '교육 대상', '강의 이력', '교육 철학', '8개 기관·단체 12회', '수강 후기', '한 명씩 챙겨 줌']) assert(facts.includes(f), f);
         assert(await page.locator('.hero a[href="/ai-instructor"]').count() >= 1, '강사 소개 링크');
         const heroBox = await page.locator('#home .hero-content').boundingBox();
         assert(heroBox.y < 200, '강사 소개가 첫 화면 최상단');
         const cta = page.locator('.hero-buttons a');
         assert(await cta.nth(0).innerText() === '대학 AI 연수 문의' && await cta.nth(0).getAttribute('href') === '/education-inquiry', '1차 CTA');
-        assert((await cta.nth(1).innerText()).startsWith('교육 프로그램 살펴보기') && await cta.nth(1).getAttribute('href') === '/programs', '2차 CTA');
+        assert((await cta.nth(1).innerText()).startsWith('수강 후기 먼저 보기') && await cta.nth(1).getAttribute('href') === '#reviews-home', '2차 CTA: 후기 바로 보기');
+        assert(await page.locator('.hero-more a[href="/programs"]').count() === 1, '프로그램 링크 유지');
         const bg = await cta.nth(0).evaluate(e => getComputedStyle(e).backgroundColor), bg2 = await cta.nth(1).evaluate(e => getComputedStyle(e).backgroundColor);
         assert(bg !== bg2, '두 버튼 시각 구분');
         assert(await page.locator('.problem-card').count() === 4, '고민 카드 4개');
@@ -125,11 +126,19 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
         const txt = await page.locator('body').innerText();
         for (const s of ['AI로 성장하고, 그 성장을 나눕니다.', 'AI 시대, 교육자의 나침반', '좋은 질문에서 시작되는, 새로운 배움', '교수님만을 대상으로 한 단독 강의는 아직 기록에 없으며', '필로소피 AI 툴', '바이브코딩 쇼케이스', '교육자 커뮤니티'])
             assert(txt.replace(/\s+/g, ' ').includes(s) || txt.includes(s.replace(/\s+/g, '')) || (await page.content()).includes(s), '없음: ' + s);
-        assert(await page.locator('#tools, #showcase, #community, #contact, #problems, #programs-home, #credentials, #learn, #philosophy').count() === 9, '섹션');
-        // 섹션 순서: 고민 → 프로그램 → 이력 → 도구 → 칼럼/유튜브 → 철학 → 커뮤니티 → 문의
-        const order = await page.evaluate(() => ['problems', 'programs-home', 'credentials', 'tools', 'learn', 'philosophy', 'community', 'contact'].map(id => document.getElementById(id).getBoundingClientRect().top + scrollY));
+        assert(await page.locator('#tools, #showcase, #community, #contact, #reviews-home, #problems, #programs-home, #credentials, #learn, #philosophy').count() === 10, '섹션');
+        // 섹션 순서: 강사 소개(첫 화면) → 수업 후기 → 고민 → 프로그램 → 이력 → 도구 → 칼럼/유튜브 → 철학 → 커뮤니티 → 문의
+        const order = await page.evaluate(() => ['home', 'reviews-home', 'problems', 'programs-home', 'credentials', 'tools', 'learn', 'philosophy', 'community', 'contact'].map(id => document.getElementById(id).getBoundingClientRect().top + scrollY));
         assert(order.every((v, i) => i === 0 || v > order[i - 1]), '섹션 순서 ' + order.join(','));
         assert(await page.locator('#featuredReviews').isHidden(), '대표 후기 없으면 숨김');
+        // 수업 후기 섹션: 후기에서 반복되는 이야기 3가지 + 원문 인용 + 전체 보기
+        assert(await page.locator('#reviews-home .theme-card').count() === 3, '후기 테마 3개');
+        assert(await page.locator('#reviews-home .quote-card').count() >= 3, '원문 인용');
+        assert(await page.locator('#reviews-home a[href="/reviews"]').count() >= 1, '후기 전체 보기');
+        await page.locator('.hero-buttons a[href="#reviews-home"]').click();
+        await page.waitForTimeout(1200);
+        const rt = await page.evaluate(() => document.getElementById('reviews-home').getBoundingClientRect().top);
+        assert(Math.abs(rt) < 200, '후기 보기 버튼 → 후기 섹션으로 이동 ' + rt);
     });
     await t('내부 링크: 메인·프로그램·강사 소개의 사이트 내부 링크가 모두 존재하는 페이지/앵커로 연결', async () => {
         const bad = [];
