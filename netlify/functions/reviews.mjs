@@ -61,7 +61,7 @@ export const handler = async (event) => {
             return cat && !(r.categories || []).includes(cat) ? html.replace('<article class="rv-card"', '<article hidden class="rv-card"') : html;
         }).join('\n');
         const visible = list.filter(r => !cat || (r.categories || []).includes(cat)).length;
-        return { statusCode: 200, headers: { ...HTML, ...CACHE }, body: reviewsListPage({ cardsHtml: cards, count: visible, cat, ssr: true }) };
+        return { statusCode: 200, headers: { ...HTML, ...CACHE }, body: reviewsListPage({ cardsHtml: cards, count: visible, cat, ssr: true, reviews: list }) };
     } catch (e) {
         console.error('reviews SSR error:', e);
         // Firestore 장애 시에도 페이지는 열리도록: 정적 대체 페이지와 같은 화면 (브라우저가 다시 시도)

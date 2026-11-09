@@ -40,3 +40,14 @@ test('sitemap.xml: 정적 페이지 + 게시 후기만', async () => {
     assert.ok(!r.body.includes('draft-hidden'));
 });
 
+
+test('/llms.txt 함수: 게시된 후기만 목록에 넣고, 추천 대상·후기 요약 섹션 포함', async () => {
+    const llms = await import('../../netlify/functions/llms.mjs');
+    const r = await llms.handler();
+    assert.equal(r.statusCode, 200);
+    assert.match(r.headers['Content-Type'], /text\/plain/);
+    assert.ok(r.body.includes('## 이런 AI 교육을 찾는 경우에 맞습니다'));
+    assert.ok(r.body.includes('## 수강 후기 (공개 동의를 받은 1건'));
+    assert.ok(r.body.includes('/reviews/teacher-vibe-coding-2026-test'));
+    assert.ok(!r.body.includes('draft-hidden') && !r.body.includes('no-consent'));
+});

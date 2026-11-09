@@ -133,12 +133,16 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
     });
     await t('내부 링크: 메인·프로그램·강사 소개의 사이트 내부 링크가 모두 존재하는 페이지/앵커로 연결', async () => {
         const bad = [];
-        for (const p of ['/', '/programs', '/ai-instructor', '/case-studies', '/insights/', '/education-inquiry']) {
+        // 정적 페이지에 들어간 후기 링크는 '게시된 후기 스냅샷'의 주소와 일치해야 함 (테스트 서버의 후기 저장소는 비어 있음)
+        const snapSlugs = new Set(JSON.parse(readFileSync(join(here, '..', '..', 'src', 'site', 'reviews-snapshot.json'), 'utf8')).reviews.map(r => r.slug));
+        for (const p of ['/', '/programs', '/ai-instructor', '/case-studies', '/insights/', '/insights/how-to-choose-an-ai-education-instructor/', '/education-inquiry']) {
             await page.goto(BASE + p, { waitUntil: 'domcontentloaded' });
             const links = await page.$$eval('a[href]', as => as.map(a => a.getAttribute('href')).filter(h => h && !/^(https?:|mailto:|tel:|javascript:)/.test(h)));
             for (const h of [...new Set(links)]) {
                 const u = new URL(h, BASE + p);
                 if (u.origin !== BASE) continue;
+                const rv = /^\/reviews\/([^/]+)$/.exec(u.pathname);
+                if (rv) { if (!snapSlugs.has(decodeURIComponent(rv[1]))) bad.push(`${p} → ${h} (게시된 후기가 아님)`); continue; }
                 const res = await fetch(u.origin + u.pathname);
                 if (res.status !== 200) { bad.push(`${p} → ${h} (${res.status})`); continue; }
                 if (u.hash && u.hash.length > 1) {
@@ -150,12 +154,31 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
         }
         assert(!bad.length, bad.join('\n'));
     });
-    await t('칼럼 목록: 5개 분류 · 작성 예정 글은 링크 없이 표시', async () => {
+    await t('후기 근거가 HTML에 직접 들어 있음 (메인·강사 소개·사례·llms.txt) + 인용은 원문 그대로', async () => {
+        const snap = JSON.parse(readFileSync(join(here, '..', '..', 'src', 'site', 'reviews-snapshot.json'), 'utf8')).reviews;
+        const raw = async (p) => (await fetch(BASE + p)).text();
+        for (const p of ['/', '/ai-instructor', '/case-studies']) {
+            const html = await raw(p);
+            assert(html.includes('class="quote-card"'), p + ' 인용 카드');
+            for (const m of html.matchAll(/<blockquote cite="\/reviews\/([^"]+)"><p>“([^<]+)”<\/p>/g)) {
+                const r = snap.find(x => x.slug === m[1]);
+                const q = m[2].replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+                assert(r && r.originalText.includes(q), `${p}: 원문에 없는 인용 — ${q}`);
+            }
+        }
+        const llms = await raw('/llms.txt');
+        assert(llms.includes('## 수강 후기') && llms.includes('## 이런 AI 교육을 찾는 경우에 맞습니다'), 'llms.txt 후기·추천 섹션');
+        const faq = await raw('/ai-instructor');
+        assert(faq.includes('AI 교육(바이브 코딩) 강사를 찾고 있습니다'), '추천 질문 FAQ');
+        const art = await raw('/insights/how-to-choose-an-ai-education-instructor/');
+        assert(art.includes('이 글은 필로소피 AI 교육이 작성했습니다'), '칼럼 작성 주체 공개');
+    });
+    await t('칼럼 목록: 6개 분류 · 작성 예정 글은 링크 없이 표시', async () => {
         await page.goto(BASE + '/insights/', { waitUntil: 'domcontentloaded' });
-        assert(await page.locator('.insight-group').count() === 5);
+        assert(await page.locator('.insight-group').count() === 6);
         assert(await page.locator('.planned-list li').count() === 5);
         assert(await page.locator('.planned-list a').count() === 0, '작성 예정 글은 링크 없음');
-        assert(await page.locator('.insight-list a').count() === 4);
+        assert(await page.locator('.insight-list a').count() === 5);
     });
     await t('프로그램: A~D 각각 목적·대상·문제·내용·결과물·준비사항·운영 방식·관련 사례·문의 버튼', async () => {
         await page.goto(BASE + '/programs', { waitUntil: 'domcontentloaded' });
