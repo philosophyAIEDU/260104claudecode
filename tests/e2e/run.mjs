@@ -102,20 +102,75 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
             assert(/<meta name="robots" content="noindex/.test(h), p);
         }
     });
-    await t('메인 페이지: 핵심 메시지 · CTA · 대표 이력 · 기존 섹션(툴·쇼케이스·커뮤니티) 유지', async () => {
+    await t('메인 페이지: 교수님 중심 메시지 · CTA 2개(연결·우선순위) · 고민 4개 · 프로그램 A~D · 기존 섹션 유지', async () => {
         await page.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
+        assert(await page.title() === '필로소피 AI 교육 | 대학 교수님 AI 연수·생성형 AI 실습', await page.title());
+        const h1 = (await page.locator('h1').innerText()).replace(/\s+/g, ' ');
+        assert(h1.includes('AI 시대, 교수님의 든든한 교육 파트너.'), h1);
+        const cta = page.locator('.hero-buttons a');
+        assert(await cta.nth(0).innerText() === '대학 AI 연수 문의' && await cta.nth(0).getAttribute('href') === '/education-inquiry', '1차 CTA');
+        assert((await cta.nth(1).innerText()).startsWith('교육 프로그램 살펴보기') && await cta.nth(1).getAttribute('href') === '/programs', '2차 CTA');
+        const bg = await cta.nth(0).evaluate(e => getComputedStyle(e).backgroundColor), bg2 = await cta.nth(1).evaluate(e => getComputedStyle(e).backgroundColor);
+        assert(bg !== bg2, '두 버튼 시각 구분');
+        assert(await page.locator('.problem-card').count() === 4, '고민 카드 4개');
+        assert(await page.locator('.prog-card').count() === 4, '프로그램 4개');
         const txt = await page.locator('body').innerText();
-        for (const s of ['교육자의 나침반', '교수님과 선생님을 위한 실습 중심 AI 교육', 'AI 강사 소개 보기', '강의 및 연수 문의하기', '경상국립대학교', '경희대학교 대학원', '필로소피 AI 툴', '바이브코딩 쇼케이스', '교육자 커뮤니티'])
-            assert(txt.includes(s), '없음: ' + s);
-        assert(await page.locator('#tools, #showcase, #community, #contact').count() === 4, '기존 섹션');
+        for (const s of ['AI로 성장하고, 그 성장을 나눕니다.', 'AI 시대, 교육자의 나침반', '교수님만을 대상으로 한 단독 강의는 아직 기록에 없으며', '필로소피 AI 툴', '바이브코딩 쇼케이스', '교육자 커뮤니티'])
+            assert(txt.replace(/\s+/g, ' ').includes(s) || txt.includes(s.replace(/\s+/g, '')) || (await page.content()).includes(s), '없음: ' + s);
+        assert(await page.locator('#tools, #showcase, #community, #contact, #problems, #programs-home, #credentials, #learn, #philosophy').count() === 9, '섹션');
+        // 섹션 순서: 고민 → 프로그램 → 이력 → 도구 → 칼럼/유튜브 → 철학 → 커뮤니티 → 문의
+        const order = await page.evaluate(() => ['problems', 'programs-home', 'credentials', 'tools', 'learn', 'philosophy', 'community', 'contact'].map(id => document.getElementById(id).getBoundingClientRect().top + scrollY));
+        assert(order.every((v, i) => i === 0 || v > order[i - 1]), '섹션 순서 ' + order.join(','));
         assert(await page.locator('#featuredReviews').isHidden(), '대표 후기 없으면 숨김');
     });
-    await t('교육 문의: 유입 경로 선택 문항 + 프로그램에서 넘어온 주제 미리 선택', async () => {
-        await page.goto(BASE + '/education-inquiry?topic=' + encodeURIComponent('교육행정 업무 자동화') + '#inquiry', { waitUntil: 'domcontentloaded' });
-        assert(await page.inputValue('#topic') === '교육행정 업무 자동화');
+    await t('내부 링크: 메인·프로그램·강사 소개의 사이트 내부 링크가 모두 존재하는 페이지/앵커로 연결', async () => {
+        const bad = [];
+        for (const p of ['/', '/programs', '/ai-instructor', '/case-studies', '/insights/', '/education-inquiry']) {
+            await page.goto(BASE + p, { waitUntil: 'domcontentloaded' });
+            const links = await page.$$eval('a[href]', as => as.map(a => a.getAttribute('href')).filter(h => h && !/^(https?:|mailto:|tel:|javascript:)/.test(h)));
+            for (const h of [...new Set(links)]) {
+                const u = new URL(h, BASE + p);
+                if (u.origin !== BASE) continue;
+                const res = await fetch(u.origin + u.pathname);
+                if (res.status !== 200) { bad.push(`${p} → ${h} (${res.status})`); continue; }
+                if (u.hash && u.hash.length > 1) {
+                    const html = await res.text();
+                    const id = decodeURIComponent(u.hash.slice(1));
+                    if (!html.includes(`id="${id}"`)) bad.push(`${p} → ${h} (앵커 없음)`);
+                }
+            }
+        }
+        assert(!bad.length, bad.join('\n'));
+    });
+    await t('칼럼 목록: 5개 분류 · 작성 예정 글은 링크 없이 표시', async () => {
+        await page.goto(BASE + '/insights/', { waitUntil: 'domcontentloaded' });
+        assert(await page.locator('.insight-group').count() === 5);
+        assert(await page.locator('.planned-list li').count() === 5);
+        assert(await page.locator('.planned-list a').count() === 0, '작성 예정 글은 링크 없음');
+        assert(await page.locator('.insight-list a').count() === 4);
+    });
+    await t('프로그램: A~D 각각 목적·대상·문제·내용·결과물·준비사항·운영 방식·관련 사례·문의 버튼', async () => {
+        await page.goto(BASE + '/programs', { waitUntil: 'domcontentloaded' });
+        assert(await page.title() === '대학 교수 AI 연수 프로그램 | 필로소피 AI 교육');
+        for (const k of ['ai-literacy', 'professor-ai', 'vibe-coding', 'admin-automation']) {
+            const t2 = await page.locator('#' + k).innerText();
+            for (const h of ['교육 목적', '추천 교육 대상', '해결하는 문제', '주요 교육 내용', '실습 결과물', '준비사항', '운영 방식', '관련 교육 사례', '문의하기']) assert(t2.includes(h), `${k}: ${h}`);
+            assert(t2.includes('협의 가능 예시'), k + ' 운영 방식은 예시로 표기');
+        }
+        assert((await page.locator('#professor-ai').innerText()).includes('신규 제안 프로그램'));
+    });
+    await t('교육 문의: 필드 구성 · 유입 경로 · 프로그램 페이지에서 넘어온 주제 미리 선택', async () => {
+        await page.goto(BASE + '/education-inquiry?topic=' + encodeURIComponent('대학 연구·행정업무 AI 자동화') + '#inquiry', { waitUntil: 'networkidle' });
+        assert(await page.title() === '대학 AI 연수·교수법 워크숍 문의 | 필로소피 AI 교육');
+        assert(await page.inputValue('#program') === 'D. 대학 연구·행정업무 AI 자동화', await page.inputValue('#program'));
+        for (const id of ['org', 'name', 'dept', 'email', 'phone', 'program', 'people', 'schedule', 'message', 'referral', 'consent']) assert(await page.locator('#' + id).count() === 1, id);
+        assert(await page.locator('#bot-field').isHidden() || (await page.locator('.hp-field').boundingBox()).x < 0, 'honeypot 숨김');
         const opts = await page.locator('#referral option').allTextContents();
         for (const o of ['유튜브', '네이버 카페', '구글 검색', '네이버 검색', 'ChatGPT 등 AI 추천', '지인 추천', '기타']) assert(opts.includes(o), o);
         assert(await page.locator('.cred-item .num').nth(1).innerText() === '6곳', '기관 수 6곳');
+        // 문의 양식이 히어로 바로 다음에 있음
+        const y = await page.evaluate(() => [document.getElementById('inquiry').offsetTop, document.getElementById('history').offsetTop]);
+        assert(y[0] < y[1], '양식이 이력보다 위');
     });
     await ctx.close();
 }
@@ -265,7 +320,7 @@ await t('동의 확인 후 홈페이지에 게시 → /reviews 목록·고유 UR
     const list = await (await fetch(BASE + '/reviews')).text();
     assert(list.includes('코딩을 몰랐지만 AI를 활용해 앱을 완성한 후기'));
     const detail = await (await fetch(BASE + '/reviews/' + s.slug)).text();
-    for (const x of ['<h1>코딩을 몰랐지만', '김○○ 선생님', '2026.06.20', '교육자를 위한 바이브 코딩', '인상 깊었던 실습', 'https://cafe.naver.com/PHILOSOPHYai/777', '같은 문단의 둘째 줄입니다.'])
+    for (const x of ['<h1>코딩을 몰랐지만', '김○○ 선생님', '2026.06.20', '교수님만의 AI 수업 앱 만들기', '인상 깊었던 실습', 'https://cafe.naver.com/PHILOSOPHYai/777', '같은 문단의 둘째 줄입니다.'])
         assert(detail.includes(x), '상세에 없음: ' + x);
     assert(detail.includes('<br>') && (detail.match(/<p>/g) || []).length > 20, '문단 유지');
 });
@@ -378,6 +433,85 @@ await t('기존 관리자 대시보드: 정상 로드 + 후기 관리 메뉴(후
     await ctx.close();
 });
 
+// ───────── 3-1. 교육 문의 접수 ─────────
+{
+    const ctx = await newContext({});
+    const page = await ctx.newPage();
+    page.on('dialog', d => d.accept());
+    const errs = []; page.on('pageerror', e => errs.push(e.message));
+    const fill = async (o) => { for (const [k, v] of Object.entries(o)) await page.fill('#' + k, v); };
+    const stored = () => page.evaluate(() => Object.values(JSON.parse(localStorage.getItem('__fakeDb') || '{}').inquiries || {}));
+    await page.goto(BASE + '/education-inquiry#inquiry', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(3100); // 3초 미만 제출은 자동 입력으로 간주하므로 대기
+
+    await t('문의: 필수 항목 누락 → 항목별 오류 · 저장 안 됨', async () => {
+        await page.click('.submit-btn');
+        await page.waitForSelector('#inquiryResult.error');
+        for (const id of ['org', 'name', 'email', 'message', 'consent']) assert(await page.locator('#' + id + 'Error.show').count() === 1, id);
+        assert((await stored()).length === 0);
+    });
+    await t('문의: 잘못된 이메일 → 이메일 오류만', async () => {
+        await fill({ org: '○○대학교 교수학습센터', name: '홍길동', email: 'ctl@univ', message: '신임 교수 대상 생성형 AI 연수를 문의드립니다.' });
+        await page.check('#consent');
+        await page.click('.submit-btn');
+        await page.waitForSelector('#emailError.show');
+        assert(await page.locator('.error-message.show').count() === 1, '이메일만 오류');
+        assert((await stored()).length === 0);
+    });
+    await t('문의: 정상 입력 → Firestore 접수 · 성공 안내 · 양식 초기화', async () => {
+        await page.fill('#email', 'ctl@univ.ac.kr');
+        await page.selectOption('#program', 'B. AI 시대의 대학 교수법·평가 혁신');
+        await page.selectOption('#referral', 'ChatGPT 등 AI 추천');
+        await page.click('.submit-btn');
+        await page.waitForSelector('#inquiryResult.success');
+        assert((await page.locator('#inquiryResult').innerText()).includes('문의가 접수되었습니다'));
+        const st = await stored();
+        assert(st.length === 1 && st[0].org === '○○대학교 교수학습센터' && st[0].consent === true && st[0].status === 'new' && st[0].referral === 'ChatGPT 등 AI 추천', JSON.stringify(st));
+        assert(await page.inputValue('#org') === '', '초기화');
+    });
+    await t('문의: 접수 직후 연타는 무시 (빈 양식 재제출로 성공 안내가 사라지지 않음)', async () => {
+        await page.click('.submit-btn');
+        await page.waitForTimeout(300);
+        assert((await page.locator('#inquiryResult').innerText()).includes('문의가 접수되었습니다'));
+    });
+    await t('문의: 같은 내용 재제출 시 중복 확인 · 버튼 연타해도 1건만', async () => {
+        await page.waitForTimeout(4200);
+        await fill({ org: '○○대학교 교수학습센터', name: '홍길동', email: 'ctl@univ.ac.kr', message: '신임 교수 대상 생성형 AI 연수를 문의드립니다.' });
+        await page.check('#consent');
+        let asked = 0; page.once('dialog', () => { asked++; });
+        await Promise.all([page.click('.submit-btn'), page.click('.submit-btn').catch(() => {}), page.click('.submit-btn').catch(() => {})]);
+        await page.waitForSelector('#inquiryResult.success');
+        assert(asked >= 1, '중복 확인 창');
+        assert((await stored()).length === 2, '연타해도 1건 추가: ' + (await stored()).length);
+    });
+    await t('문의: 저장 실패 → "접수되지 않았습니다" + 메일 대안, 입력 내용 유지', async () => {
+        await page.waitForTimeout(4200);
+        await page.evaluate(() => { window.__FAIL_WRITES = true; });
+        await fill({ org: '△△대학교 교육혁신원', name: '김담당', email: 'edu@univ.ac.kr', message: '교수법 워크숍 일정을 문의드립니다.' });
+        await page.check('#consent');
+        await page.click('.submit-btn');
+        await page.waitForSelector('#inquiryResult.error');
+        const tx = await page.locator('#inquiryResult').innerText();
+        assert(tx.includes('접수되지 않았습니다') && !tx.includes('접수되었습니다'), tx);
+        assert(await page.locator('#inquiryResult a[href^="mailto:dearname27@naver.com?subject="]').count() === 1, '메일 대안');
+        assert(await page.inputValue('#org') === '△△대학교 교육혁신원', '입력 유지');
+        await page.evaluate(() => { window.__FAIL_WRITES = false; });
+    });
+    await t('문의: 숨은 칸(봇) 입력 시 접수 거부', async () => {
+        await page.evaluate(() => { document.getElementById('bot-field').value = 'spam'; });
+        const before = (await stored()).length;
+        await page.click('.submit-btn');
+        await page.waitForFunction(() => /자동 입력/.test(document.getElementById('inquiryResult').textContent));
+        assert((await stored()).length === before);
+        await page.evaluate(() => { document.getElementById('bot-field').value = ''; });
+    });
+    await t('문의 페이지 JS 오류 없음', async () => { assert(!errs.length, errs.join(' | ')); });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(BASE + '/education-inquiry#inquiry');
+    await page.screenshot({ path: join(out, 'screens', 'inquiry-mobile.png') });
+    await ctx.close();
+}
+
 // ───────── 4. 모바일 ─────────
 {
     const ctx = await newContext({ ...devices['iPhone 13'] }, ADMIN);
@@ -397,6 +531,17 @@ await t('기존 관리자 대시보드: 정상 로드 + 후기 관리 메뉴(후
         assert(await page.locator('#publishBtn').isVisible() && await page.locator('#aiBtn').isVisible());
         await page.screenshot({ path: join(out, 'screens', 'admin-mobile.png'), fullPage: false });
     });
+    await t('모바일 메인: 메뉴 열기 · CTA 버튼 크기(44px 이상) · 제목 넘침 없음', async () => {
+        await page.goto(BASE + '/');
+        await page.click('#hamburger');
+        await page.locator('#navMenu a[href="/programs"]').waitFor({ state: 'visible', timeout: 3000 });
+        await page.click('#hamburger');
+        const h = await page.locator('.hero-buttons .btn-cta').boundingBox();
+        assert(h.height >= 44, 'CTA 높이 ' + h.height);
+        const over = await page.evaluate(() => { const h1 = document.querySelector('h1'); return h1.scrollWidth - h1.clientWidth; });
+        assert(over <= 1, '제목 넘침');
+        await page.screenshot({ path: join(out, 'screens', 'home-mobile.png') });
+    });
     await t('모바일 메뉴 열기 (강사 소개 페이지)', async () => {
         await page.goto(BASE + '/ai-instructor');
         await page.click('.nav-toggle');
@@ -406,11 +551,26 @@ await t('기존 관리자 대시보드: 정상 로드 + 후기 관리 메뉴(후
     await ctx.close();
 }
 
+// ───────── 4-1. 태블릿 ─────────
+{
+    const ctx = await newContext({ ...devices['iPad (gen 7)'] });
+    const page = await ctx.newPage();
+    for (const p of ['/', '/programs', '/ai-instructor', '/case-studies', '/education-inquiry', '/insights/']) {
+        await t(`태블릿(810px) 가로 넘침 없음: ${p}`, async () => {
+            await page.goto(BASE + p);
+            const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+            assert(over <= 1, `가로 넘침 ${over}px`);
+        });
+    }
+    await page.goto(BASE + '/'); await page.screenshot({ path: join(out, 'screens', 'home-tablet.png') });
+    await ctx.close();
+}
+
 // ───────── 5. 화면 캡처 (변경 후) ─────────
 {
     const ctx = await newContext({ viewport: { width: 1366, height: 900 }, deviceScaleFactor: 1 });
     const page = await ctx.newPage();
-    for (const [p, n] of [['/', 'after-home'], ['/ai-instructor', 'after-instructor'], ['/programs', 'after-programs'], ['/case-studies', 'after-cases'], ['/reviews', 'after-reviews'], ['/insights/can-teachers-build-apps-without-coding/', 'after-insight']]) {
+    for (const [p, n] of [['/', 'after-home'], ['/education-inquiry', 'after-inquiry'], ['/ai-instructor', 'after-instructor'], ['/programs', 'after-programs'], ['/case-studies', 'after-cases'], ['/reviews', 'after-reviews'], ['/insights/can-teachers-build-apps-without-coding/', 'after-insight']]) {
         await page.goto(BASE + p);
         await page.waitForTimeout(150);
         await page.screenshot({ path: join(out, 'screens', n + '.png'), fullPage: p !== '/' });

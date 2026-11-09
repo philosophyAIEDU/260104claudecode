@@ -1,10 +1,10 @@
 /* 후기 카드·상세 공용 스타일 (review-core.mjs 렌더 결과)
    메인 페이지·교육 문의 페이지·후기 페이지·관리자 미리보기에서 함께 사용합니다. */
-:root { --rv-surface: #fffefa; --rv-line: #e5e0d2; --rv-ink: #203e34; --rv-muted: #66706a; --rv-gold: #8a681d; --rv-gold-soft: #f4ead2; --rv-sage: #e7eee3; --rv-soft: #f3efe4; }
+:root { --rv-surface: #ffffff; --rv-line: #e6dfd0; --rv-ink: #162C43; --rv-muted: #5b6670; --rv-gold: #7a5c1e; --rv-gold-soft: #f3ead6; --rv-sage: #e9eef4; --rv-soft: #f1ece1; }
 /* Reviews (공용 — review-core.mjs 렌더 결과) */
 .rv-filter { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; padding: 0; list-style: none; }
-.rv-filter a, .rv-filter button { display: inline-block; padding: 8px 16px; border-radius: 999px; border: 1px solid #cfc6b0; background: var(--rv-surface); color: #3f5248; font-weight: 600; font-size: 14px; text-decoration: none; cursor: pointer; font-family: inherit; }
-.rv-filter [aria-current="true"], .rv-filter [aria-pressed="true"] { background: #315b4c; color: #fffefa; border-color: #315b4c; }
+.rv-filter a, .rv-filter button { display: inline-block; padding: 8px 16px; border-radius: 999px; border: 1px solid #cfc6b0; background: var(--rv-surface); color: #27313B; font-weight: 600; font-size: 14px; text-decoration: none; cursor: pointer; font-family: inherit; }
+.rv-filter [aria-current="true"], .rv-filter [aria-pressed="true"] { background: #162C43; color: #fffefa; border-color: #162C43; }
 .rv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
 .rv-card { background: var(--rv-surface); border: 1px solid var(--rv-line); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 10px; }
 .rv-card[hidden] { display: none; }
@@ -12,7 +12,7 @@
 .rv-card-title a { color: var(--rv-ink); text-decoration: none; }
 .rv-card-title a:hover { text-decoration: underline; }
 .rv-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.rv-tag { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 2px 10px; background: var(--rv-sage); color: #244839; }
+.rv-tag { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 2px 10px; background: var(--rv-sage); color: #0d1d2e; }
 .rv-tag-program { background: var(--rv-gold-soft); color: #5f4710; }
 .rv-story { margin: 0; display: grid; gap: 8px; }
 .rv-story-row { display: grid; gap: 2px; }

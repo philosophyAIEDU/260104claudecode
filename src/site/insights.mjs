@@ -4,9 +4,30 @@
 // ⚠️ '현장 사례'와 '직접 진행한 실습'에는 src/site/data.mjs HISTORY에 기록된 사실만 씁니다.
 //    운영자가 실제 경험을 추가할 때는 experience 배열에 문장을 더하세요.
 
+/** 칼럼 분류 (대학 교수님의 실제 고민 중심) */
+export const INSIGHT_CATEGORIES = [
+    { key: 'genai', label: '대학 교수님을 위한 생성형 AI 활용', program: 'ai-literacy' },
+    { key: 'pedagogy', label: 'AI 시대의 교수법과 평가 혁신', program: 'professor-ai' },
+    { key: 'automation', label: '교수님 연구·행정업무 자동화', program: 'admin-automation' },
+    { key: 'build', label: 'Claude Code와 AI 수업 앱 제작', program: 'vibe-coding' },
+    { key: 'ethics', label: 'AI 교육 철학과 윤리', program: '' },
+];
+
+/**
+ * 작성 예정 주제 — 아직 글이 없습니다. 화면에는 '작성 예정'으로만 표시하고 링크를 만들지 않습니다.
+ * 글을 실제로 쓰면 아래 INSIGHTS 배열에 추가하고 여기서 지우세요.
+ */
+export const PLANNED_INSIGHTS = [
+    { title: '대학 교수는 ChatGPT로 강의자료를 어떻게 만들 수 있을까요?', category: 'genai' },
+    { title: '학생들이 AI로 과제를 작성한다면 평가 방법을 어떻게 바꿔야 할까요?', category: 'pedagogy' },
+    { title: '교수님이 Claude Code로 AI 수업 앱을 만들 수 있을까요?', category: 'build' },
+    { title: '대학 교수학습센터는 생성형 AI 연수를 어떻게 설계해야 할까요?', category: 'pedagogy' },
+    { title: '교수님의 연구자료를 AI로 안전하게 관리하려면 어떻게 해야 할까요?', category: 'ethics' },
+];
+
 export const INSIGHTS = [
     {
-        slug: 'can-teachers-build-apps-without-coding',
+        slug: 'can-teachers-build-apps-without-coding', category: 'build',
         title: '교사가 코딩을 몰라도 교육용 앱을 만들 수 있을까요?',
         description: '코딩을 몰라도 Claude Code·GPT Codex 같은 AI 코딩 도구로 간단한 교육용 웹앱을 만들 수 있습니다. 가능한 범위, 시작 방법, 주의할 점을 정리했습니다.',
         published: '2026-11-06', modified: '2026-11-06',
@@ -41,7 +62,7 @@ export const INSIGHTS = [
         programs: ['vibe-coding'],
     },
     {
-        slug: 'how-educators-verify-ai-answers',
+        slug: 'how-educators-verify-ai-answers', category: 'genai',
         title: 'AI가 생성한 답변을 교육자가 어떻게 검증해야 할까요?',
         description: '생성형 AI의 답변은 그럴듯하지만 틀릴 수 있습니다. 교육자가 수업 자료와 업무에 AI 답변을 쓰기 전에 확인해야 할 검증 절차를 정리했습니다.',
         published: '2026-11-06', modified: '2026-11-06',
@@ -73,10 +94,10 @@ export const INSIGHTS = [
             '검증 과정에서 학생·동료의 개인정보를 AI에 입력하지 마세요.',
             '검증 절차는 시간을 줄여 주지 않습니다. 대신 잘못된 자료가 교실에 들어가는 것을 막아 줍니다.',
         ],
-        programs: ['ai-literacy'],
+        programs: ['ai-literacy', 'professor-ai'],
     },
     {
-        slug: 'what-professors-can-do-with-claude-code',
+        slug: 'what-professors-can-do-with-claude-code', category: 'build',
         title: '교수자가 Claude Code를 배우면 어떤 일을 할 수 있을까요?',
         description: 'Claude Code를 배운 교수자는 강의용 웹앱, 연구 자료 정리 도구, 과제 피드백 보조 도구 등을 직접 만들 수 있습니다. 활용 범위와 한계를 정리했습니다.',
         published: '2026-11-06', modified: '2026-11-06',
@@ -108,10 +129,10 @@ export const INSIGHTS = [
             '미공개 연구 데이터나 학생 정보를 AI 도구에 올리기 전에 소속 기관의 정보보호 지침을 확인하세요.',
             'Claude Code는 유료 요금제나 API 사용이 필요할 수 있습니다. 도입 전 비용을 확인하세요.',
         ],
-        programs: ['professor-ai', 'vibe-coding'],
+        programs: ['vibe-coding', 'admin-automation'],
     },
     {
-        slug: 'reduce-school-admin-work-with-ai',
+        slug: 'reduce-school-admin-work-with-ai', category: 'automation',
         title: '교사의 반복적인 행정업무를 AI로 줄일 수 있을까요?',
         description: '공문 초안, 안내문, 자료 정리처럼 반복되는 학교 행정업무는 AI로 줄일 수 있습니다. 시작 방법과 개인정보 보호 원칙을 정리했습니다.',
         published: '2026-11-06', modified: '2026-11-06',

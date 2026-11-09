@@ -109,3 +109,45 @@ test('관리자 화면이 저장하는 전체 필드 구성(타임스탬프·가
         consentNote: '카페 쪽지로 동의', memo: '', aiDraft: { title: 't', checks: {}, model: 'gemini-3.8-flash' }, updatedAt: now,
     }));
 });
+
+// ───────── 교육 문의 (inquiries) ─────────
+const inq = (o = {}) => ({
+    org: '○○대학교 교수학습센터', name: '홍길동', dept: '', email: 'ctl@univ.ac.kr', phone: '', program: 'A. 교수님을 위한 생성형 AI 실무 입문',
+    people: '교수 20명', schedule: '', message: '신임 교수 대상 생성형 AI 연수를 문의드립니다.', referral: '구글 검색',
+    consent: true, status: 'new', source: 'education-inquiry', ...o,
+});
+
+test('교육 문의: 로그인 없이 올바른 문의는 접수된다 (서버 시간 필수)', async () => {
+    const { serverTimestamp, addDoc } = await import('firebase/firestore');
+    await assertSucceeds(addDoc(collection(anon(), 'inquiries'), inq({ createdAt: serverTimestamp() })));
+});
+
+test('교육 문의: 동의 없음·이메일 형식 오류·필수 누락·짧은 내용·추가 필드·상태 조작·임의 시간은 거부', async () => {
+    const { serverTimestamp, addDoc, Timestamp } = await import('firebase/firestore');
+    const c = () => collection(anon(), 'inquiries');
+    const now = serverTimestamp();
+    await assertFails(addDoc(c(), inq({ consent: false, createdAt: now })));
+    await assertFails(addDoc(c(), inq({ email: 'not-an-email', createdAt: now })));
+    await assertFails(addDoc(c(), inq({ org: '', createdAt: now })));
+    await assertFails(addDoc(c(), inq({ message: '짧음', createdAt: now })));
+    await assertFails(addDoc(c(), inq({ createdAt: now, admin: true })));
+    await assertFails(addDoc(c(), inq({ status: 'done', createdAt: now })));
+    await assertFails(addDoc(c(), inq({ createdAt: Timestamp.fromDate(new Date('2020-01-01')) })));
+    await assertFails(addDoc(c(), inq({ message: 'x'.repeat(3001), createdAt: now })));
+    const { name, ...noName } = inq({ createdAt: now });
+    await assertFails(addDoc(c(), noName));
+});
+
+test('교육 문의: 방문자·일반 회원은 읽기·수정·삭제 불가, 관리자만 처리', async () => {
+    const { serverTimestamp, updateDoc } = await import('firebase/firestore');
+    await env.withSecurityRulesDisabled(c => setDoc(doc(c.firestore(), 'inquiries', 'q1'), inq({ createdAt: new Date() })));
+    await assertFails(getDoc(doc(anon(), 'inquiries', 'q1')));
+    await assertFails(getDoc(doc(user(), 'inquiries', 'q1')));
+    await assertFails(getDocs(collection(user(), 'inquiries')));
+    await assertFails(updateDoc(doc(user(), 'inquiries', 'q1'), { status: 'done' }));
+    await assertFails(deleteDoc(doc(anon(), 'inquiries', 'q1')));
+    await assertSucceeds(getDocs(collection(admin(), 'inquiries')));
+    await assertSucceeds(updateDoc(doc(admin(), 'inquiries', 'q1'), { status: 'done', updatedAt: serverTimestamp() }));
+    await assertFails(updateDoc(doc(admin(), 'inquiries', 'q1'), { message: '관리자도 원문은 못 바꿈' }));
+    await assertSucceeds(deleteDoc(doc(admin(), 'inquiries', 'q1')));
+});

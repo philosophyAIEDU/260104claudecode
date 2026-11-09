@@ -4,13 +4,14 @@ import { escapeHtml as esc } from '../../assets/js/review-core.mjs';
 
 export { esc };
 
+// 방문자 흐름: 교수님(문제 → 실습 → 프로그램 → 문의) / 기관 담당자(전문 분야 → 프로그램 → 이력 → 문의)
 export const NAV = [
-    { href: '/ai-instructor', label: '강사 소개', key: 'ai-instructor' },
     { href: '/programs', label: '교육 프로그램', key: 'programs' },
     { href: '/case-studies', label: '교육 사례', key: 'case-studies' },
-    { href: '/reviews', label: '후기', key: 'reviews' },
+    { href: '/ai-instructor', label: '강사 소개', key: 'ai-instructor' },
     { href: '/insights/', label: 'AI 교육 칼럼', key: 'insights' },
-    { href: '/#tools', label: 'AI 툴', key: 'tools' },
+    { href: '/reviews', label: '후기', key: 'reviews' },
+    { href: '/#tools', label: 'AI 실습 도구', key: 'tools' },
     { href: '/community.html', label: '커뮤니티', key: 'community' },
 ];
 
@@ -104,7 +105,7 @@ export function header(active) {
     <nav id="siteNav" class="site-nav" aria-label="주요 메뉴">
       <ul>
         ${NAV.map(n => `<li><a href="${n.href}"${n.key === active ? ' aria-current="page"' : ''}>${esc(n.label)}</a></li>`).join('\n        ')}
-        <li><a class="nav-cta" href="${SITE.inquiryUrl}" data-track="cta_inquiry_click" data-track-label="header">강의 문의</a></li>
+        <li><a class="nav-cta" href="${SITE.inquiryUrl}" data-track="cta_inquiry_click" data-track-label="header">대학 AI 연수 문의</a></li>
       </ul>
     </nav>
   </div>
@@ -117,7 +118,7 @@ export function footer() {
     <div>
       <p class="footer-brand">필로소피 AI 교육 <span>Philosophy AI Education</span></p>
       <p class="footer-one">${esc(SITE.oneLiner)}</p>
-      <p class="footer-phil">“${esc(SITE.philosophy)}”</p>
+      <p class="footer-phil">${esc(SITE.growthSlogan)}</p>
     </div>
     <div>
       <h2 class="footer-h">둘러보기</h2>
@@ -136,21 +137,21 @@ export function footer() {
       </ul>
     </div>
   </div>
-  <div class="wrap footer-bottom"><span>&copy; 2026 Philosophy AI Education</span><span>${esc(SITE.slogan)}</span></div>
+  <div class="wrap footer-bottom"><span>&copy; 2026 필로소피 AI 교육 (Philosophy AI Education)</span><span>${esc(SITE.slogan)}</span></div>
 </footer>`;
 }
 
 /** 페이지 상·하단에 반복하는 섭외 CTA (같은 문의 기능으로만 연결) */
-export function inquiryCta(label = 'section') {
-    return `<section class="cta-band" aria-label="강의 문의">
+export function inquiryCta(label = 'section', { title = '우리 대학 교수님께 맞는 AI 연수를 함께 설계합니다', text = '기관명, 희망 프로그램, 교육 목적만 알려 주시면 대상과 일정에 맞는 구성안을 제안드립니다.' } = {}) {
+    return `<section class="cta-band" aria-label="대학 AI 연수 문의">
   <div class="wrap cta-inner">
     <div>
-      <p class="eyebrow">Lecture Inquiry</p>
-      <h2>기관에 맞는 AI 교육을 함께 설계합니다</h2>
-      <p>기관·대상·인원·희망 일정을 알려 주시면 교육 구성과 진행 방식을 제안드립니다.</p>
+      <p class="eyebrow">University AI Training</p>
+      <h2>${esc(title)}</h2>
+      <p>${esc(text)}</p>
     </div>
     <div class="cta-actions">
-      <a class="btn btn-primary" href="${SITE.inquiryUrl}" data-track="cta_inquiry_click" data-track-label="${esc(label)}">강의 및 연수 문의하기</a>
+      <a class="btn btn-primary" href="${SITE.inquiryUrl}" data-track="cta_inquiry_click" data-track-label="${esc(label)}">대학 AI 연수 문의</a>
       <a class="btn btn-ghost" href="mailto:${SITE.email}" data-track="cta_email_click" data-track-label="${esc(label)}">${SITE.email}</a>
     </div>
   </div>

@@ -41,11 +41,15 @@ export function buildLlmsTxt() {
 
 > ${SITE.oneLiner}
 
+${SITE.channelIntro}
+
 - 공식 홈페이지: ${SITE.origin}/
 ${SITE.channels.map(c => `- ${c.label}: ${c.url}`).join('\n')}
 - 강의 문의: ${SITE.origin}/education-inquiry (이메일 ${SITE.email})
 - 슬로건: ${SITE.slogan}
-- 교육 철학: ${SITE.philosophy}
+- 철학: ${SITE.growthSlogan} (${SITE.philosophy})
+- 전문 분야: ${SITE.specialty}
+- 핵심 고객: 대학 교수님 및 대학 교육기관(교수학습센터·교육혁신원·학과·연구소)
 - 활동명: 필로소피 AI 교육 (운영자의 실명·학력은 이 사이트에 공개하지 않습니다)
 - 최종 갱신: ${SITE.updated}
 
@@ -55,11 +59,11 @@ ${SITE.audiences.map(a => `- ${a}`).join('\n')}
 ## 전문 분야
 ${SITE.expertise.map(e => `- ${e.title}: ${e.desc}`).join('\n')}
 
-## 강의 이력 (공개 기록 기준 ${s.orgs}개 기관, ${s.sessions}회 강의, ${s.since}~)
+## 강의 이력 (공개 기록 기준 ${s.orgs}개 기관, ${s.sessions}회 강의, ${s.since}~; 대학 교수님만을 대상으로 한 단독 강의는 아직 기록에 없음)
 ${HISTORY.map(h => `- ${h.date} ${h.title} — ${h.subject}${h.audience ? ` (대상: ${h.audience})` : ''}`).join('\n')}
 
 ## 교육 프로그램
-${PROGRAM_DETAILS.map(p => `- ${p.title} [${STATUS_LABEL[p.status]}]: ${p.problem} 주요 내용: ${p.contents.join(', ')}`).join('\n')}
+${PROGRAM_DETAILS.map(p => `- ${p.letter}. ${p.title} [${STATUS_LABEL[p.status]}]: ${p.purpose} 주요 내용: ${p.contents.join(', ')}. 실습 결과물: ${p.artifacts.join(' / ')}`).join('\n')}
 
 ## 자주 받는 질문
 ${faq.map(f => `### ${f.q}\n${f.a}`).join('\n\n')}

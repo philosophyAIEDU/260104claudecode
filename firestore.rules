@@ -218,6 +218,36 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // ===== 교육 문의 (education-inquiry.html → assets/js/inquiry.mjs) =====
+    // 누구나(로그인 없이) 접수 가능하지만, 필드·길이·이메일 형식·개인정보 동의·서버 시간을 서버에서 검증.
+    // 접수된 문의는 관리자만 읽기·처리 상태 변경·삭제 가능 (개인정보 보호).
+    function optStr(d, k, max) {
+      return !(k in d) || (d[k] is string && d[k].size() <= max);
+    }
+    function validInquiry(d) {
+      return d.keys().hasOnly(['org', 'name', 'dept', 'email', 'phone', 'program', 'people', 'schedule',
+          'message', 'referral', 'consent', 'status', 'source', 'createdAt'])
+        && d.keys().hasAll(['org', 'name', 'email', 'message', 'consent', 'status', 'createdAt'])
+        && d.org is string && d.org.size() >= 2 && d.org.size() <= 100
+        && d.name is string && d.name.size() >= 2 && d.name.size() <= 50
+        && d.email is string && d.email.size() <= 120 && d.email.matches('^[^@ ]+@[^@ ]+[.][^@ ]{2,}$')
+        && d.message is string && d.message.size() >= 10 && d.message.size() <= 3000
+        && optStr(d, 'dept', 60) && optStr(d, 'phone', 30) && optStr(d, 'program', 60)
+        && optStr(d, 'people', 50) && optStr(d, 'schedule', 100) && optStr(d, 'referral', 30)
+        && (!('source' in d) || d.source == 'education-inquiry')
+        && d.consent == true
+        && d.status == 'new'
+        && d.createdAt == request.time;
+    }
+    match /inquiries/{inquiryId} {
+      allow create: if validInquiry(request.resource.data);
+      allow read, delete: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'memo', 'updatedAt'])
+        && request.resource.data.status in ['new', 'replied', 'done']
+        && (!('memo' in request.resource.data) || (request.resource.data.memo is string && request.resource.data.memo.size() <= 1000));
+    }
+
     // 신고 — 로그인 사용자만 접수, 관리자만 열람/처리
     match /reports/{reportId} {
       allow read, delete: if isAdmin();

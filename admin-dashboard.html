@@ -627,6 +627,23 @@
             </div>
         </div>
 
+        <!-- 교육 문의 (education-inquiry.html 양식 → Firestore inquiries) -->
+        <div class="inquiries-section" id="inquiriesSection" style="margin-bottom:3rem;">
+            <div class="table-header" style="border-radius:15px 15px 0 0; display:flex; justify-content:space-between; align-items:center; padding:1.5rem; flex-wrap:wrap; gap:.6rem;">
+                <span><i class="fas fa-envelope-open-text"></i> 교육 문의 <span id="inquiriesCount" style="font-size:.85rem; font-weight:400;"></span></span>
+                <span style="display:flex; gap:.6rem; flex-wrap:wrap;">
+                    <select id="inquiriesFilter" aria-label="문의 상태" style="padding:.5rem .8rem; border-radius:8px; border:none; font-weight:600;">
+                        <option value="open">새 문의·답변 중</option><option value="all">전체</option><option value="done">처리 완료</option>
+                    </select>
+                    <button id="inquiriesRefreshBtn" style="background:#fff; color:var(--primary-color); border:none; padding:.6rem 1.2rem; border-radius:8px; font-weight:700; cursor:pointer; font-size:.95rem;"><i class="fas fa-rotate"></i> 새로고침</button>
+                </span>
+            </div>
+            <div id="inquiriesContainer" style="background:#fff; border-radius:0 0 15px 15px; box-shadow:0 5px 20px var(--shadow); min-height:60px; padding:1rem 1.5rem;">
+                <div class="loading"><div class="spinner"></div> 문의 불러오는 중...</div>
+            </div>
+            <p style="font-size:.85rem; color:#7f8c8d; margin-top:.6rem;">개인정보 보호: 문의일로부터 1년이 지났거나 삭제를 요청받은 문의는 ‘삭제’로 지워 주세요.</p>
+        </div>
+
         <!-- 후기 관리 (교육 후기 아카이브: reviews-admin.html) -->
         <div class="reviews-mgmt-section" style="margin-bottom:3rem;">
             <div class="table-header" style="border-radius:15px 15px 0 0; display:flex; justify-content:space-between; align-items:center; padding:1.5rem; flex-wrap:wrap; gap:.6rem;">
@@ -852,6 +869,9 @@
                 loadReportsList();
                 loadContentsInput();
                 loadReviewStats();
+                loadInquiries();
+                document.getElementById('inquiriesRefreshBtn')?.addEventListener('click', loadInquiries);
+                document.getElementById('inquiriesFilter')?.addEventListener('change', renderInquiries);
                 document.getElementById('reportsRefreshBtn')?.addEventListener('click', loadReportsList);
                 document.getElementById('contentsInputRefreshBtn')?.addEventListener('click', loadContentsInput);
                 refreshTimer = setInterval(() => { loadDashboardData(); loadVisitorStats(); loadReportsList(); }, 5 * 60 * 1000);
@@ -918,6 +938,59 @@
             } catch (e) {
                 box.textContent = '후기 통계를 불러오지 못했습니다 (firestore.rules 배포 여부를 확인하세요): ' + e.message;
             }
+        }
+
+
+        // ===== 교육 문의 (inquiries — 관리자만 읽기, 텍스트는 escAdm으로 이스케이프) =====
+        let inquiries = [];
+        const INQ_STATUS = { new: '새 문의', replied: '답변 중', done: '처리 완료' };
+        async function loadInquiries() {
+            const box = document.getElementById('inquiriesContainer');
+            if (!box) return;
+            try {
+                const snap = await window.getDocs(window.collection(db, 'inquiries'));
+                inquiries = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0));
+                const fresh = inquiries.filter(q => q.status === 'new').length;
+                document.getElementById('inquiriesCount').textContent = `(전체 ${inquiries.length}건 · 새 문의 ${fresh}건)`;
+                renderInquiries();
+            } catch (e) {
+                box.textContent = '문의를 불러오지 못했습니다 (firestore.rules의 inquiries 규칙 게시 여부를 확인하세요): ' + e.message;
+            }
+        }
+        function renderInquiries() {
+            const box = document.getElementById('inquiriesContainer');
+            const f = document.getElementById('inquiriesFilter').value;
+            const rows = inquiries.filter(q => f === 'all' || (f === 'done' ? q.status === 'done' : q.status !== 'done'));
+            if (!rows.length) { box.innerHTML = '<p style="color:#7f8c8d;">표시할 문의가 없습니다.</p>'; return; }
+            box.innerHTML = rows.map(q => {
+                const when = q.createdAt && q.createdAt.toDate ? q.createdAt.toDate().toLocaleString('ko-KR') : '';
+                const subject = encodeURIComponent(`[필로소피 AI 교육] ${q.org || ''} 교육 문의 답변`);
+                return `<div class="table-item" style="display:block; padding:1rem 0; border-bottom:1px solid #eee;">
+                    <div style="display:flex; justify-content:space-between; gap:.6rem; flex-wrap:wrap;">
+                        <strong>${escAdm(q.org)} · ${escAdm(q.name)}${q.dept ? ' (' + escAdm(q.dept) + ')' : ''}</strong>
+                        <span style="font-size:.85rem; color:#7f8c8d;">${escAdm(when)} · <b>${escAdm(INQ_STATUS[q.status] || q.status)}</b></span>
+                    </div>
+                    <div style="font-size:.9rem; color:#555; margin:.35rem 0;">
+                        <a href="mailto:${escAdm(q.email)}?subject=${subject}">${escAdm(q.email)}</a>${q.phone ? ' · ' + escAdm(q.phone) : ''}
+                        ${q.program ? ' · 희망: ' + escAdm(q.program) : ''}${q.people ? ' · 인원: ' + escAdm(q.people) : ''}${q.schedule ? ' · 일정: ' + escAdm(q.schedule) : ''}${q.referral ? ' · 경로: ' + escAdm(q.referral) : ''}
+                    </div>
+                    <div style="white-space:pre-wrap; background:#f8f9fa; border-radius:8px; padding:.7rem; font-size:.92rem;">${escAdm(q.message)}</div>
+                    <div style="display:flex; gap:.4rem; margin-top:.5rem; flex-wrap:wrap;">
+                        ${['new', 'replied', 'done'].filter(st => st !== q.status).map(st => `<button data-inq="${escAdm(q.id)}" data-st="${st}" style="padding:.35rem .8rem; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer;">${INQ_STATUS[st]}(으)로</button>`).join('')}
+                        <button data-inq-del="${escAdm(q.id)}" style="padding:.35rem .8rem; border-radius:6px; border:1px solid #e3b9b2; color:#a3352a; background:#fff; cursor:pointer;">삭제</button>
+                    </div>
+                </div>`;
+            }).join('');
+            box.querySelectorAll('button[data-inq]').forEach(b => b.addEventListener('click', async () => {
+                try { await window.fsUpdateDoc(window.fsDoc(db, 'inquiries', b.dataset.inq), { status: b.dataset.st, updatedAt: window.fsServerTimestamp() }); await loadInquiries(); }
+                catch (e) { alert('상태를 바꾸지 못했습니다: ' + e.message); }
+            }));
+            box.querySelectorAll('button[data-inq-del]').forEach(b => b.addEventListener('click', async () => {
+                if (!confirm('이 문의를 삭제할까요? 되돌릴 수 없습니다.')) return;
+                try { await window.fsDeleteDoc(window.fsDoc(db, 'inquiries', b.dataset.inqDel)); await loadInquiries(); }
+                catch (e) { alert('삭제하지 못했습니다: ' + e.message); }
+            }));
         }
 
         function setupGate() {
