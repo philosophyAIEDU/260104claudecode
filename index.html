@@ -433,8 +433,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
     .edu-cta-inner { grid-template-columns: 1fr; gap: 44px; }
     .community-inner { padding: 44px 36px; }
 }
-@media (max-width: 768px) {
-    .container { padding: 0 24px; }
+@media (max-width: 900px) {
     .nav-menu {
         position: fixed; top: 68px; left: 0; right: 0; flex-direction: column; align-items: stretch;
         background: var(--parchment); padding: 16px; gap: 2px; border-bottom: 1px solid var(--line);
@@ -448,6 +447,9 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
     .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.active span:nth-child(2) { opacity: 0; }
     .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+}
+@media (max-width: 768px) {
+    .container { padding: 0 24px; }
     .section-pad { padding: 72px 0; }
     .hero { padding: 132px 0 72px; }
     .tools-grid { grid-template-columns: 1fr; }
@@ -493,9 +495,10 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         <nav class="container">
             <a href="#home" class="logo"><svg class="brand-orbit" viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="14" ry="9" transform="rotate(-35 16 16)" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="16" cy="16" r="4" fill="currentColor"/><circle cx="25" cy="7" r="2" fill="#9fc9ea"/></svg>Philosophy <em>AI</em><span class="logo-kr">필로소피 AI 교육</span></a>
             <ul class="nav-menu" id="navMenu">
+                <li><a href="/ai-instructor">강사 소개</a></li>
+                <li><a href="#reviews-home" data-track="reviews_click" data-track-label="header">수업 후기</a></li>
                 <li><a href="/programs">교육 프로그램</a></li>
                 <li><a href="/case-studies">교육 사례</a></li>
-                <li><a href="/ai-instructor">강사 소개</a></li>
                 <li><a href="/insights/">AI 칼럼</a></li>
                 <li><a href="#tools">AI 실습 도구</a></li>
                 <li><a href="community.html">커뮤니티</a></li>
