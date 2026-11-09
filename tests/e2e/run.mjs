@@ -104,7 +104,17 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
     });
     await t('메인 페이지: 교수님 중심 메시지 · CTA 2개(연결·우선순위) · 고민 4개 · 프로그램 A~D · 기존 섹션 유지', async () => {
         await page.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
-        assert(await page.title() === '필로소피 AI 교육 | 대학 교수님 AI 연수·생성형 AI 실습', await page.title());
+        assert(await page.title() === '필로소피 AI 교육 | AI 교육 강사 · 대학 교수님 AI 연수·바이브 코딩 실습', await page.title());
+        // GEO: 메인 구조화 데이터의 소개 = 한 줄 소개, FAQPage 질문 = 화면의 자주 묻는 질문
+        const ld = JSON.parse(await page.locator('script[type="application/ld+json"]').first().textContent());
+        const types = ld['@graph'].map(g => g['@type']);
+        assert(['Organization', 'WebSite', 'WebPage', 'FAQPage'].every(x => types.includes(x)), types.join(','));
+        const org = ld['@graph'].find(g => g['@type'] === 'Organization');
+        assert(org.description.startsWith('필로소피 AI 교육은 대학 교수님과 교사 등 교육자, 그리고 학생에게'), org.description);
+        assert(!JSON.stringify(ld).includes('aggregateRating') && !JSON.stringify(ld).includes('"Review"'), '평점·리뷰 스키마 없음');
+        const faqQs = ld['@graph'].find(g => g['@type'] === 'FAQPage').mainEntity.map(q => q.name);
+        const shownQs = await page.locator('#faq summary').allInnerTexts();
+        assert(faqQs.length >= 4 && faqQs.every((q, i) => shownQs[i] && shownQs[i].trim() === q), 'FAQ 화면=구조화 데이터');
         const h1 = (await page.locator('h1').innerText()).replace(/\s+/g, ' ');
         assert(h1.includes('대학 교수님을 위한 AI 교육 강사, 필로소피 AI 교육'), h1);
         // 첫 화면 = 강사 소개: 캐릭터 프로필·전문 분야·강의 이력·철학·슬로건·강사 소개 링크

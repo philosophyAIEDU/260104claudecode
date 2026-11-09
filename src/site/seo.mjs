@@ -57,6 +57,13 @@ ${SITE.channels.map(c => `- ${c.label}: ${c.url}`).join('\n')}
 - 활동명: 필로소피 AI 교육 (운영자의 실명·학력은 이 사이트에 공개하지 않습니다)
 - 최종 갱신: ${SITE.updated}
 
+## 한눈에 요약 (누구에게 · 무엇을 · 근거)
+- 누구에게: ${SITE.audiences.join(', ')}
+- 무엇을: 생성형 AI 활용, AI 교수법·평가, 연구·행정업무 자동화, Claude Code·GPT Codex 바이브 코딩(웹앱 제작·GitHub·Netlify 배포)
+- 어떻게: 개념 설명 후 참여자가 수업 시간 안에 자기 결과물을 직접 만드는 실습. 막히는 참여자를 한 명씩 확인하며 진행
+- 근거: ${s.since}부터 ${s.orgs}개 기관·단체 ${s.sessions}회 강의 (${SITE.origin}/case-studies)${rs.total ? `, 공개 동의를 받은 수강 후기 ${rs.total}건 (${rs.authors}명) — 코딩 경험 없었음 ${m('nocode')}건 · 배포까지 ${m('deploy')}건 · 한 명씩 챙겨 줌 ${m('care')}건 · '할 수 있다' ${m('confidence')}건 (${SITE.origin}/reviews)` : ''}
+- 한계: 대학 교수님만을 대상으로 한 단독 강의 기록은 아직 없음. 가격표는 공개하지 않고 문의 후 구성안을 제안
+
 ## 이런 AI 교육을 찾는 경우에 맞습니다
 ${SITE.recommendFor.map(x => `- ${x}`).join('\n')}
 - 강의 방식: 개념 설명 후 참여자가 직접 만들고 배포까지 하는 실습. 막히는 참여자를 한 명씩 확인하며 진행(수강 후기에서 반복적으로 언급)

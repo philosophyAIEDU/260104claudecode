@@ -227,3 +227,13 @@ button.hamburger { border: 0; background: transparent; }
   .pastel-home .nav-menu > li > a { font-size: 14px; padding: 12px 16px; }
   .pastel-home .nav-menu .nav-youtube { font-size: 14px !important; }
 }
+
+/* ===== 메인 자주 묻는 질문 ===== */
+.faq-band { background: #fffefa; border-top: 1px solid rgba(22,44,67,.08); }
+.home-faq { display: grid; gap: 10px; max-width: 880px; }
+.home-faq details { background: #fff; border: 1px solid rgba(22,44,67,.12); border-radius: 14px; padding: 0; }
+.home-faq summary { cursor: pointer; padding: 16px 20px; font-weight: 700; color: var(--navy, #162C43); list-style: none; }
+.home-faq summary::-webkit-details-marker { display: none; }
+.home-faq summary::after { content: '+'; float: right; color: var(--gold-brand, #C6A15B); font-size: 20px; line-height: 1; }
+.home-faq details[open] summary::after { content: '−'; }
+.home-faq details p { margin: 0; padding: 0 20px 18px; line-height: 1.75; color: #3d4a57; }

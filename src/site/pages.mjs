@@ -2,7 +2,7 @@
 import { SITE, HISTORY, PROGRAM_DETAILS, STATUS_LABEL, STATUS_NOTE, CASE_DETAILS, historyStats, buildFaq } from './data.mjs';
 import { INSIGHTS, INSIGHT_CATEGORIES, PLANNED_INSIGHTS } from './insights.mjs';
 import { summarizeReviews, pickQuote, orderForDisplay, caseIdFor, caseById, CURATED_QUOTES } from './review-insights.mjs';
-import { page, esc, abs, breadcrumbLd, crumbs, inquiryCta } from './layout.mjs';
+import { page, esc, abs, breadcrumbLd, crumbs, inquiryCta, organizationLd } from './layout.mjs';
 import { CATEGORIES, PROGRAMS, programLabel, toPublicReview, renderReviewDetail, renderReviewCard, hasContent, PROGRAM_PAGE_KEYS } from '../../assets/js/review-core.mjs';
 
 const fmt = (d) => d.replace(/-/g, '.');
@@ -217,7 +217,7 @@ ${reviewEvidenceSection(reviews, { id: 'instructor-reviews', title: '수강생 �
 ${inquiryCta('instructor_bottom')}`;
     return page({
         title: 'AI 교육 전문 강사 소개 | 필로소피 AI 교육',
-        description: `대학 교수님을 위한 생성형 AI 활용, AI 교수법, 연구·행정업무 자동화, AI 수업 앱 제작을 가르치는 필로소피 AI 교육의 강사 소개. ${s.orgs}개 기관·단체 ${s.sessions}회 강의 이력과 수강 후기, 교육 철학을 확인하세요.`,
+        description: `교수님·교사 등 교육자와 학생에게 생성형 AI 활용과 바이브 코딩을 실습으로 가르치는 AI 교육 강사, 필로소피 AI 교육. ${s.orgs}개 기관·단체 ${s.sessions}회 강의 이력${rs.total ? `, 수강 후기 ${rs.total}건` : ''}, 자주 묻는 질문을 확인하세요.`,
         path, active: 'ai-instructor', image: '/assets/web/edu-2607-gnu-2.jpg', ogType: 'profile',
         jsonLd: [
             { '@type': 'ProfilePage', '@id': abs(path) + '#webpage', url: abs(path), name: 'AI 교육 전문 강사 소개 — 필로소피 AI 교육', inLanguage: 'ko', mainEntity: { '@id': abs('/#organization') }, dateModified: SITE.updated },
@@ -546,4 +546,35 @@ export function reviewHeroLine(list) {
     if (!rs.total) return '';
     const m = (k) => rs.mentions.find(x => x.key === k).count;
     return `                        <div><dt>수강 후기</dt><dd>${rs.total}건 (${rs.authors}명) — 코딩 경험 없었음 ${m('nocode')}건 · 배포까지 ${m('deploy')}건 · 한 명씩 챙겨 줌 ${m('care')}건 · “할 수 있다” ${m('confidence')}건 <a href="#reviews-home" data-track="reviews_click" data-track-label="hero_fact">후기 보기</a></dd></div>`;
+}
+
+// ───────── 메인 페이지(index.html) 구조화 데이터 · 자주 묻는 질문 ─────────
+// 메인의 FAQPage 는 화면에 보이는 #faq 섹션과 같은 질문·답변만 담습니다.
+const HOME_FAQ_COUNT = 6;
+function homeFaqItems(list) {
+    const rs = summarizeReviews(list);
+    const faq = buildFaq(rs);
+    const keep = ['추천할 만한가요', '어떤 변화를', '어떤 교육을 하나요', '교육자와 학생', '대학 교수님을 대상으로', '어떻게 문의'];
+    return keep.map(k => faq.find(f => f.q.includes(k))).filter(Boolean).slice(0, HOME_FAQ_COUNT);
+}
+export function homeLd(list) {
+    const graph = [
+        organizationLd(),
+        { '@type': 'WebSite', '@id': abs('/#website'), url: abs('/'), name: SITE.name, alternateName: SITE.nameEn, inLanguage: 'ko', publisher: { '@id': abs('/#organization') } },
+        { '@type': 'WebPage', '@id': abs('/#webpage'), url: abs('/'), name: '필로소피 AI 교육 — AI 교육 강사 소개와 수강 후기', inLanguage: 'ko', isPartOf: { '@id': abs('/#website') }, about: { '@id': abs('/#organization') }, dateModified: SITE.updated },
+        { '@type': 'FAQPage', '@id': abs('/#faq'), mainEntity: homeFaqItems(list).map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+    ];
+    const json = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }, null, 1).replace(/</g, '\\u003c');
+    return `    <script type="application/ld+json">\n${json}\n    </script>`;
+}
+export function homeFaq(list) {
+    const items = homeFaqItems(list);
+    return `            <div class="section-head">
+                <span class="eyebrow">FAQ</span>
+                <h2 class="section-title" id="faqTitle">AI 교육 강사를 찾는 분들이 <em>자주 묻는 질문</em></h2>
+                <p class="section-sub">강의를 맡기기 전에 많이 물어보시는 내용입니다. 더 많은 질문은 <a href="/ai-instructor#faq-h">강사 소개 페이지</a>에 있습니다.</p>
+            </div>
+            <div class="home-faq">${items.map(f => `
+                <details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('')}
+            </div>`;
 }
