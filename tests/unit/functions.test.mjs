@@ -26,7 +26,7 @@ test('/reviews?cat=: 다른 분류 카드는 hidden', async () => {
 test('/reviews/<slug>: 상세 — 제목·날짜·원문·프로그램·카페 링크, 비공개 문서는 404', async () => {
     const r = await reviews.handler({ path: '/reviews/teacher-vibe-coding-2026-test' });
     assert.equal(r.statusCode, 200);
-    for (const s of ['<h1>', '2026.04.12', '후기 원문', '교육자를 위한 바이브 코딩', 'https://cafe.naver.com/PHILOSOPHYai/1', '&lt;script&gt;']) assert.ok(r.body.includes(s), s);
+    for (const s of ['<h1>', '2026.04.12', '후기 원문', '교수님만의 AI 수업 앱 만들기', 'https://cafe.naver.com/PHILOSOPHYai/1', '&lt;script&gt;']) assert.ok(r.body.includes(s), s);
     assert.ok(!r.body.includes('<script>alert'));
     assert.equal((await reviews.handler({ path: '/reviews/no-consent-2026-test' })).statusCode, 404);
     assert.equal((await reviews.handler({ path: '/reviews/draft-hidden-2026-test' })).statusCode, 404);

@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 강의·연수 문의 — 교사·교수 대상 AI 교육 | 필로소피 AI 교육</title>
-    <meta name="description" content="교육청·대학·학교·공공기관에서 진행한 AI 리터러시, 바이브 코딩 교육 이력과 필로소피 AI 봉사단 활동을 소개합니다. 강의·연수 문의를 남겨 주세요.">
-    <meta property="og:title" content="교육 문의 — Philosophy AI Education">
-    <meta property="og:description" content="AI 리터러시·바이브 코딩 교육 이력과 봉사단 활동. 강의와 연수 문의를 받습니다.">
+    <title>대학 AI 연수·교수법 워크숍 문의 | 필로소피 AI 교육</title>
+    <meta name="description" content="대학 교수님 대상 생성형 AI 연수, AI 교수법·평가 워크숍, AI 수업 앱 만들기, 연구·행정업무 자동화 교육을 문의하세요. 기관명과 교육 목적만 남기시면 대상과 일정에 맞는 구성안을 제안드립니다.">
+    <meta property="og:title" content="대학 AI 연수·교수법 워크숍 문의 | 필로소피 AI 교육">
+    <meta property="og:description" content="교수학습센터·교육혁신원·학과의 AI 연수 문의를 받습니다. 프로그램 A~D와 실제 강의 이력을 확인하고 문의해 주세요.">
     <meta property="og:type" content="website">
     <link rel="canonical" href="https://philosophyaiedu.com/education-inquiry">
     <meta property="og:url" content="https://philosophyaiedu.com/education-inquiry">
     <meta property="og:image" content="https://philosophyaiedu.com/assets/web/edu-2607-gnu-2.jpg">
     <meta property="og:site_name" content="필로소피 AI 교육">
     <meta property="og:locale" content="ko_KR">
-    <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "ContactPage", "@id": "https://philosophyaiedu.com/education-inquiry#webpage", "url": "https://philosophyaiedu.com/education-inquiry", "name": "교육 문의 — 필로소피 AI 교육", "inLanguage": "ko", "about": {"@id": "https://philosophyaiedu.com/#organization"}}, {"@type": "Organization", "@id": "https://philosophyaiedu.com/#organization", "name": "필로소피 AI 교육", "alternateName": "Philosophy AI Education", "url": "https://philosophyaiedu.com/", "email": "dearname27@naver.com", "sameAs": ["https://www.youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA", "https://cafe.naver.com/PHILOSOPHYai"]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "홈", "item": "https://philosophyaiedu.com/"}, {"@type": "ListItem", "position": 2, "name": "교육 문의", "item": "https://philosophyaiedu.com/education-inquiry"}]}]}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "ContactPage", "@id": "https://philosophyaiedu.com/education-inquiry#webpage", "url": "https://philosophyaiedu.com/education-inquiry", "name": "대학 AI 연수·교수법 워크숍 문의 — 필로소피 AI 교육", "inLanguage": "ko", "about": {"@id": "https://philosophyaiedu.com/#organization"}}, {"@type": "Organization", "@id": "https://philosophyaiedu.com/#organization", "name": "필로소피 AI 교육", "alternateName": "Philosophy AI Education", "url": "https://philosophyaiedu.com/", "email": "dearname27@naver.com", "sameAs": ["https://www.youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA", "https://cafe.naver.com/PHILOSOPHYai"]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "홈", "item": "https://philosophyaiedu.com/"}, {"@type": "ListItem", "position": 2, "name": "교육 문의", "item": "https://philosophyaiedu.com/education-inquiry"}]}]}</script>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23f2ebe0'/%3E%3Cpath d='M50 16 L57 43 L84 50 L57 57 L50 84 L43 57 L16 50 L43 43 Z' fill='%234a1556'/%3E%3C/svg%3E">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -491,7 +491,9 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
 
     </style>
     <link rel="stylesheet" href="assets/pastel-theme.css">
+    <link rel="stylesheet" href="assets/brand-2026.css">
     <link rel="stylesheet" href="assets/review-cards.css">
+    <script type="module" src="assets/js/inquiry.mjs"></script>
     <script type="module">
         // 후기 아카이브(reviews 컬렉션)에 게시된 후기가 있으면 우선 보여 줍니다 (대표 후기 → 최신 순, 최대 6개).
         // 없으면 기존 '강연 후기' 게시판 미리보기가 그대로 동작합니다.
@@ -515,16 +517,13 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         <nav class="container">
             <a href="index.html" class="logo">Philosophy <em>AI</em><span class="logo-kr">필로소피 AI 교육</span></a>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="/ai-instructor">강사 소개</a></li>
                 <li><a href="/programs">교육 프로그램</a></li>
                 <li><a href="/case-studies">교육 사례</a></li>
-                <li><a href="/reviews">후기</a></li>
-                <li><a href="index.html#tools">필로소피 AI 툴</a></li>
-                <li><a href="index.html#showcase">바이브코딩 쇼케이스</a></li>
+                <li><a href="/ai-instructor">강사 소개</a></li>
+                <li><a href="/insights/">AI 칼럼</a></li>
+                <li><a href="index.html#tools">AI 실습 도구</a></li>
                 <li><a href="community.html">커뮤니티</a></li>
-                <li><a href="education-inquiry.html" class="active">교육 문의</a></li>
-                <li><a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener" class="nav-ext nav-youtube"><i class="fab fa-youtube"></i> 유튜브</a></li>
-                <li><a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener" class="nav-ext nav-naver"><i class="fas fa-mug-hot"></i> 카페</a></li>
+                <li><a href="#inquiry" class="nav-cta" aria-current="page">대학 AI 연수 문의</a></li>
                 <li id="navLoginItem"><a href="auth-system.html" class="login-btn">로그인</a></li>
                 <li id="navUserItem" style="display: none;">
                     <div class="user-info-nav">
@@ -534,7 +533,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                     </div>
                 </li>
             </ul>
-            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+            <button type="button" class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="navMenu"><span></span><span></span><span></span></button>
         </nav>
     </header>
 
@@ -543,16 +542,15 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         <div class="container">
             <div class="page-hero-layout">
                 <div>
-                    <span class="eyebrow">Education Inquiry</span>
-                    <h1>교육 현장에서 검증한<br><em>AI 교육을 제안합니다</em>.</h1>
-                    <p class="lead">교육청·대학원·고등학교·공공기관·연구실에서
-                        <strong>AI 리터러시</strong>와 <strong>바이브 코딩</strong> 교육을 진행해 왔습니다.
-                        아래에서 지금까지의 교육 이력과 봉사단 활동을 한눈에 확인하시고,
-                        필요한 교육을 편하게 문의해 주세요.</p>
+                    <span class="eyebrow">University AI Training</span>
+                    <h1>대학 AI 연수·<br><em>교수법 워크숍 문의</em></h1>
+                    <p class="lead">교수학습센터(CTL)·교육혁신원·학과·연구소의 교수님 대상 AI 연수를 상담해 드립니다.
+                        <strong>기관명, 담당자, 이메일, 교육 목적</strong>만 남겨 주시면 대상·인원·일정에 맞는 구성안을 제안드립니다.
+                        교사·대학 직원 대상 연수도 문의하실 수 있습니다.</p>
                     <div class="page-hero-buttons">
-                        <a href="#inquiry" class="btn btn-primary"><i class="fas fa-paper-plane"></i> 교육 문의하기</a>
-                        <a href="#history" class="btn btn-ghost">교육 이력 먼저 보기 →</a>
-                        <a href="/programs" class="btn btn-ghost">교육 프로그램 →</a>
+                        <a href="#inquiry" class="btn btn-cta"><i class="fas fa-paper-plane" aria-hidden="true"></i> 문의 양식 작성하기</a>
+                        <a href="/programs" class="btn btn-ghost">교육 프로그램 A~D 보기 →</a>
+                        <a href="#history" class="btn btn-ghost">교육 이력 보기 →</a>
                     </div>
                 </div>
                 <div class="hero-figure">
@@ -563,6 +561,136 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                         <strong>경상국립대 물리 정교사(1급) 자격 연수</strong>
                         <small>2026.07 · AI 리터러시 교육</small>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 교육 문의 (Firestore 저장 + Netlify Forms 알림) ===== -->
+    <section id="inquiry" class="section-pad inquiry-band">
+        <div class="container">
+            <div class="contact-wrap">
+                <div class="contact-aside">
+                    <span class="eyebrow">Contact</span>
+                    <h2>교육 문의를 남겨 주세요.</h2>
+                    <p>필수 항목은 <b>기관명, 담당자명, 이메일, 교육 목적</b> 네 가지입니다. 나머지는 아는 만큼만 적어 주셔도 됩니다.
+                        접수된 문의는 확인 후 입력하신 이메일로 순차적으로 답변드립니다.</p>
+                    <ul class="contact-list">
+                        <li><span class="ci"><i class="fas fa-envelope" aria-hidden="true"></i></span>
+                            <div>이메일로 직접 문의<small><a class="mail-link" href="mailto:dearname27@naver.com">dearname27@naver.com</a></small></div></li>
+                        <li><span class="ci"><i class="fas fa-building-columns" aria-hidden="true"></i></span>
+                            <div>주요 대상<small>대학 교수님 · 교수학습센터·교육혁신원·학과·연구소 · 대학 직원 · 교사</small></div></li>
+                        <li><span class="ci"><i class="fas fa-list-check" aria-hidden="true"></i></span>
+                            <div>프로그램<small><a href="/programs">A. 생성형 AI 실무 입문 · B. 교수법·평가 혁신 · C. AI 수업 앱 · D. 연구·행정 자동화</a></small></div></li>
+                        <li><span class="ci"><i class="fas fa-clock" aria-hidden="true"></i></span>
+                            <div>운영 방식<small>특강·워크숍·여러 회차 과정 등 기관과 협의 (정해진 가격표 없음)</small></div></li>
+                    </ul>
+                    <button type="button" class="copy-mail" id="copyMailBtn">
+                        <i class="fas fa-copy" aria-hidden="true"></i> <span id="copyMailText">메일 주소 복사하기</span>
+                    </button>
+                </div>
+                <div class="contact-card">
+                    <form id="inquiryForm" name="education-inquiry" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+                        <input type="hidden" name="form-name" value="education-inquiry">
+                        <p class="hp-field" aria-hidden="true"><label>이 칸은 비워 두세요 <input type="text" id="bot-field" name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+                        <p class="form-required-note"><span class="req" aria-hidden="true">*</span> 표시는 필수 항목입니다.</p>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="org">기관명 <span class="req" aria-hidden="true">*</span></label>
+                                <input type="text" id="org" name="org" autocomplete="organization" placeholder="예) ○○대학교 교수학습센터" required maxlength="100" aria-describedby="orgError">
+                                <div class="error-message" id="orgError" role="alert"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="name">담당자명 <span class="req" aria-hidden="true">*</span></label>
+                                <input type="text" id="name" name="name" autocomplete="name" placeholder="성함" required maxlength="50" aria-describedby="nameError">
+                                <div class="error-message" id="nameError" role="alert"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dept">담당 부서<span class="opt">(선택)</span></label>
+                                <input type="text" id="dept" name="dept" placeholder="예) 교육혁신원, ○○학과" maxlength="60" aria-describedby="deptError">
+                                <div class="error-message" id="deptError" role="alert"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">이메일 <span class="req" aria-hidden="true">*</span></label>
+                                <input type="email" id="email" name="email" autocomplete="email" inputmode="email" placeholder="name@university.ac.kr" required maxlength="120" aria-describedby="emailError">
+                                <div class="error-message" id="emailError" role="alert"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">연락처<span class="opt">(선택)</span></label>
+                                <input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="tel" placeholder="010-0000-0000" maxlength="30" aria-describedby="phoneError">
+                                <div class="error-message" id="phoneError" role="alert"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="program">희망 교육 프로그램<span class="opt">(선택)</span></label>
+                                <select id="program" name="program" aria-describedby="programError">
+                                <option value="">선택해 주세요</option>
+                                <option value="A. 교수님을 위한 생성형 AI 실무 입문">A. 교수님을 위한 생성형 AI 실무 입문</option>
+                                <option value="B. AI 시대의 대학 교수법·평가 혁신">B. AI 시대의 대학 교수법·평가 혁신</option>
+                                <option value="C. 교수님만의 AI 수업 앱 만들기">C. 교수님만의 AI 수업 앱 만들기</option>
+                                <option value="D. 대학 연구·행정업무 AI 자동화">D. 대학 연구·행정업무 AI 자동화</option>
+                                <option value="교사·교육실무사 대상 연수">교사·교육실무사 대상 연수</option>
+                                <option value="아직 정하지 못했습니다 / 상담 희망">아직 정하지 못했습니다 / 상담 희망</option>
+                                </select>
+                                <div class="error-message" id="programError" role="alert"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="people">예상 참여 인원<span class="opt">(선택)</span></label>
+                                <input type="text" id="people" name="people" placeholder="예) 교수 25명" maxlength="50" aria-describedby="peopleError">
+                                <div class="error-message" id="peopleError" role="alert"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="schedule">희망 교육 일정<span class="opt">(선택)</span></label>
+                                <input type="text" id="schedule" name="schedule" placeholder="예) 2027년 2월 중, 3시간" maxlength="100" aria-describedby="scheduleError">
+                                <div class="error-message" id="scheduleError" role="alert"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">교육 목적 및 요청사항 <span class="req" aria-hidden="true">*</span></label>
+                            <textarea id="message" name="message" placeholder="교육 대상(예: 신임 교수), 기대하는 결과, 장소·실습 환경 등을 알려 주시면 더 정확하게 제안드릴 수 있습니다." required maxlength="3000" aria-describedby="messageError"></textarea>
+                            <div class="error-message" id="messageError" role="alert"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="referral">필로소피 AI 교육을 어떻게 알게 되셨나요?<span class="opt">(선택)</span></label>
+                            <select id="referral" name="referral" aria-describedby="referralError">
+                                <option value="">선택하지 않음</option>
+                                <option value="유튜브">유튜브</option>
+                                <option value="네이버 카페">네이버 카페</option>
+                                <option value="구글 검색">구글 검색</option>
+                                <option value="네이버 검색">네이버 검색</option>
+                                <option value="ChatGPT 등 AI 추천">ChatGPT 등 AI 추천</option>
+                                <option value="지인 추천">지인 추천</option>
+                                <option value="기타">기타</option>
+                            </select>
+                            <div class="error-message" id="referralError" role="alert"></div>
+                        </div>
+                        <div class="form-group consent-group">
+                            <details class="privacy-box">
+                                <summary>개인정보 수집·이용 안내 (펼쳐 보기)</summary>
+                                <ul>
+                                    <li><b>수집 항목</b>: 기관명, 담당자명, 이메일 (선택: 담당 부서, 연락처, 희망 프로그램, 예상 인원, 희망 일정, 알게 된 경로), 문의 내용</li>
+                                    <li><b>이용 목적</b>: 교육 문의 확인, 답변, 교육 일정·구성 협의</li>
+                                    <li><b>보유 기간</b>: 문의일로부터 1년 또는 삭제를 요청하실 때까지. 이후 지체 없이 삭제합니다.</li>
+                                    <li><b>처리 위탁·보관</b>: 문의 내용은 Google Firebase(Cloud Firestore)에 저장되며, 이메일 알림을 위해 Netlify Forms가 사용될 수 있습니다.</li>
+                                    <li>동의를 거부하실 수 있으며, 이 경우 양식 대신 <a href="mailto:dearname27@naver.com">dearname27@naver.com</a>으로 직접 문의해 주세요.</li>
+                                </ul>
+                            </details>
+                            <label class="consent-label" for="consent"><input type="checkbox" id="consent" name="consent" required aria-describedby="consentError"> 개인정보 수집·이용에 동의합니다. <span class="req" aria-hidden="true">*</span></label>
+                            <div class="error-message" id="consentError" role="alert"></div>
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            <span class="text"><i class="fas fa-paper-plane" aria-hidden="true"></i> 문의 보내기</span>
+                            <span class="loading"><i class="fas fa-spinner" aria-hidden="true"></i> 접수하는 중...</span>
+                        </button>
+                    </form>
+                    <div class="inquiry-result" id="inquiryResult" role="status" aria-live="polite" tabindex="-1" hidden></div>
+                    <p class="form-note">양식이 열리지 않거나 접수에 실패하면
+                        <a href="mailto:dearname27@naver.com">dearname27@naver.com</a> 으로 직접 보내 주세요.</p>
                 </div>
             </div>
         </div>
@@ -616,40 +744,36 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         <div class="container">
             <div class="section-head reveal">
                 <div class="ornament"><svg width="200" height="24" viewBox="0 0 200 24" aria-hidden="true"><line x1="0" y1="12" x2="80" y2="12" stroke="currentColor" stroke-width="1" opacity="0.5"></line><line x1="120" y1="12" x2="200" y2="12" stroke="currentColor" stroke-width="1" opacity="0.5"></line><path d="M100 4 L96 18 L100 16 L104 18 Z" fill="currentColor"></path></svg></div>
-                <span class="eyebrow">What I Teach</span>
-                <h2 class="section-title">이런 <em>교육</em>을 진행합니다</h2>
-                <p class="section-sub">듣는 분들의 배경과 목표에 맞춰 실습 중심으로 구성합니다.
-                    아래 주제를 조합하거나, 기관에 필요한 형태로 새로 설계해 드릴 수 있습니다.</p>
+                <span class="eyebrow">Programs</span>
+                <h2 class="section-title">대학 교수님을 위한 <em>4대 AI 교육 프로그램</em></h2>
+                <p class="section-sub">기관의 대상과 목표에 맞춰 조합하거나 새로 구성합니다. 교육 시간과 회차는 협의해 정합니다.
+                    각 프로그램의 대상·준비사항·관련 강의 사례는 <a href="/programs">교육 프로그램</a> 페이지에서 확인하세요.</p>
             </div>
             <div class="topic-grid reveal">
-                <div class="topic-card">
-                    <div class="topic-icon"><i class="fas fa-compass"></i></div>
-                    <h3>AI 리터러시 교육</h3>
-                    <div class="topic-sub">사용법을 넘어, 판단 기준까지</div>
-                    <p>AI가 잘하는 일과 못하는 일, 환각과 검증, 개인정보와 저작권까지.
-                        현장에서 바로 쓸 수 있는 기준을 세우는 입문·심화 연수입니다.</p>
-                </div>
-                <div class="topic-card">
-                    <div class="topic-icon c2"><i class="fas fa-code"></i></div>
-                    <h3>바이브 코딩</h3>
-                    <div class="topic-sub">코딩을 몰라도 도구를 만든다</div>
-                    <p>Claude Code, GPT Codex 등으로 수업 도구와 업무 자동화를 직접 만들어 보는 실습 수업입니다.
-                        입문부터 배포까지 한 번에 경험합니다.</p>
-                </div>
-                <div class="topic-card">
-                    <div class="topic-icon c3"><i class="fas fa-chalkboard-user"></i></div>
-                    <h3>교육자 대상 직무연수</h3>
-                    <div class="topic-sub">수업과 업무에 바로 쓰는 AI</div>
-                    <p>교사·교육실무사·전문적학습공동체를 위한 연수입니다.
-                        수업 자료 제작, 평가 문항 설계, 행정 업무 자동화를 함께 실습합니다.</p>
-                </div>
-                <div class="topic-card">
-                    <div class="topic-icon c4"><i class="fas fa-flask"></i></div>
-                    <h3>연구실·기업 특강</h3>
-                    <div class="topic-sub">현장 맞춤 심화 주제</div>
-                    <p>파인튜닝, 하이브리드 AI 활용 등 연구·실무 목적에 맞춘 심화 특강입니다.
-                        기관의 데이터와 과제를 바탕으로 내용을 설계합니다.</p>
-                </div>
+                <a class="topic-card" href="/programs#ai-literacy">
+                    <div class="topic-icon"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i></div>
+                    <h3>A. 교수님을 위한 생성형 AI 실무 입문</h3>
+                    <div class="topic-sub">강의자료·연구자료를 AI로, 검증까지</div>
+                    <p>ChatGPT·Claude·Gemini로 강의자료를 만들고 연구자료를 정리하며, 결과 검증과 개인정보·보안 기준을 세웁니다.</p>
+                </a>
+                <a class="topic-card" href="/programs#professor-ai">
+                    <div class="topic-icon c2"><i class="fas fa-chalkboard-user" aria-hidden="true"></i></div>
+                    <h3>B. AI 시대의 대학 교수법·평가 혁신</h3>
+                    <div class="topic-sub">AI를 쓰는 학생을 전제로 다시 설계</div>
+                    <p>사고 과정을 드러내는 수업 활동, AI 활용 과제, 평가 루브릭과 피드백을 함께 만듭니다. (신규 제안 프로그램)</p>
+                </a>
+                <a class="topic-card" href="/programs#vibe-coding">
+                    <div class="topic-icon c3"><i class="fas fa-code" aria-hidden="true"></i></div>
+                    <h3>C. 교수님만의 AI 수업 앱 만들기</h3>
+                    <div class="topic-sub">코딩을 몰라도 Claude Code로</div>
+                    <p>바이브 코딩으로 수업용 웹 앱을 만들고 GitHub·Netlify로 배포합니다. 필요하면 Firebase·AI API까지 연결합니다.</p>
+                </a>
+                <a class="topic-card" href="/programs#admin-automation">
+                    <div class="topic-icon c4"><i class="fas fa-gears" aria-hidden="true"></i></div>
+                    <h3>D. 대학 연구·행정업무 AI 자동화</h3>
+                    <div class="topic-sub">반복 업무를 AI 워크플로로</div>
+                    <p>연구자료 정리, 반복 문서, 보고서 초안, 데이터 분석을 자동화하고 데이터 보안·검증 기준을 함께 다룹니다.</p>
+                </a>
             </div>
         </div>
     </section>
@@ -934,113 +1058,6 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         </div>
     </section>
 
-    <!-- ===== 교육 문의 ===== -->
-    <section id="inquiry" class="section-pad">
-        <div class="container">
-            <div class="contact-wrap">
-                <div class="contact-aside reveal">
-                    <span class="eyebrow">Contact</span>
-                    <h2>교육 문의를 남겨 주세요.</h2>
-                    <p>기관·대상·인원·희망 일정만 알려 주시면, 상황에 맞는 교육 구성과 진행 방식을 제안해 드립니다.
-                        아래 양식을 작성하시면 메일 작성 창이 열립니다.</p>
-                    <ul class="contact-list">
-                        <li><span class="ci"><i class="fas fa-envelope"></i></span>
-                            <div>이메일 문의<small><a class="mail-link" href="mailto:dearname27@naver.com">dearname27@naver.com</a></small></div></li>
-                        <li><span class="ci"><i class="fas fa-chalkboard-user"></i></span>
-                            <div>강의·연수<small>교육청·학교·대학·기업·공공기관</small></div></li>
-                        <li><span class="ci"><i class="fas fa-users-line"></i></span>
-                            <div>대상<small>교사·교육실무사·대학원생·연구원·일반 실무자</small></div></li>
-                        <li><span class="ci"><i class="fas fa-clock"></i></span>
-                            <div>회신<small>확인 후 순차적으로 답변드립니다</small></div></li>
-                    </ul>
-                    <button type="button" class="copy-mail" id="copyMailBtn">
-                        <i class="fas fa-copy"></i> <span id="copyMailText">메일 주소 복사하기</span>
-                    </button>
-                </div>
-
-                <div class="contact-card reveal">
-                    <form id="inquiryForm" novalidate>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="name">이름</label>
-                                <input type="text" id="name" name="name" placeholder="성함을 입력해 주세요" required>
-                                <div class="error-message" id="nameError">이름을 2글자 이상 입력해주세요.</div>
-                            </div>
-                            <div class="form-group">
-                                <label for="org">소속·기관</label>
-                                <input type="text" id="org" name="org" placeholder="예) ○○교육청, ○○고등학교" required>
-                                <div class="error-message" id="orgError">소속·기관명을 2글자 이상 입력해주세요.</div>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="email">이메일</label>
-                                <input type="email" id="email" name="email" placeholder="answer@example.com" required>
-                                <div class="error-message" id="emailError">올바른 이메일 주소를 입력해주세요.</div>
-                            </div>
-                            <div class="form-group">
-                                <label for="phone">연락처<span class="opt">(선택)</span></label>
-                                <input type="tel" id="phone" name="phone" placeholder="010-0000-0000">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="topic">희망 교육 주제</label>
-                            <select id="topic" name="topic">
-                                <option value="AI 리터러시 교육">AI 리터러시 교육</option>
-                                <option value="바이브 코딩 (입문)">바이브 코딩 (입문)</option>
-                                <option value="바이브 코딩 (심화·프로젝트)">바이브 코딩 (심화·프로젝트)</option>
-                                <option value="교육자 대상 직무연수">교육자 대상 직무연수</option>
-                                <option value="교육행정 업무 자동화">교육행정 업무 자동화</option>
-                                <option value="대학 교수자를 위한 AI 활용">대학 교수자를 위한 AI 활용</option>
-                                <option value="학생 대상 AI 수업">학생 대상 AI 수업</option>
-                                <option value="연구실·기업 특강 (파인튜닝 등)">연구실·기업 특강 (파인튜닝 등)</option>
-                                <option value="아직 정하지 못했습니다 / 상담 희망">아직 정하지 못했습니다 / 상담 희망</option>
-                            </select>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="schedule">희망 일정<span class="opt">(선택)</span></label>
-                                <input type="text" id="schedule" name="schedule" placeholder="예) 2026년 9월 중, 3시간">
-                            </div>
-                            <div class="form-group">
-                                <label for="people">예상 인원<span class="opt">(선택)</span></label>
-                                <input type="text" id="people" name="people" placeholder="예) 교사 30명">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="referral">필로소피 AI 교육을 어떻게 알게 되셨나요?<span class="opt">(선택)</span></label>
-                            <select id="referral" name="referral">
-                                <option value="">선택하지 않음</option>
-                                <option value="유튜브">유튜브</option>
-                                <option value="네이버 카페">네이버 카페</option>
-                                <option value="구글 검색">구글 검색</option>
-                                <option value="네이버 검색">네이버 검색</option>
-                                <option value="ChatGPT 등 AI 추천">ChatGPT 등 AI 추천</option>
-                                <option value="지인 추천">지인 추천</option>
-                                <option value="기타">기타</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="message">문의 내용</label>
-                            <textarea id="message" name="message" placeholder="교육 대상, 목표, 장소, 준비 환경 등 알려주시면 더 정확하게 제안드릴 수 있습니다." required></textarea>
-                            <div class="error-message" id="messageError">문의 내용을 10글자 이상 입력해주세요.</div>
-                        </div>
-                        <button type="submit" class="submit-btn">
-                            <span class="text"><i class="fas fa-paper-plane"></i> 교육 문의 보내기</span>
-                            <span class="loading"><i class="fas fa-spinner"></i> 메일 창을 여는 중...</span>
-                        </button>
-                    </form>
-                    <div class="success-message" id="successMessage">
-                        <i class="fas fa-circle-check"></i>
-                        <span>메일 작성 창이 열렸습니다. 내용을 확인하시고 '보내기'를 누르면 문의가 전송됩니다.</span>
-                    </div>
-                    <p class="form-note">메일 앱이 열리지 않는다면
-                        <a href="mailto:dearname27@naver.com">dearname27@naver.com</a> 으로 직접 보내주세요.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- ===== Lightbox ===== -->
     <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="사진 크게 보기">
         <button class="lb-close" id="lbClose" aria-label="닫기"><i class="fas fa-xmark"></i></button>
@@ -1078,7 +1095,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                         <h4>교육 문의</h4>
                         <a href="mailto:dearname27@naver.com">dearname27@naver.com</a>
                         <a href="#history">교육 이력</a>
-                        <a href="#reviews">강연 후기</a>
+                        <a href="/reviews">수강 후기</a>
                         <a href="#volunteer">봉사단 활동</a>
                         <a href="https://cafe.naver.com/PHILOSOPHYai" target="_blank" rel="noopener">네이버 카페</a>
                         <a href="https://youtube.com/channel/UCKXP5U8mn3UMC6gWblROxAA?si=D-UYjTy7zj8Rg8Fd" target="_blank" rel="noopener">유튜브</a>
@@ -1103,8 +1120,9 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('navMenu');
         hamburger.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
+            const open = navMenu.classList.toggle('active');
             hamburger.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
         });
         navMenu.querySelectorAll('a').forEach(a => {
             a.addEventListener('click', () => {
@@ -1186,101 +1204,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
             setTimeout(() => { copyMailText.textContent = '메일 주소 복사하기'; }, 2500);
         });
 
-        // ===== 프로그램 페이지에서 넘어온 희망 주제 미리 선택 (?topic=) =====
-        (function prefillTopic() {
-            const t = new URLSearchParams(location.search).get('topic');
-            if (!t) return;
-            const sel = document.getElementById('topic');
-            const v = t.trim().slice(0, 60);
-            let opt = [...sel.options].find(o => o.value === v);
-            if (!opt) { opt = document.createElement('option'); opt.value = v; opt.textContent = v; sel.insertBefore(opt, sel.firstChild); }
-            sel.value = v;
-        })();
-
-        // ===== 교육 문의 폼 =====
-        const inquiryForm = document.getElementById('inquiryForm');
-        const successMessage = document.getElementById('successMessage');
-        let isSubmitting = false;
-
-        const validators = {
-            name: v => v.trim().length >= 2,
-            org: v => v.trim().length >= 2,
-            email: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()),
-            message: v => v.trim().length >= 10,
-        };
-
-        function setFieldState(field, valid) {
-            const group = field.closest('.form-group');
-            const err = group.querySelector('.error-message');
-            group.classList.toggle('error', !valid);
-            group.classList.toggle('success', valid);
-            if (err) err.classList.toggle('show', !valid);
-        }
-
-        Object.keys(validators).forEach(id => {
-            const field = document.getElementById(id);
-            field.addEventListener('blur', () => setFieldState(field, validators[id](field.value)));
-            field.addEventListener('input', () => {
-                if (field.closest('.form-group').classList.contains('error')) {
-                    setFieldState(field, validators[id](field.value));
-                }
-            });
-        });
-
-        inquiryForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (isSubmitting) return;
-
-            let allValid = true;
-            let firstInvalid = null;
-            Object.keys(validators).forEach(id => {
-                const field = document.getElementById(id);
-                const valid = validators[id](field.value);
-                setFieldState(field, valid);
-                if (!valid) { allValid = false; firstInvalid = firstInvalid || field; }
-            });
-            if (!allValid) { firstInvalid.focus(); return; }
-
-            isSubmitting = true;
-            const btn = inquiryForm.querySelector('.submit-btn');
-            btn.classList.add('loading');
-            btn.disabled = true;
-
-            try {
-                const val = (id) => document.getElementById(id).value.trim();
-                const name = val('name'), org = val('org'), email = val('email');
-                const phone = val('phone'), topic = val('topic');
-                const schedule = val('schedule'), people = val('people'), message = val('message');
-                const referral = val('referral');
-                // 성과 측정: 문의 양식 제출(메일 창 열기)과 유입 경로만 GA4에 기록 — 이름·연락처 등 개인정보는 보내지 않음
-                if (typeof gtag === 'function') gtag('event', 'inquiry_submit', { referral_source: referral || '(미선택)', topic });
-
-                const subject = `[교육 문의] ${org} ${name}님 — ${topic}`;
-                const body =
-                    `■ 이름: ${name}\n` +
-                    `■ 소속·기관: ${org}\n` +
-                    `■ 이메일: ${email}\n` +
-                    `■ 연락처: ${phone || '-'}\n` +
-                    `■ 희망 교육 주제: ${topic}\n` +
-                    `■ 희망 일정: ${schedule || '-'}\n` +
-                    `■ 예상 인원: ${people || '-'}\n` +
-                    `■ 알게 된 경로: ${referral || '-'}\n\n` +
-                    `■ 문의 내용\n${message}\n\n` +
-                    `— Philosophy AI Education 교육 문의 페이지에서 보냄`;
-                window.location.href =
-                    `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-                successMessage.classList.add('show');
-                setTimeout(() => successMessage.classList.remove('show'), 8000);
-            } catch (err) {
-                console.error('문의 전송 오류:', err);
-                alert(`메일 앱을 여는 중 오류가 발생했습니다. ${CONTACT_EMAIL} 으로 직접 보내주세요.`);
-            } finally {
-                isSubmitting = false;
-                btn.classList.remove('loading');
-                btn.disabled = false;
-            }
-        });
+        // ===== 교육 문의 양식: assets/js/inquiry.mjs (검증 · 스팸 방어 · Firestore 접수 · Netlify Forms 알림) =====
 
         // ===== Firebase auth (네비게이션 로그인 상태) =====
         const firebaseConfig = {

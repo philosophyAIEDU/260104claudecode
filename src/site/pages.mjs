@@ -1,6 +1,6 @@
 // 정적 페이지 빌더 — scripts/build-pages.mjs 가 HTML 파일로 저장합니다.
-import { SITE, HISTORY, PROGRAM_DETAILS, STATUS_LABEL, CASE_DETAILS, historyStats, buildFaq } from './data.mjs';
-import { INSIGHTS } from './insights.mjs';
+import { SITE, HISTORY, PROGRAM_DETAILS, STATUS_LABEL, STATUS_NOTE, CASE_DETAILS, historyStats, buildFaq } from './data.mjs';
+import { INSIGHTS, INSIGHT_CATEGORIES, PLANNED_INSIGHTS } from './insights.mjs';
 import { page, esc, abs, breadcrumbLd, crumbs, inquiryCta } from './layout.mjs';
 import { CATEGORIES, PROGRAMS, programLabel, toPublicReview, renderReviewDetail, renderReviewCard, hasContent } from '../../assets/js/review-core.mjs';
 
@@ -45,32 +45,33 @@ export function aiInstructorPage() {
     const s = historyStats();
     const faq = buildFaq();
     const path = '/ai-instructor';
-    const crumb = [{ name: '홈', path: '/' }, { name: 'AI 강사 소개', path }];
+    const crumb = [{ name: '홈', path: '/' }, { name: 'AI 교육 강사 소개', path }];
+    const uni = HISTORY.filter(h => ['경상국립대학교', '경희대학교', '서울대학교'].includes(h.org));
     const body = `
 ${crumbs(crumb)}
 <section class="page-hero">
   <div class="wrap hero-grid">
     <div>
-      <p class="eyebrow">AI Instructor for Educators</p>
-      <h1>교육자를 위한 AI 강사,<br>필로소피 AI 교육</h1>
+      <p class="eyebrow">AI Education Instructor</p>
+      <h1>대학 교수님을 위한 AI 교육 강사,<br>필로소피 AI 교육</h1>
       <div class="answer-box"><p>${esc(SITE.oneLiner)}</p></div>
-      <p class="lead">학교 교사와 대학 교수 등 교육자들이 생성형 AI를 실제 교육 현장에 적용할 수 있도록 실습 중심의 교육을 진행합니다. AI 리터러시부터 교육용 웹앱 제작, 업무 자동화까지 교육자의 문제를 해결하는 방법을 함께 연구하고 실습합니다.</p>
-      <ul class="chips" aria-label="핵심 분야">
-        <li>AI 리터러시</li><li>교수자 AI 교육</li><li>교사 AI 직무연수</li><li>바이브 코딩</li><li>교육 업무 자동화</li>
+      <p class="lead">교수님들이 실제로 겪는 고민 — 강의자료 제작, AI 시대의 과제·평가, 반복되는 연구·행정업무 — 에서 출발해, 비전공자도 따라 할 수 있는 단계별 실습으로 함께 해결합니다. 기술적으로 가능한 것과 교육적으로 바람직한 것을 구분하는 판단과 윤리도 함께 다룹니다.</p>
+      <ul class="chips" aria-label="전문 분야">
+        <li>교수님 AI 실습</li><li>대학 교수법 혁신</li><li>연구·업무 자동화</li><li>AI 수업 앱 제작</li>
       </ul>
       <div class="btn-row">
-        <a class="btn btn-primary" href="${SITE.inquiryUrl}" data-track="cta_inquiry_click" data-track-label="instructor_top">강의 및 연수 문의하기</a>
+        <a class="btn btn-cta" href="${SITE.inquiryUrl}" data-track="cta_inquiry_click" data-track-label="instructor_top">대학 AI 연수 문의</a>
         <a class="btn btn-ghost" href="#history">강의 이력 보기</a>
       </div>
     </div>
     <aside class="profile-card" aria-label="강사 프로필">
-      <img src="/assets/mascot.jpg" alt="필로소피 AI 교육의 철학자 캐릭터 일러스트" width="168" height="168">
-      <p class="img-note">프로필 이미지는 필로소피 AI 교육의 캐릭터 일러스트입니다.</p>
+      <img src="/assets/mascot.jpg" alt="보라색 재킷을 입은 필로소피 AI 교육의 철학자 캐릭터 일러스트" width="168" height="168">
+      <p class="img-note">얼굴을 공개하지 않는 대신 철학자 캐릭터로 소개합니다.</p>
       <h2 style="font-size:20px;margin:6px 0 2px">필로소피 AI 교육</h2>
       <p class="role">Philosophy AI Education</p>
       <dl>
         <div><dt>활동명</dt><dd>필로소피 AI 교육</dd></div>
-        <div><dt>전문 분야</dt><dd>교육자 대상 생성형 AI 활용 및 바이브 코딩 실습 교육</dd></div>
+        <div><dt>전문 분야</dt><dd>${esc(SITE.specialty)}</dd></div>
         <div><dt>교육 대상</dt><dd>${esc(SITE.audiences.join(' · '))}</dd></div>
         <div><dt>강의 문의</dt><dd><a href="mailto:${SITE.email}">${SITE.email}</a></dd></div>
       </dl>
@@ -80,21 +81,21 @@ ${crumbs(crumb)}
 
 <section class="section section-alt" aria-labelledby="quick-h">
   <div class="wrap">
-    <div class="section-head"><p class="eyebrow">At a Glance</p><h2 id="quick-h">강사를 찾는 담당자분께, 핵심만 먼저</h2></div>
+    <div class="section-head"><p class="eyebrow">For University Staff</p><h2 id="quick-h">대학 기관 담당자분께, 핵심만 먼저</h2></div>
     <div class="grid-3">
-      <div class="card"><h3>어떤 교육을 하나요?</h3><p>생성형 AI 리터러시, 바이브 코딩(Claude Code·GPT Codex), 교육용 웹앱 제작, 교육행정 업무 자동화를 실습 중심으로 가르칩니다. <a href="/programs">교육 프로그램 보기</a></p></div>
-      <div class="card"><h3>누구를 대상으로 하나요?</h3><p>${esc(SITE.audiences.join(', '))}을 대상으로 합니다.</p></div>
-      <div class="card"><h3>실제 강의 경험이 있나요?</h3><p>${s.since}부터 ${esc(s.orgList.join(', '))}에서 ${s.sessions}회 강의했습니다. <a href="/case-studies">교육 사례 보기</a></p></div>
-      <div class="card"><h3>어떤 결과물을 만드나요?</h3><p>수업용 웹앱, AI 활용 체크리스트, 업무 자동화 초안처럼 현장에서 바로 쓰는 결과물을 직접 만듭니다. 강사가 만든 도구는 <a href="/#tools">필로소피 AI 툴</a>에 공개되어 있습니다.</p></div>
-      <div class="card"><h3>수강자 후기가 있나요?</h3><p>네이버 카페에 남겨 주신 후기 가운데 공개 동의를 받은 글을 원문 그대로 옮겨 게시합니다. <a href="/reviews">후기 보기</a></p></div>
-      <div class="card"><h3>어떻게 문의하나요?</h3><p><a href="${SITE.inquiryUrl}">교육 문의 양식</a> 또는 <a href="mailto:${SITE.email}">${SITE.email}</a>로 기관·대상·인원·일정을 보내 주세요.</p></div>
+      <div class="card"><h3>어떤 분야를 가르치나요?</h3><p>${esc(SITE.specialty)}입니다. <a href="/programs">4대 대학 AI 교육 프로그램 보기</a></p></div>
+      <div class="card"><h3>교육 철학은 무엇인가요?</h3><p>“${esc(SITE.growthSlogan)}” AI로 교수님의 능력을 키우고, 그 능력이 학생과 사회에 선한 영향력으로 이어지도록 돕습니다.</p></div>
+      <div class="card"><h3>실제로 어떤 교육을 했나요?</h3><p>${s.since}부터 ${esc(s.orgList.join(', '))}에서 ${s.sessions}회 강의했습니다. <a href="/case-studies">교육 사례 보기</a></p></div>
+      <div class="card"><h3>교육 대상과 방식은요?</h3><p>대학 교수님을 중심으로 대학 직원·연구자·교사까지, 직접 손으로 해 보는 실습 중심으로 진행합니다. 특강·워크숍·여러 회차 과정 등은 기관과 협의해 정합니다.</p></div>
+      <div class="card"><h3>우리 대학에 맞출 수 있나요?</h3><p>문의 내용(대상, 인원, 목적, 일정)을 바탕으로 프로그램 A~D를 조합하거나 새로 구성해 제안드립니다.</p></div>
+      <div class="card"><h3>교수님 대상 경험은 어느 정도인가요?</h3><p>교수님만을 대상으로 한 단독 강의는 아직 공개 기록에 없습니다. 대학 부설 연수원·대학원·연구실 강의 경험을 바탕으로 교수님용 과정을 구성했습니다.</p></div>
     </div>
   </div>
 </section>
 
 <section class="section" aria-labelledby="exp-h">
   <div class="wrap">
-    <div class="section-head"><p class="eyebrow">Expertise</p><h2 id="exp-h">주요 전문 분야</h2></div>
+    <div class="section-head"><p class="eyebrow">Expertise</p><h2 id="exp-h">전문 분야</h2></div>
     <div class="grid-3">${SITE.expertise.map(e => `<div class="card"><h3>${esc(e.title)}</h3><p>${esc(e.desc)}</p></div>`).join('')}</div>
   </div>
 </section>
@@ -102,7 +103,7 @@ ${crumbs(crumb)}
 <section class="section section-alt" id="history" aria-labelledby="history-h">
   <div class="wrap">
     <div class="section-head"><p class="eyebrow">Teaching History</p><h2 id="history-h">강의 이력</h2>
-      <p>교육청·대학·대학원·고등학교·공공기관·연구실에서 진행한 강의입니다. 각 항목을 누르면 사진과 교육 내용을 볼 수 있습니다.</p></div>
+      <p>대학 연수원·대학원·연구실·교육청·고등학교·공공기관에서 진행한 강의입니다. 이 중 대학 현장의 강의는 ${uni.map(h => esc(h.org)).join(', ')}입니다. 각 항목을 누르면 사진과 교육 내용을 볼 수 있습니다.</p></div>
     ${historyListHtml(HISTORY)}
     ${statsHtml()}
   </div>
@@ -110,20 +111,20 @@ ${crumbs(crumb)}
 
 <section class="section" aria-labelledby="diff-h">
   <div class="wrap">
-    <div class="section-head"><p class="eyebrow">Difference</p><h2 id="diff-h">AI 도구의 사용법을 알려주는 것을 넘어,<br>교육자가 직접 자신의 교육용 시스템을 만들 수 있도록 돕습니다.</h2></div>
+    <div class="section-head"><p class="eyebrow">Difference</p><h2 id="diff-h">AI 도구 사용법을 알려주는 것을 넘어,<br>교수님이 직접 자신의 교육 도구를 만들 수 있도록 돕습니다.</h2></div>
     <div class="compare">
       <div><h3>도구 사용법 중심 교육</h3><ul><li>새로 나온 AI 도구의 기능을 소개합니다.</li><li>정해진 예시를 따라 해 봅니다.</li><li>도구가 바뀌면 다시 배워야 합니다.</li><li>결과물은 강의 시간에 만든 예제에 머뭅니다.</li></ul></div>
-      <div><h3>필로소피 AI 교육의 실습</h3><ul><li>교육자의 실제 고민(수업·평가·행정)에서 출발합니다.</li><li>AI에게 맡길 일과 사람이 판단할 일을 구분하는 기준을 세웁니다.</li><li>내 수업에 맞는 웹앱·업무 도구를 직접 만들어 배포합니다.</li><li>도구가 바뀌어도 쓸 수 있는 설계 방법이 남습니다.</li></ul></div>
+      <div><h3>필로소피 AI 교육의 실습</h3><ul><li>교수님의 실제 고민(강의·평가·연구·행정)에서 출발합니다.</li><li>AI에게 맡길 일과 교수님이 판단할 일을 구분하는 기준을 세웁니다.</li><li>내 수업에 맞는 웹 앱·업무 도구를 직접 만들어 배포합니다.</li><li>도구가 바뀌어도 쓸 수 있는 설계 방법이 남습니다.</li></ul></div>
     </div>
   </div>
 </section>
 
 <section class="section section-alt" aria-labelledby="fit-h">
   <div class="wrap">
-    <div class="section-head"><p class="eyebrow">Honest Fit</p><h2 id="fit-h">이런 기관·교육자께 맞습니다</h2><p>섭외 전에 비교하실 수 있도록, 잘 맞는 경우와 다른 선택이 나은 경우를 함께 적었습니다.</p></div>
+    <div class="section-head"><p class="eyebrow">Honest Fit</p><h2 id="fit-h">이런 대학·교수님께 맞습니다</h2><p>섭외 전에 비교하실 수 있도록, 잘 맞는 경우와 다른 선택이 나은 경우를 함께 적었습니다.</p></div>
     <div class="fit">
-      <div class="yes"><b>잘 맞는 경우</b>AI를 수업과 업무에 실제로 적용하는 실습이 필요할 때 · 코딩 경험 없이 교육용 도구를 만들어 보고 싶을 때 · 교사·교육실무사·대학원생 등 교육 현장 구성원 대상 연수</div>
-      <div class="no"><b>다른 선택이 나을 수 있는 경우</b>대규모 강연 위주의 AI 트렌드 소개만 필요할 때 · 기관 전산 시스템 연동 개발이 목적일 때 · 대학 교수 대상 단독 진행 이력을 필수 조건으로 보실 때 (현재 대학원·연구실 특강 이력 보유)</div>
+      <div class="yes"><b>잘 맞는 경우</b>교수님들이 AI를 강의·연구·행정에 직접 적용해 보는 실습이 필요할 때 · 코딩 경험 없이 수업 도구를 만들어 보고 싶을 때 · 교수학습센터에서 실습형 AI 연수를 기획할 때</div>
+      <div class="no"><b>다른 선택이 나을 수 있는 경우</b>대규모 강연 위주의 AI 트렌드 소개만 필요할 때 · 학내 전산 시스템 연동 개발이 목적일 때 · 교수님 대상 단독 강의 이력을 필수 조건으로 보실 때</div>
     </div>
   </div>
 </section>
@@ -131,9 +132,9 @@ ${crumbs(crumb)}
 <section class="section" aria-labelledby="phil-h">
   <div class="wrap narrow">
     <p class="eyebrow">Philosophy</p>
-    <h2 id="phil-h">교육 철학</h2>
+    <h2 id="phil-h">교육 철학 — ${esc(SITE.growthSlogan)}</h2>
     <div class="answer-box"><p><b>“${esc(SITE.philosophy)}”</b></p></div>
-    <p>AI 시대에도 배움의 중심은 사람입니다. 필로소피 AI 교육은 AI를 정답 기계가 아니라 교육자의 능력을 키우는 도구로 다루고, 그렇게 키운 능력을 다시 나눕니다. 필로소피 AI 봉사단은 정기 스터디를 열고, 리퍼 노트북을 정비해 보육원·학교 등 4개 기관에 전달했습니다. (<a href="/education-inquiry#volunteer">봉사단 활동 보기</a>)</p>
+    <p>필로소피 AI 교육은 “${esc(SITE.legacySlogan)}”라는 마음으로 시작했습니다. AI 시대에도 배움의 중심은 사람이기에, AI를 정답 기계가 아니라 교육자의 능력을 키우는 도구로 다루고, 그렇게 키운 능력을 다시 나눕니다. 필로소피 AI 봉사단은 정기 스터디를 열고, 리퍼 노트북을 정비해 보육원·학교 등 4개 기관에 전달했습니다. (<a href="/education-inquiry#volunteer">봉사단 활동 보기</a>)</p>
   </div>
 </section>
 
@@ -147,7 +148,7 @@ ${crumbs(crumb)}
 <section class="section" aria-labelledby="ch-h">
   <div class="wrap narrow">
     <h2 id="ch-h">공식 채널</h2>
-    <p>필로소피 AI 교육은 모든 채널에서 같은 이름과 소개를 사용합니다.</p>
+    <p>${esc(SITE.channelIntro)}</p>
     <ul class="related">
       <li><a href="${SITE.origin}/">공식 홈페이지 · philosophyaiedu.com</a></li>
       ${SITE.channels.map(c => `<li><a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.label)} ↗</a></li>`).join('')}
@@ -157,11 +158,11 @@ ${crumbs(crumb)}
 </section>
 ${inquiryCta('instructor_bottom')}`;
     return page({
-        title: 'AI 강사 소개 — 교사·교수 대상 AI 교육 | 필로소피 AI 교육',
-        description: `교사와 대학 교수 등 교육자를 위한 AI 강사, 필로소피 AI 교육. ${s.orgList.slice(0, 4).join('·')} 등 ${s.orgs}개 기관 ${s.sessions}회 강의. AI 리터러시·바이브 코딩·업무 자동화 실습 교육.`,
+        title: 'AI 교육 전문 강사 소개 | 필로소피 AI 교육',
+        description: `대학 교수님을 위한 생성형 AI 활용, AI 교수법, 연구·행정업무 자동화, AI 수업 앱 제작을 가르치는 필로소피 AI 교육의 강사 소개. ${s.orgs}개 기관 ${s.sessions}회 강의 이력과 교육 철학을 확인하세요.`,
         path, active: 'ai-instructor', image: '/assets/web/edu-2607-gnu-2.jpg', ogType: 'profile',
         jsonLd: [
-            { '@type': 'ProfilePage', '@id': abs(path) + '#webpage', url: abs(path), name: 'AI 강사 소개 — 필로소피 AI 교육', inLanguage: 'ko', mainEntity: { '@id': abs('/#organization') }, dateModified: SITE.updated },
+            { '@type': 'ProfilePage', '@id': abs(path) + '#webpage', url: abs(path), name: 'AI 교육 전문 강사 소개 — 필로소피 AI 교육', inLanguage: 'ko', mainEntity: { '@id': abs('/#organization') }, dateModified: SITE.updated },
             breadcrumbLd(crumb), faqLd(faq),
         ],
         body,
@@ -171,48 +172,53 @@ ${inquiryCta('instructor_bottom')}`;
 // ───────────── /programs ─────────────
 export function programsPage() {
     const path = '/programs';
-    const crumb = [{ name: '홈', path: '/' }, { name: '교육 프로그램', path }];
+    const crumb = [{ name: '홈', path: '/' }, { name: '대학 AI 교육 프로그램', path }];
     const blocks = PROGRAM_DETAILS.map(p => {
         const hist = historyFor(p.key);
         return `
 <article class="program" id="${p.key}" aria-labelledby="${p.key}-h">
-  <div class="program-head"><h2 id="${p.key}-h">${esc(p.title)}</h2><span class="status status-${p.status}">${esc(STATUS_LABEL[p.status])}</span></div>
+  <div class="program-head"><span class="program-letter" aria-hidden="true">${p.letter}</span><h2 id="${p.key}-h"><span class="sr-only">프로그램 ${p.letter}. </span>${esc(p.title)}</h2><span class="status status-${p.status}">${esc(STATUS_LABEL[p.status])}</span></div>
+  <p class="program-purpose"><b>교육 목적</b> ${esc(p.purpose)}</p>
   <div class="program-grid">
-    <div><h3>1. 적합한 교육 대상</h3><p>${esc(p.audience.join(', '))}</p></div>
-    <div><h3>2. 교육 전의 고민</h3><p>“${esc(p.problem)}”</p></div>
-    <div><h3>3. 강의 내용 (제안 구성)</h3><ul>${p.contents.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
-    <div><h3>4. 기대하는 학습 결과</h3><ul>${p.outcomes.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
-    <div><h3>5. 실습 결과물 예시</h3><ul>${p.artifacts.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
-    <div><h3>6. 관련 강의 이력</h3>${hist.length ? `<ul>${hist.map(h => `<li><a href="/case-studies#${h.id}">${fmt(h.date)} ${esc(h.title)}</a> — ${esc(h.subject)}</li>`).join('')}</ul>` : '<p class="muted">아직 같은 주제의 진행 이력이 없습니다.</p>'}</div>
-    <div><h3>7. 관련 수강 후기</h3><div class="program-reviews" data-program="${p.key}"><p class="muted small">공개 동의를 받은 후기가 등록되면 이곳에 표시됩니다. <a href="/reviews">전체 후기 보기</a></p></div></div>
-    <div><h3>8. 강의 문의</h3><p><a class="btn btn-primary" href="${inquiryHref(p.title)}" data-track="cta_inquiry_click" data-track-label="program_${p.key}">이 프로그램 문의하기</a></p></div>
+    <div><h3>추천 교육 대상</h3><ul>${p.audience.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
+    <div><h3>해결하는 문제</h3><p>“${esc(p.problem)}”</p></div>
+    <div><h3>주요 교육 내용</h3><ul>${p.contents.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
+    <div><h3>실습 결과물</h3><ul>${p.artifacts.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
+    <div><h3>준비사항</h3><ul>${p.prep.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
+    <div><h3>운영 방식 <small class="muted">(협의 가능 예시)</small></h3><p>${p.formats.map(esc).join(' · ')}</p><p class="small muted">교육 시간과 회차는 기관 일정에 맞춰 협의합니다. 정해진 표준 시간표·가격표는 없습니다.</p></div>
+    <div><h3>관련 교육 사례</h3>${hist.length ? `<ul>${hist.map(h => `<li><a href="/case-studies#${h.id}">${fmt(h.date)} ${esc(h.title)}</a> — ${esc(h.subject)}${h.audience ? ` (${esc(h.audience)})` : ''}</li>`).join('')}</ul>` : '<p class="muted">아직 같은 주제의 진행 이력이 없습니다.</p>'}<p class="small muted">${esc(STATUS_NOTE[p.status])}</p></div>
+    <div><h3>관련 수강 후기</h3><div class="program-reviews" data-program="${p.key}"><p class="muted small">공개 동의를 받은 후기가 등록되면 이곳에 표시됩니다. <a href="/reviews">전체 후기 보기</a></p></div></div>
   </div>
   <div class="fit"><div class="yes"><b>이런 분께 맞습니다</b>${esc(p.fit)}</div><div class="no"><b>참고해 주세요</b>${esc(p.notFit)}</div></div>
+  <p class="program-cta"><a class="btn btn-cta" href="${inquiryHref(p.title)}" data-track="cta_inquiry_click" data-track-label="program_${p.key}">프로그램 ${p.letter} 문의하기</a></p>
 </article>`;
     }).join('');
     const body = `
 ${crumbs(crumb)}
 <section class="page-hero">
   <div class="wrap narrow">
-    <p class="eyebrow">Programs</p>
-    <h1>교육자의 실제 고민에서 출발하는<br>AI 교육 프로그램</h1>
-    <div class="answer-box"><p>필로소피 AI 교육은 <b>AI 리터러시</b>, <b>바이브 코딩</b>, <b>교육행정 업무 자동화</b>, <b>대학 교수자를 위한 AI 활용</b> 네 가지 프로그램을 운영합니다. 기관의 대상·시간·환경에 맞춰 조합하거나 새로 설계합니다.</p></div>
-    <p class="trust-note">각 프로그램에는 <b>진행 이력 있음</b> / <b>일부 주제 진행 이력 · 확장 제안</b> / <b>신규 제안 프로그램</b>을 구분해 표시했습니다. 강의 내용은 기관 요청에 맞춰 조정하는 제안 구성입니다.</p>
-    <div class="btn-row">${PROGRAM_DETAILS.map(p => `<a class="btn btn-ghost" href="#${p.key}">${esc(p.title)}</a>`).join('')}</div>
+    <p class="eyebrow">University AI Programs</p>
+    <h1>대학 교수님을 위한<br>4대 AI 교육 프로그램</h1>
+    <div class="answer-box"><p>필로소피 AI 교육은 <b>A. 생성형 AI 실무 입문</b>, <b>B. AI 시대의 교수법·평가 혁신</b>, <b>C. AI 수업 앱 만들기</b>, <b>D. 연구·행정업무 AI 자동화</b> 네 가지 프로그램을 제공합니다. 대학의 대상·인원·목적에 맞춰 조합하거나 새로 구성합니다.</p></div>
+    <div class="program-compare" role="table" aria-label="프로그램 한눈에 비교">
+      <div role="row" class="pc-head"><span role="columnheader">프로그램</span><span role="columnheader">이런 고민에</span><span role="columnheader">실습 결과물</span></div>
+      ${PROGRAM_DETAILS.map(p => `<a role="row" href="#${p.key}"><span role="cell"><b>${p.letter}</b> ${esc(p.title)}</span><span role="cell">${esc(p.problem)}</span><span role="cell">${esc(p.artifacts[0].replace(/\s*\(.*\)$/, ''))}</span></a>`).join('')}
+    </div>
+    <p class="trust-note">각 프로그램에 <b>같은 주제 진행 이력 있음(다른 대상)</b> / <b>일부 주제 진행 이력 · 교수님용 새 구성</b> / <b>신규 제안 프로그램</b>을 구분해 표시했습니다. 교수님만을 대상으로 한 단독 강의 이력은 아직 공개 기록에 없으며, 교육 내용은 기관과 협의해 조정하는 제안 구성입니다.</p>
   </div>
 </section>
 <section class="section section-alt"><div class="wrap">${blocks}</div></section>
-${inquiryCta('programs_bottom')}`;
+${inquiryCta('programs_bottom', { title: '어떤 프로그램이 맞을지 고민되시나요?', text: '대상과 목적만 알려 주셔도 A~D 중 알맞은 조합을 제안드립니다.' })}`;
     const courses = PROGRAM_DETAILS.map(p => ({
         '@type': 'Course', '@id': abs(path) + '#' + p.key, name: p.title, url: abs(path) + '#' + p.key,
-        description: `${p.problem} — ${p.contents.join(', ')}`, inLanguage: 'ko',
+        description: `${p.purpose} 주요 내용: ${p.contents.join(', ')}.`, inLanguage: 'ko',
         provider: { '@id': abs('/#organization') },
         teaches: p.contents,
         audience: { '@type': 'EducationalAudience', audienceType: p.audience.join(', ') },
     }));
     return page({
-        title: '교육 프로그램 — AI 리터러시·바이브 코딩·업무 자동화 | 필로소피 AI 교육',
-        description: '교사·교수·교육기관을 위한 AI 교육 프로그램: 교육자를 위한 AI 리터러시, 바이브 코딩(Claude Code·GPT Codex), 교육행정 업무 자동화, 대학 교수자를 위한 AI 활용. 대상·내용·결과물·강의 이력 안내.',
+        title: '대학 교수 AI 연수 프로그램 | 필로소피 AI 교육',
+        description: '대학 교수님을 위한 AI 연수 프로그램 4가지 — 생성형 AI 실무 입문, AI 시대의 교수법·평가 혁신, 교수님만의 AI 수업 앱 만들기, 대학 연구·행정업무 AI 자동화. 대상·내용·실습 결과물·준비사항과 관련 강의 사례를 안내합니다.',
         path, active: 'programs', jsonLd: [breadcrumbLd(crumb), ...courses], body,
         scripts: '<script type="module" src="/assets/js/program-reviews.mjs"></script>',
     });
@@ -225,7 +231,6 @@ export function caseStudiesPage() {
     const pending = '<span class="pending">기록 보완 예정</span>';
     const cases = HISTORY.map(h => {
         const d = CASE_DETAILS[h.id] || {};
-        const progs = h.programs.map(k => programLabel(k)).filter(Boolean);
         return `
 <article class="case" id="${h.id}" aria-labelledby="${h.id}-h">
   <h2 id="${h.id}-h">${esc(h.title)}</h2>
@@ -238,7 +243,7 @@ export function caseStudiesPage() {
     <dt>5. 어떤 실습을 했나요?</dt><dd>${d.practice ? esc(d.practice) : pending}</dd>
     <dt>6. 참여자 반응</dt><dd>${d.reaction ? esc(d.reaction) : `${pending} · 공개 동의를 받은 후기가 등록되면 <a href="/reviews">후기</a>에 연결됩니다.`}</dd>
     <dt>7. 확인된 교육 결과</dt><dd>${d.result ? esc(d.result) : '<span class="pending">아직 공개할 수 있는 결과 자료가 없습니다</span>'}</dd>
-    <dt>8. 관련 프로그램·자료</dt><dd>${progs.map((l, i) => `<a href="/programs#${h.programs[i]}">${esc(l)}</a>`).join(', ')}${h.links.map(l => ` · <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join('')}</dd>
+    <dt>8. 관련 프로그램·자료</dt><dd>${h.programs.map(k => PROGRAM_DETAILS.some(p => p.key === k) ? `<a href="/programs#${k}">${esc(programLabel(k))}</a>` : esc(programLabel(k))).join(', ')}${h.links.map(l => ` · <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join('')}</dd>
   </dl>
   <div class="photos">${h.photos.map(p => `<figure><img src="${esc(p.src)}" alt="${esc(p.alt)}" loading="lazy" decoding="async" width="400" height="300"><figcaption>${esc(p.cap)} (실제 강의 현장 사진)</figcaption></figure>`).join('')}</div>
 </article>`;
@@ -249,16 +254,16 @@ ${crumbs(crumb)}
 <section class="page-hero">
   <div class="wrap narrow">
     <p class="eyebrow">Case Studies</p>
-    <h1>기관별 AI 교육 사례</h1>
-    <div class="answer-box"><p>필로소피 AI 교육은 ${s.since}부터 ${esc(s.orgList.join(', '))} 등 ${s.orgs}개 기관에서 ${s.sessions}회 강의했습니다. 모든 사례를 같은 형식(기관·대상·목적·내용·실습·반응·결과·자료)으로 정리합니다.</p></div>
-    <p class="trust-note">확인되지 않은 학습 성과는 적지 않습니다. 기록이 없는 항목은 <b>기록 보완 예정</b>으로 표시하고, 자료가 확보되면 업데이트합니다.</p>
+    <h1>AI 교육 강의 사례와 기관 연수</h1>
+    <div class="answer-box"><p>필로소피 AI 교육은 ${s.since}부터 ${esc(s.orgList.join(', '))} 등 ${s.orgs}개 기관에서 ${s.sessions}회 강의했습니다. 모든 사례를 같은 형식(기관·대상·목적·내용·실습·반응·결과·자료)으로 정리하고, 관련된 <a href="/programs">대학 AI 교육 프로그램</a>과 연결했습니다.</p></div>
+    <p class="trust-note">대학 현장의 강의는 경상국립대학교(부설 연수원 교사 자격연수), 경희대학교 대학원, 서울대학교 생산공학연구실입니다. 교수님만을 대상으로 한 단독 강의는 아직 기록에 없습니다. 확인되지 않은 학습 성과는 적지 않으며, 기록이 없는 항목은 <b>기록 보완 예정</b>으로 표시합니다.</p>
   </div>
 </section>
 <section class="section section-alt"><div class="wrap">${cases}</div></section>
 ${inquiryCta('cases_bottom')}`;
     return page({
-        title: '기관별 AI 교육 사례 — 교육청·대학·학교 강의 | 필로소피 AI 교육',
-        description: `${s.orgList.join('·')}에서 진행한 AI 리터러시·바이브 코딩 교육 사례. 기관, 대상, 교육 목적, 실습 내용, 강의 사진을 같은 형식으로 정리했습니다.`,
+        title: 'AI 교육 강의 사례 및 기관 연수 | 필로소피 AI 교육',
+        description: `${s.orgList.join('·')}에서 진행한 생성형 AI 활용·바이브 코딩 강의 사례. 기관, 대상, 교육 목적, 실습 내용과 현장 사진을 같은 형식으로 정리하고 관련 교육 프로그램과 연결했습니다.`,
         path, active: 'case-studies', jsonLd: [breadcrumbLd(crumb), {
             '@type': 'ItemList', name: '필로소피 AI 교육 강의 사례', itemListElement: HISTORY.map((h, i) => ({ '@type': 'ListItem', position: i + 1, name: `${fmt(h.date)} ${h.title} — ${h.subject}`, url: abs(path) + '#' + h.id })),
         }], body,
@@ -269,23 +274,37 @@ ${inquiryCta('cases_bottom')}`;
 export function insightsIndexPage() {
     const path = '/insights/';
     const crumb = [{ name: '홈', path: '/' }, { name: 'AI 교육 칼럼', path }];
+    const groups = INSIGHT_CATEGORIES.map(c => {
+        const posts = INSIGHTS.filter(a => a.category === c.key);
+        const planned = PLANNED_INSIGHTS.filter(p => p.category === c.key);
+        if (!posts.length && !planned.length) return '';
+        return `<section class="insight-group" aria-labelledby="cat-${c.key}">
+  <h2 id="cat-${c.key}">${esc(c.label)}</h2>
+  ${posts.length ? `<ul class="insight-list">${posts.map(a => `<li><a href="/insights/${a.slug}/"><h3>${esc(a.title)}</h3><p>${esc(a.description)}</p><p class="muted small">작성 필로소피 AI 교육 · <time datetime="${a.modified}">${fmt(a.modified)}</time> 수정</p></a></li>`).join('')}</ul>` : ''}
+  ${planned.length ? `<ul class="planned-list" aria-label="작성 예정 글">${planned.map(p => `<li><span class="planned-badge">작성 예정</span> ${esc(p.title)}</li>`).join('')}</ul>` : ''}
+  ${c.program ? `<p class="small"><a href="/programs#${c.program}">관련 프로그램: ${esc(programLabel(c.program))} →</a></p>` : ''}
+</section>`;
+    }).join('');
     const body = `
 ${crumbs(crumb)}
 <section class="page-hero">
   <div class="wrap narrow">
     <p class="eyebrow">Insights</p>
-    <h1>교육자의 질문에 답하는 AI 교육 칼럼</h1>
-    <div class="answer-box"><p>교사·교수·교육기관 담당자분들이 실제로 묻는 질문을 제목으로 삼고, 첫 문단에서 바로 답합니다. 강의 현장에서 다룬 내용과 주의할 점을 함께 정리합니다.</p></div>
+    <h1>교수님의 질문에 답하는 AI 교육 칼럼</h1>
+    <div class="answer-box"><p>대학 교수님과 교육자분들이 실제로 묻는 질문을 제목으로 삼고, 첫 문단에서 바로 답합니다. 강의 현장에서 다룬 내용과 주의할 점을 함께 정리하며, 일반적인 설명과 실제 강의 경험을 구분해 적습니다.</p></div>
+    <p class="small">실습 영상은 <a href="${esc(SITE.channels[0].url)}" target="_blank" rel="noopener">유튜브 필로소피 AI 교육 채널 ↗</a>에서, 함께 공부하는 이야기는 <a href="${esc(SITE.channels[1].url)}" target="_blank" rel="noopener">네이버 카페 ↗</a>에서 볼 수 있습니다.</p>
   </div>
 </section>
 <section class="section section-alt"><div class="wrap narrow">
-  <ul class="insight-list">${INSIGHTS.map(a => `<li><a href="/insights/${a.slug}/"><h2>${esc(a.title)}</h2><p>${esc(a.description)}</p><p class="muted small">작성 필로소피 AI 교육 · <time datetime="${a.modified}">${fmt(a.modified)}</time> 수정</p></a></li>`).join('')}</ul>
+  ${groups}
+  <p class="trust-note">‘작성 예정’ 표시는 아직 발행하지 않은 주제입니다. 글이 완성되면 이 목록에서 바로 읽을 수 있습니다.</p>
 </div></section>
 ${inquiryCta('insights_index')}`;
     return page({
-        title: 'AI 교육 칼럼 — 교사·교수의 AI 활용 질문에 답합니다 | 필로소피 AI 교육',
-        description: '교사가 코딩 없이 앱을 만들 수 있을까? AI 답변은 어떻게 검증할까? 교육자의 실제 질문에 첫 문단에서 바로 답하는 필로소피 AI 교육 칼럼.',
-        path, active: 'insights', jsonLd: [breadcrumbLd(crumb), { '@type': 'Blog', name: '필로소피 AI 교육 칼럼', url: abs(path), inLanguage: 'ko', publisher: { '@id': abs('/#organization') } }], body,
+        title: 'AI 교육 칼럼 — 교수님의 AI 활용 질문에 답합니다 | 필로소피 AI 교육',
+        description: '생성형 AI 활용, AI 시대의 교수법과 평가, 연구·행정업무 자동화, Claude Code 수업 앱 제작까지 — 대학 교수님과 교육자의 실제 질문에 첫 문단에서 바로 답하는 필로소피 AI 교육 칼럼.',
+        path, active: 'insights', jsonLd: [breadcrumbLd(crumb), { '@type': 'Blog', name: '필로소피 AI 교육 칼럼', url: abs(path), inLanguage: 'ko', publisher: { '@id': abs('/#organization') },
+            blogPost: INSIGHTS.map(a => ({ '@type': 'BlogPosting', headline: a.title, url: abs(`/insights/${a.slug}/`), datePublished: a.published, dateModified: a.modified })) }], body,
     });
 }
 
@@ -297,7 +316,7 @@ export function insightPage(a) {
     const body = `
 ${crumbs(crumb)}
 <article class="article"><div class="wrap narrow">
-  <p class="eyebrow">AI 교육 칼럼</p>
+  <p class="eyebrow">AI 교육 칼럼 · ${esc((INSIGHT_CATEGORIES.find(c => c.key === a.category) || {}).label || '')}</p>
   <h1>${esc(a.title)}</h1>
   <p class="article-meta"><span>작성자: <a href="/ai-instructor">필로소피 AI 교육</a></span><span>작성일 <time datetime="${a.published}">${fmt(a.published)}</time></span><span>수정일 <time datetime="${a.modified}">${fmt(a.modified)}</time></span></p>
   <div class="answer-box"><p>${esc(a.answer)}</p></div>
@@ -325,7 +344,8 @@ ${inquiryCta('insight_' + a.slug)}`;
         description: a.description, path, active: 'insights', ogType: 'article',
         image: cases[0] ? cases[0].photos[0].src : undefined,
         jsonLd: [breadcrumbLd(crumb), {
-            '@type': 'Article', '@id': abs(path) + '#article', headline: a.title, description: a.description,
+            '@type': 'BlogPosting', '@id': abs(path) + '#article', headline: a.title, description: a.description,
+            articleSection: (INSIGHT_CATEGORIES.find(c => c.key === a.category) || {}).label,
             inLanguage: 'ko', datePublished: a.published, dateModified: a.modified, mainEntityOfPage: abs(path),
             author: { '@id': abs('/#organization') }, publisher: { '@id': abs('/#organization') },
             image: cases[0] ? abs(cases[0].photos[0].src) : abs(SITE.logo),

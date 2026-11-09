@@ -73,7 +73,12 @@ export function writeBatch() {
 export function orderBy(field, dir) { return { orderBy: field, dir }; }
 export function limit(n) { return { limit: n }; }
 export function increment(n) { return { __increment: n }; }
-export async function addDoc(col, data) { const ref = doc(col); await setDoc(ref, data); return ref; }
+export async function addDoc(col, data) {
+    if (window.__FAIL_WRITES) { const e = new Error('네트워크 오류(테스트)'); e.code = 'unavailable'; throw e; }
+    // inquiries: 규칙 핵심 흉내 (동의·필수값) — 실제 규칙은 tests/rules 에서 에뮬레이터로 검증
+    if (col.name === 'inquiries' && !(data.consent === true && data.status === 'new' && data.org && data.email && data.message)) throw denied();
+    const ref = doc(col); await setDoc(ref, data); return ref;
+}
 export async function updateDoc(ref, data) {
     const db = load(); const cur = (db[ref.col] || {})[ref.id] || {};
     const next = { ...cur };

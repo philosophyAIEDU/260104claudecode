@@ -7,12 +7,12 @@
 
 export const NOT_MENTIONED = '언급 없음';
 
-/** 교육 프로그램 (programs 페이지의 앵커와 동일한 key) */
+/** 교육 프로그램 (programs 페이지의 앵커와 동일한 key — 저장된 후기와 호환되도록 key는 바꾸지 않음) */
 export const PROGRAMS = [
-    { key: 'ai-literacy', label: '교육자를 위한 AI 리터러시' },
-    { key: 'vibe-coding', label: '교육자를 위한 바이브 코딩' },
-    { key: 'admin-automation', label: '교육행정 업무 자동화' },
-    { key: 'professor-ai', label: '대학 교수자를 위한 AI 활용' },
+    { key: 'ai-literacy', label: '교수님을 위한 생성형 AI 실무 입문' },
+    { key: 'professor-ai', label: 'AI 시대의 대학 교수법·평가 혁신' },
+    { key: 'vibe-coding', label: '교수님만의 AI 수업 앱 만들기' },
+    { key: 'admin-automation', label: '대학 연구·행정업무 AI 자동화' },
     { key: 'special-lecture', label: '기관 맞춤 특강·기타' },
 ];
 
