@@ -13,7 +13,7 @@ export const PROGRAMS = [
     { key: 'professor-ai', label: 'AI 시대의 대학 교수법·평가 혁신' },
     { key: 'vibe-coding', label: '교수님만의 AI 수업 앱 만들기' },
     { key: 'admin-automation', label: '대학 연구·행정업무 AI 자동화' },
-    { key: 'special-lecture', label: '기관 맞춤 특강·기타' },
+    { key: 'special-lecture', label: '특강·그룹 코칭' },
 ];
 
 /** 방문자 필터 카테고리 (전체는 필터 없음) */
@@ -174,9 +174,14 @@ export function publishCheck(r) {
 /** 공개 페이지에서 보여줄 작성자 표기 */
 export function displayAuthor(r) {
     const name = String(r.authorDisplay || '').trim();
-    const base = (r.anonymous || !name) ? '익명' : name;
-    return r.authorType ? `${base} · ${r.authorType}` : base;
+    const anon = r.anonymous || !name;
+    const type = r.authorType && r.authorType !== '기타' ? r.authorType : '';
+    if (anon) return type ? `익명 · ${type}` : '익명 수강생';
+    return type ? `${name} · ${type}` : name;
 }
+
+/** /programs 페이지에 실제로 있는 프로그램(A~D)만 링크 */
+export const PROGRAM_PAGE_KEYS = ['ai-literacy', 'professor-ai', 'vibe-coding', 'admin-automation'];
 
 export function formatDate(d) {
     const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d || '');
@@ -242,7 +247,7 @@ export function renderReviewCard(raw, { basePath = '/reviews/' } = {}) {
   <h3 class="rv-card-title"><a href="${escapeHtml(href)}">${escapeHtml(r.title)}</a></h3>
   ${story ? `<dl class="rv-story">${story}</dl>` : ''}
   ${summary}${excerpt}
-  <div class="rv-meta"><span>${escapeHtml(displayAuthor(r))}</span>${r.reviewDate ? `<time datetime="${escapeHtml(r.reviewDate)}">${formatDate(r.reviewDate)}</time>` : ''}</div>
+  <div class="rv-meta"><span>${escapeHtml(displayAuthor(r))}</span>${r.reviewDate ? `<time datetime="${escapeHtml(r.reviewDate)}">${formatDate(r.reviewDate)}</time>` : ''}${r.institution ? `<span class="rv-inst">${escapeHtml(r.institution)}</span>` : ''}</div>
   <a class="rv-more" href="${escapeHtml(href)}">후기 원문 보기 <span aria-hidden="true">→</span></a>
 </article>`;
 }
@@ -256,8 +261,8 @@ export function renderReviewDetail(raw) {
         `<figure><img src="${escapeHtml(im.url)}" alt="${escapeHtml(im.alt || '후기 첨부 이미지')}" loading="lazy" decoding="async"></figure>`).join('')}</div>` : '';
     const meta = [
         `<div><dt>작성자</dt><dd>${escapeHtml(displayAuthor(r))}</dd></div>`,
-        programLabel(r.program) ? `<div><dt>교육 프로그램</dt><dd><a href="/programs#${escapeHtml(r.program)}">${escapeHtml(programLabel(r.program))}</a></dd></div>` : '',
-        r.institution ? `<div><dt>교육기관</dt><dd>${escapeHtml(r.institution)}</dd></div>` : '',
+        programLabel(r.program) ? `<div><dt>교육 프로그램</dt><dd>${PROGRAM_PAGE_KEYS.includes(r.program) ? `<a href="/programs#${escapeHtml(r.program)}">${escapeHtml(programLabel(r.program))}</a>` : escapeHtml(programLabel(r.program))}</dd></div>` : '',
+        r.institution ? `<div><dt>수강한 교육</dt><dd>${escapeHtml(r.institution)}</dd></div>` : '',
         r.reviewDate ? `<div><dt>후기 작성일</dt><dd><time datetime="${escapeHtml(r.reviewDate)}">${formatDate(r.reviewDate)}</time></dd></div>` : '',
     ].join('');
     return `<article class="rv-detail">
@@ -306,6 +311,16 @@ const FIELD_ALIASES = {
     program: ['program', '교육프로그램', '교육 프로그램', '프로그램'],
     title: ['title', '제목', '후기제목', '후기 제목'],
     authorType: ['authortype', '작성자유형', '작성자 유형', '유형'],
+    // 선택: 미리 정리해 둔 항목(원문에 근거한 정리만 넣으세요). 가져온 뒤에도 하나씩 검토합니다.
+    concernBefore: ['concernbefore', '교육전고민', '교육 전 고민'],
+    memorablePractice: ['memorablepractice', '인상깊었던실습', '인상 깊었던 실습'],
+    changeAfter: ['changeafter', '교육후변화', '교육 후 변화'],
+    adminSummary: ['adminsummary', '운영자요약', '운영자 요약'],
+    categories: ['categories', '분류', '카테고리'],
+    institution: ['institution', '교육명', '교육기관', '교육기관명'],
+    anonymous: ['anonymous', '익명'],
+    cafeNickname: ['cafenickname', '카페닉네임', '카페 닉네임', '닉네임'],
+    privateNote: ['privatenote', '운영메모', '운영 메모'],
 };
 
 function canonicalField(h) {
@@ -385,11 +400,25 @@ export function parseImport(text, format) {
         const authorDisplay = String(rec.authorDisplay || '').trim().slice(0, LIMITS.authorDisplay);
         const authorType = AUTHOR_TYPES.includes(String(rec.authorType || '').trim()) ? String(rec.authorType).trim() : '';
         const program = resolveProgram(rec.program);
+        const str = (v, max) => String(v ?? '').trim().slice(0, max);
+        const cats = (Array.isArray(rec.categories) ? rec.categories : String(rec.categories || '').split(/[|,;]/))
+            .map(c => String(c).trim()).filter(c => CATEGORIES.some(x => x.key === c));
+        const anon = rec.anonymous === true || rec.anonymous === 'true' || !authorDisplay || authorDisplay === '익명';
         items.push({
-            title: String(rec.title || '').trim().slice(0, LIMITS.title),
-            originalText, sourceUrl, reviewDate, authorDisplay,
-            anonymous: !authorDisplay || authorDisplay === '익명',
+            title: str(rec.title, LIMITS.title),
+            originalText, sourceUrl, reviewDate,
+            authorDisplay: anon ? '' : authorDisplay,
+            anonymous: anon,
             authorType, program,
+            concernBefore: str(rec.concernBefore, LIMITS.short),
+            memorablePractice: str(rec.memorablePractice, LIMITS.short),
+            changeAfter: str(rec.changeAfter, LIMITS.short),
+            adminSummary: str(rec.adminSummary, LIMITS.adminSummary),
+            categories: [...new Set(cats)],
+            institution: str(rec.institution, LIMITS.institution),
+            cafeNickname: str(rec.cafeNickname, 50),
+            privateNote: str(rec.privateNote, 500),
+            // 안전장치: 가져온 후기는 항상 임시저장 + 동의 확인 전 (파일에 다른 값이 있어도 무시)
             status: 'draft', consentStatus: 'pending',
         });
     });

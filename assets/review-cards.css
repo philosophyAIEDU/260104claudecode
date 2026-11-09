@@ -39,3 +39,4 @@
 .rv-images img { border-radius: 12px; border: 1px solid var(--rv-line); }
 .trust-note { font-size: 14px; color: var(--rv-muted); background: var(--rv-soft); border-radius: 12px; padding: 14px 18px; }
 
+.rv-inst { flex-basis: 100%; font-size: 12.5px; }

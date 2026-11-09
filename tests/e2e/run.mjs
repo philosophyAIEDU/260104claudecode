@@ -111,7 +111,7 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
         assert((await page.locator('.hero-slogan').innerText()) === 'AI 시대, 교수님의 든든한 교육 파트너.');
         assert(await page.locator('.hero-profile img[src="assets/mascot.jpg"]').count() === 1, '캐릭터 프로필');
         const facts = await page.locator('.hero-profile-facts').innerText();
-        for (const f of ['전문 분야', '교육 대상', '강의 이력', '교육 철학', '6개 기관 8회']) assert(facts.includes(f), f);
+        for (const f of ['전문 분야', '교육 대상', '강의 이력', '교육 철학', '8개 기관·단체 12회']) assert(facts.includes(f), f);
         assert(await page.locator('.hero a[href="/ai-instructor"]').count() >= 1, '강사 소개 링크');
         const heroBox = await page.locator('#home .hero-content').boundingBox();
         assert(heroBox.y < 200, '강사 소개가 첫 화면 최상단');
@@ -175,7 +175,7 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
         assert(await page.locator('#bot-field').isHidden() || (await page.locator('.hp-field').boundingBox()).x < 0, 'honeypot 숨김');
         const opts = await page.locator('#referral option').allTextContents();
         for (const o of ['유튜브', '네이버 카페', '구글 검색', '네이버 검색', 'ChatGPT 등 AI 추천', '지인 추천', '기타']) assert(opts.includes(o), o);
-        assert(await page.locator('.cred-item .num').nth(1).innerText() === '6곳', '기관 수 6곳');
+        assert(await page.locator('.cred-item .num').nth(1).innerText() === '8곳', '기관 수 8곳');
         // 문의 양식이 히어로 바로 다음에 있음
         const y = await page.evaluate(() => [document.getElementById('inquiry').offsetTop, document.getElementById('history').offsetTop]);
         assert(y[0] < y[1], '양식이 이력보다 위');
@@ -420,6 +420,43 @@ await t('CSV 일괄 가져오기 → 모두 임시저장·동의 확인 전, 중
 await t('hidden 처리된 요소는 실제로 숨겨짐 (로그인 게이트·가져오기 버튼)', async () => {
     assert(await ap.locator('#gate').isHidden(), 'gate');
     assert(await ap.locator('#importSaveBtn').isHidden(), 'import button');
+});
+await t('JSON 가져오기(정리 항목 포함) → 여러 개 선택 → 공개 동의 확인 후 한 번에 게시 → 후기·사례 페이지', async () => {
+    await ap.click('#tab-import');
+    const data = { reviews: [1, 2].map(i => ({
+        title: `[테스트] 온라인 특강 후기 ${i}`, originalText: `테스트 원문 ${i}번입니다.\n\n두 번째 문단입니다.`, reviewDate: '2026-09-1' + i,
+        authorDisplay: '', anonymous: true, authorType: '기타', program: 'special-lecture', categories: ['vibe-coding'],
+        institution: '테스트 그룹 코칭 (2026.09)', concernBefore: '코딩을 몰랐음', memorablePractice: '웹앱 배포', changeAfter: '',
+        cafeNickname: '테스트닉' + i, consentStatus: 'confirmed', status: 'published',
+    })) };
+    await ap.fill('#importText', JSON.stringify(data));
+    await ap.click('#importParseBtn');
+    await ap.waitForSelector('#importPreview table');
+    await ap.click('#importSaveBtn');
+    await ap.waitForFunction(() => /임시저장으로 가져왔습니다/.test(document.getElementById('importMsg').textContent));
+    let imp = storeReviews().filter(r => r.title.startsWith('[테스트] 온라인'));
+    assert(imp.length === 2 && imp.every(r => r.status === 'draft' && r.consentStatus === 'pending'), '파일에 게시 값이 있어도 임시저장·동의 전으로');
+    assert(imp[0].concernBefore === '코딩을 몰랐음' && imp[0].institution === '테스트 그룹 코칭 (2026.09)' && imp[0].categories[0] === 'vibe-coding', '정리 항목 보존');
+    assert(!JSON.stringify(imp).includes('테스트닉'), '카페 닉네임은 공개 문서에 없음');
+    const priv = await ap.evaluate(() => Object.values(JSON.parse(localStorage.getItem('__fakeDb')).review_private || {}).map(x => x.memo).join('|'));
+    assert(priv.includes('카페 닉네임: 테스트닉1'), '닉네임은 비공개 메모로');
+    await ap.click('#tab-list');
+    await ap.fill('#lq', '[테스트] 온라인');
+    await ap.check('#selectAll');
+    assert((await ap.locator('#selCount').innerText()) === '2개 선택');
+    ap.removeAllListeners('dialog');
+    const msgs = [];
+    ap.on('dialog', d => { msgs.push(d.message()); d.type() === 'prompt' ? d.accept('2026-11-10 카페 쪽지로 게시 동의 확인') : d.accept(); });
+    await ap.click('#bulkPublishBtn');
+    await ap.waitForFunction(() => document.querySelectorAll('#listBox .pill-published').length >= 2);
+    await ap.waitForTimeout(200);
+    ap.removeAllListeners('dialog'); ap.on('dialog', d => d.accept());
+    assert(msgs[0].includes('게시 동의를 받으셨나요') && msgs.some(m => m.includes('2건을 게시했습니다')), msgs.join(' / '));
+    imp = storeReviews().filter(r => r.title.startsWith('[테스트] 온라인'));
+    assert(imp.every(r => r.status === 'published' && r.consentStatus === 'confirmed'), '게시됨');
+    const html = await (await fetch(BASE + '/reviews/' + imp[0].slug)).text();
+    for (const x of ['익명 수강생', '수강한 교육', '테스트 그룹 코칭 (2026.09)', '교육 전 고민', '테스트 원문']) assert(html.includes(x), x);
+    assert(!html.includes('/programs#special-lecture'), '없는 앵커로 링크하지 않음');
 });
 await t('관리자 화면 JS 오류 없음', async () => { assert(!jsErrors.length, jsErrors.join(' | ')); });
 await ap.click('#tab-editor'); await ap.evaluate(() => window.scrollTo(0, 0));

@@ -2,7 +2,7 @@
 import { SITE, HISTORY, PROGRAM_DETAILS, STATUS_LABEL, STATUS_NOTE, CASE_DETAILS, historyStats, buildFaq } from './data.mjs';
 import { INSIGHTS, INSIGHT_CATEGORIES, PLANNED_INSIGHTS } from './insights.mjs';
 import { page, esc, abs, breadcrumbLd, crumbs, inquiryCta } from './layout.mjs';
-import { CATEGORIES, PROGRAMS, programLabel, toPublicReview, renderReviewDetail, renderReviewCard, hasContent } from '../../assets/js/review-core.mjs';
+import { CATEGORIES, PROGRAMS, programLabel, toPublicReview, renderReviewDetail, renderReviewCard, hasContent, PROGRAM_PAGE_KEYS } from '../../assets/js/review-core.mjs';
 
 const fmt = (d) => d.replace(/-/g, '.');
 const byId = (id) => HISTORY.find(h => h.id === id);
@@ -21,7 +21,7 @@ function statsHtml() {
     const s = historyStats();
     return `<div class="stat-row">
   <div class="stat"><b>${s.sessions}회</b><span>진행한 강의 (공개 기록)</span></div>
-  <div class="stat"><b>${s.orgs}곳</b><span>강의한 기관</span></div>
+  <div class="stat"><b>${s.orgs}곳</b><span>강의한 기관·단체</span></div>
   <div class="stat"><b>${s.since}~</b><span>교육 활동 기간</span></div>
   <div class="stat"><b>40여 개</b><span>직접 만들어 공개한 AI 학습 도구</span></div>
 </div>
@@ -46,7 +46,7 @@ export function aiInstructorPage() {
     const faq = buildFaq();
     const path = '/ai-instructor';
     const crumb = [{ name: '홈', path: '/' }, { name: 'AI 교육 강사 소개', path }];
-    const uni = HISTORY.filter(h => ['경상국립대학교', '경희대학교', '서울대학교'].includes(h.org));
+    const uni = HISTORY.filter(h => ['경상국립대학교', '동신대학교', '경희대학교', '서울대학교'].includes(h.org));
     const body = `
 ${crumbs(crumb)}
 <section class="page-hero">
@@ -88,7 +88,7 @@ ${crumbs(crumb)}
       <div class="card"><h3>실제로 어떤 교육을 했나요?</h3><p>${s.since}부터 ${esc(s.orgList.join(', '))}에서 ${s.sessions}회 강의했습니다. <a href="/case-studies">교육 사례 보기</a></p></div>
       <div class="card"><h3>교육 대상과 방식은요?</h3><p>대학 교수님을 중심으로 대학 직원·연구자·교사까지, 직접 손으로 해 보는 실습 중심으로 진행합니다. 특강·워크숍·여러 회차 과정 등은 기관과 협의해 정합니다.</p></div>
       <div class="card"><h3>우리 대학에 맞출 수 있나요?</h3><p>문의 내용(대상, 인원, 목적, 일정)을 바탕으로 프로그램 A~D를 조합하거나 새로 구성해 제안드립니다.</p></div>
-      <div class="card"><h3>교수님 대상 경험은 어느 정도인가요?</h3><p>교수님만을 대상으로 한 단독 강의는 아직 공개 기록에 없습니다. 대학 부설 연수원·대학원·연구실 강의 경험을 바탕으로 교수님용 과정을 구성했습니다.</p></div>
+      <div class="card"><h3>교수님 대상 경험은 어느 정도인가요?</h3><p>교수님만을 대상으로 한 단독 강의는 아직 공개 기록에 없습니다. 대학 부설 연수원·대학 수업·대학원·연구실 강의 경험을 바탕으로 교수님용 과정을 구성했습니다.</p></div>
     </div>
   </div>
 </section>
@@ -103,7 +103,7 @@ ${crumbs(crumb)}
 <section class="section section-alt" id="history" aria-labelledby="history-h">
   <div class="wrap">
     <div class="section-head"><p class="eyebrow">Teaching History</p><h2 id="history-h">강의 이력</h2>
-      <p>대학 연수원·대학원·연구실·교육청·고등학교·공공기관에서 진행한 강의입니다. 이 중 대학 현장의 강의는 ${uni.map(h => esc(h.org)).join(', ')}입니다. 각 항목을 누르면 사진과 교육 내용을 볼 수 있습니다.</p></div>
+      <p>대학 연수원·대학 수업·대학원·연구실·교육청·고등학교·공공기관·온라인 그룹 코칭에서 진행한 강의입니다. 이 중 대학 현장의 강의는 ${uni.map(h => esc(h.org)).join(', ')}입니다. 각 항목을 누르면 사진과 교육 내용을 볼 수 있습니다.</p></div>
     ${historyListHtml(HISTORY)}
     ${statsHtml()}
   </div>
@@ -159,7 +159,7 @@ ${crumbs(crumb)}
 ${inquiryCta('instructor_bottom')}`;
     return page({
         title: 'AI 교육 전문 강사 소개 | 필로소피 AI 교육',
-        description: `대학 교수님을 위한 생성형 AI 활용, AI 교수법, 연구·행정업무 자동화, AI 수업 앱 제작을 가르치는 필로소피 AI 교육의 강사 소개. ${s.orgs}개 기관 ${s.sessions}회 강의 이력과 교육 철학을 확인하세요.`,
+        description: `대학 교수님을 위한 생성형 AI 활용, AI 교수법, 연구·행정업무 자동화, AI 수업 앱 제작을 가르치는 필로소피 AI 교육의 강사 소개. ${s.orgs}개 기관·단체 ${s.sessions}회 강의 이력과 수강 후기, 교육 철학을 확인하세요.`,
         path, active: 'ai-instructor', image: '/assets/web/edu-2607-gnu-2.jpg', ogType: 'profile',
         jsonLd: [
             { '@type': 'ProfilePage', '@id': abs(path) + '#webpage', url: abs(path), name: 'AI 교육 전문 강사 소개 — 필로소피 AI 교육', inLanguage: 'ko', mainEntity: { '@id': abs('/#organization') }, dateModified: SITE.updated },
@@ -241,7 +241,7 @@ export function caseStudiesPage() {
     <dt>3. 어떤 목적의 교육이었나요?</dt><dd>${d.purpose ? esc(d.purpose) : pending}</dd>
     <dt>4. 무엇을 교육했나요?</dt><dd>${esc(h.desc)}</dd>
     <dt>5. 어떤 실습을 했나요?</dt><dd>${d.practice ? esc(d.practice) : pending}</dd>
-    <dt>6. 참여자 반응</dt><dd>${d.reaction ? esc(d.reaction) : `${pending} · 공개 동의를 받은 후기가 등록되면 <a href="/reviews">후기</a>에 연결됩니다.`}</dd>
+    <dt>6. 참여자 반응</dt><dd>${d.reaction ? esc(d.reaction) + (d.reviewsLink ? ` <a href="/reviews?cat=${esc(d.reviewsLink)}">참여자 후기 보기 →</a>` : '') : `${pending} · 공개 동의를 받은 후기가 등록되면 <a href="/reviews">후기</a>에 연결됩니다.`}</dd>
     <dt>7. 확인된 교육 결과</dt><dd>${d.result ? esc(d.result) : '<span class="pending">아직 공개할 수 있는 결과 자료가 없습니다</span>'}</dd>
     <dt>8. 관련 프로그램·자료</dt><dd>${h.programs.map(k => PROGRAM_DETAILS.some(p => p.key === k) ? `<a href="/programs#${k}">${esc(programLabel(k))}</a>` : esc(programLabel(k))).join(', ')}${h.links.map(l => ` · <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join('')}</dd>
   </dl>
@@ -255,7 +255,7 @@ ${crumbs(crumb)}
   <div class="wrap narrow">
     <p class="eyebrow">Case Studies</p>
     <h1>AI 교육 강의 사례와 기관 연수</h1>
-    <div class="answer-box"><p>필로소피 AI 교육은 ${s.since}부터 ${esc(s.orgList.join(', '))} 등 ${s.orgs}개 기관에서 ${s.sessions}회 강의했습니다. 모든 사례를 같은 형식(기관·대상·목적·내용·실습·반응·결과·자료)으로 정리하고, 관련된 <a href="/programs">대학 AI 교육 프로그램</a>과 연결했습니다.</p></div>
+    <div class="answer-box"><p>필로소피 AI 교육은 ${s.since}부터 ${esc(s.orgList.join(', '))} 등 ${s.orgs}개 기관·단체에서 ${s.sessions}회 강의했습니다. 모든 사례를 같은 형식(기관·대상·목적·내용·실습·반응·결과·자료)으로 정리하고, 관련된 <a href="/programs">대학 AI 교육 프로그램</a>과 연결했습니다.</p></div>
     <p class="trust-note">대학 현장의 강의는 경상국립대학교(부설 연수원 교사 자격연수), 경희대학교 대학원, 서울대학교 생산공학연구실입니다. 교수님만을 대상으로 한 단독 강의는 아직 기록에 없습니다. 확인되지 않은 학습 성과는 적지 않으며, 기록이 없는 항목은 <b>기록 보완 예정</b>으로 표시합니다.</p>
   </div>
 </section>
@@ -368,7 +368,7 @@ ${crumbs(crumb)}
   <div class="wrap">
     <p class="eyebrow">Reviews</p>
     <h1>필로소피 AI 교육 수강 후기</h1>
-    <div class="answer-box"><p>강의와 연수에 참여하신 선생님·교수님·교육 담당자분들이 네이버 카페 등에 남겨 주신 후기입니다. 작성자의 공개 동의를 확인한 글만 게시하며, <b>후기 원문</b>과 <b>운영자 요약</b>을 구분해 보여 드립니다.</p></div>
+    <div class="answer-box"><p>강의·연수·온라인 그룹 코칭에 참여하신 선생님, 대학 구성원, 1인 사업가와 크리에이터분들이 네이버 카페에 남겨 주신 후기입니다. 코딩 경험이 없던 분들이 Claude Code·GPT Codex로 웹앱을 만들고 배포한 경험을 직접 쓴 글입니다. 작성자의 공개 동의를 확인한 글만 게시하며, <b>후기 원문</b>과 <b>운영자 요약</b>을 구분해 보여 드립니다.</p></div>
   </div>
 </section>
 <section class="section section-alt" aria-labelledby="rv-list-h">
@@ -402,7 +402,7 @@ ${crumbs(crumb)}
 ${renderReviewDetail(r)}
 <p class="trust-note">이 후기는 작성자의 공개 동의를 받아 게시했습니다. 원문은 작성자가 쓴 그대로이며, 정리 항목과 운영자 요약은 운영자가 원문을 바탕으로 작성했습니다.</p>
 ${others.length ? `<h2 style="margin-top:36px">다른 후기</h2><div class="rv-grid">${others.map(o => renderReviewCard(o)).join('')}</div>` : ''}
-<div class="btn-row"><a class="btn btn-ghost" href="/reviews">← 후기 목록</a>${r.program ? `<a class="btn btn-ghost" href="/programs#${esc(r.program)}">${esc(programLabel(r.program))} 프로그램 보기</a>` : ''}</div>
+<div class="btn-row"><a class="btn btn-ghost" href="/reviews">← 후기 목록</a>${PROGRAM_PAGE_KEYS.includes(r.program) ? `<a class="btn btn-ghost" href="/programs#${esc(r.program)}">${esc(programLabel(r.program))} 프로그램 보기</a>` : `<a class="btn btn-ghost" href="/case-studies">교육 사례 보기</a>`}</div>
 </div></div>
 ${inquiryCta('review_detail')}`;
     return page({
