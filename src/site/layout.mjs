@@ -6,11 +6,11 @@ export { esc };
 
 // 방문자 흐름: 교수님(문제 → 실습 → 프로그램 → 문의) / 기관 담당자(전문 분야 → 프로그램 → 이력 → 문의)
 export const NAV = [
+    { href: '/ai-instructor', label: '강사 소개', key: 'ai-instructor' },
+    { href: '/reviews', label: '수업 후기', key: 'reviews' },
     { href: '/programs', label: '교육 프로그램', key: 'programs' },
     { href: '/case-studies', label: '교육 사례', key: 'case-studies' },
-    { href: '/ai-instructor', label: '강사 소개', key: 'ai-instructor' },
     { href: '/insights/', label: 'AI 교육 칼럼', key: 'insights' },
-    { href: '/reviews', label: '후기', key: 'reviews' },
     { href: '/#tools', label: 'AI 실습 도구', key: 'tools' },
     { href: '/community.html', label: '커뮤니티', key: 'community' },
 ];

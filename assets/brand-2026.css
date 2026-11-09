@@ -214,3 +214,16 @@ button.hamburger { border: 0; background: transparent; }
 .theme-card blockquote { background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; min-height: 0 !important; }
 .theme-card blockquote footer { background: none !important; padding: 0 !important; }
 .reviews-band .home-reviews .review-stats { margin-top: 18px; }
+/* 상단 메뉴 8개(강사 소개·수업 후기 …) — 좁은 가로 폭에서 로그인 버튼이 넘치지 않게 */
+@media (min-width: 901px) and (max-width: 1100px) {
+  .pastel-home .nav-menu > li > a { font-size: 12px; padding-inline: 5px; }
+  .pastel-home .nav-menu .nav-cta { padding-inline: 10px !important; }
+  .pastel-home .nav-menu .nav-youtube { font-size: 0 !important; }
+  .pastel-home .nav-menu .nav-youtube i { font-size: 15px; }
+}
+@media (max-width: 900px) {
+  .pastel-home .nav-menu { visibility: hidden; pointer-events: none; background: var(--bg); }
+  .pastel-home .nav-menu.active { visibility: visible; pointer-events: auto; }
+  .pastel-home .nav-menu > li > a { font-size: 14px; padding: 12px 16px; }
+  .pastel-home .nav-menu .nav-youtube { font-size: 14px !important; }
+}

@@ -113,6 +113,10 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
         const facts = await page.locator('.hero-profile-facts').innerText();
         for (const f of ['전문 분야', '교육 대상', '강의 이력', '교육 철학', '8개 기관·단체 12회', '수강 후기', '한 명씩 챙겨 줌']) assert(facts.includes(f), f);
         assert(await page.locator('.hero a[href="/ai-instructor"]').count() >= 1, '강사 소개 링크');
+        // 상단 메뉴: 강사 소개 바로 옆에 수업 후기
+        const navTxt = await page.locator('#navMenu > li > a').allInnerTexts();
+        assert(navTxt[0].trim() === '강사 소개' && navTxt[1].trim() === '수업 후기', '상단 메뉴 순서 ' + navTxt.join('|'));
+        assert(await page.locator('#navMenu a[href="#reviews-home"]').count() === 1, '메뉴 → 후기 섹션');
         const heroBox = await page.locator('#home .hero-content').boundingBox();
         assert(heroBox.y < 200, '강사 소개가 첫 화면 최상단');
         const cta = page.locator('.hero-buttons a');
