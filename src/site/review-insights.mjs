@@ -23,6 +23,7 @@ export const MENTIONS = [
     { key: 'github', label: 'GitHub를 언급', re: /github|깃허브|깃퍼브/i },
     { key: 'firebase', label: 'Firebase·구글 로그인을 언급', re: /firebase|파이어베이스|구글 로그인|구글 인증/i },
     { key: 'nocode', label: '코딩·개발 경험이 없었다고 언급', re: /코딩\s*1도|코딩을\s*(전혀\s*)?몰|개발을\s*(하나도|전혀)\s*모르|제로베이스|초초+보|컴맹|AI 신생아|한번도 안해본/ },
+    { key: 'care', label: '막히는 사람을 한 명씩 챙겨 줬다고 언급', re: /하나\s?하나\s?(다|알려|짚어|봐|꼼꼼|떠먹|아주|쉽게|따라할|차근)|한\s*명\s*한\s*명|챙겨|놓치지 않|누락되는|놓친 부분|막히는 부분/ },
     { key: 'confidence', label: '자신감·"할 수 있다"를 언급', re: /자신감|할 수 있겠|할 수 있구나|할 수 있을 것|할 수 있다는/ },
 ];
 

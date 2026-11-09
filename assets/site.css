@@ -234,7 +234,7 @@ p { margin: 0 0 1em; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 
 /* ===== 후기 근거 블록 (2026-11-10) ===== */
-.review-stats { list-style: none; padding: 0; margin: 0 0 6px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.review-stats { list-style: none; padding: 0; margin: 0 0 6px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
 .review-stats li { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
 .review-stats b { display: block; font-size: 24px; color: var(--navy); }
 .review-stats span { font-size: 13px; color: var(--muted); }

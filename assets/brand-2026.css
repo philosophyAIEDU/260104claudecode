@@ -195,3 +195,22 @@ button.hamburger { border: 0; background: transparent; }
 .quote-card figcaption { font-size: 13px; color: var(--text-soft); margin-top: auto; }
 .quote-card figcaption a { color: var(--navy); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 @media (max-width: 860px) { .review-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .quote-grid { grid-template-columns: 1fr; } }
+
+/* ===== 수업 후기 섹션 (강사 소개 바로 다음) ===== */
+.pastel-home .reviews-band, .reviews-band { background: var(--cream, #F8F5EE); border-top: 1px solid rgba(22,44,67,.08); }
+.reviews-band .home-reviews { margin-top: 30px; }
+.theme-grid { list-style: none; padding: 0; margin: 8px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.theme-card { background: #fff; border: 1px solid rgba(22,44,67,.12); border-top: 4px solid var(--gold-brand, #C6A15B); border-radius: 18px; padding: 20px 22px; display: flex; flex-direction: column; gap: 8px; }
+.theme-card .theme-count { font-size: 28px; line-height: 1; color: var(--navy, #162C43); }
+.theme-card h3 { margin: 0; font-size: 18px; color: var(--navy, #162C43); }
+.theme-card blockquote { margin: 4px 0 0; padding: 0; font-size: 15px; line-height: 1.6; color: #3d4a57; }
+.theme-card blockquote p { margin: 0; }
+.theme-card footer { margin-top: 6px; font-size: 13px; }
+.theme-card footer a { color: var(--navy, #162C43); }
+.reviews-band .stat-note { font-size: 13px; }
+@media (max-width: 860px) { .theme-grid { grid-template-columns: 1fr; } }
+.review-stats:has(li:nth-child(5)) { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 860px) { .review-stats:has(li:nth-child(5)) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.theme-card blockquote { background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; min-height: 0 !important; }
+.theme-card blockquote footer { background: none !important; padding: 0 !important; }
+.reviews-band .home-reviews .review-stats { margin-top: 18px; }

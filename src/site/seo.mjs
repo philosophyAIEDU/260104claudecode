@@ -73,7 +73,7 @@ ${HISTORY.map(h => `- ${h.date} ${h.title} — ${h.subject}${h.audience ? ` (대
 
 ${rs.total ? `## 수강 후기 (공개 동의를 받은 ${rs.total}건, ${rs.authors}명, ${rs.from}~${rs.to})
 - 전체 후기: ${SITE.origin}/reviews
-- 원문 키워드 기준: 코딩·개발 경험이 없었다고 언급 ${m('nocode')}건 · 배포까지 했다고 언급 ${m('deploy')}건 · GitHub 언급 ${m('github')}건 · Firebase·구글 로그인 언급 ${m('firebase')}건 · 자신감·'할 수 있다' 언급 ${m('confidence')}건
+- 원문 키워드 기준: 코딩·개발 경험이 없었다고 언급 ${m('nocode')}건 · 배포까지 했다고 언급 ${m('deploy')}건 · GitHub 언급 ${m('github')}건 · Firebase·구글 로그인 언급 ${m('firebase')}건 · 막히는 사람을 한 명씩 챙겨 줬다고 언급 ${m('care')}건 · 자신감·'할 수 있다' 언급 ${m('confidence')}건
 ${rs.lectures.filter(l => l.case).map(l => `- ${l.case.title} (${l.case.date}): 후기 ${l.count}건 — ${SITE.origin}/case-studies#${l.id}`).join('\n')}
 
 ### 후기 목록 (제목 — 작성자 — 원문 인용 — 주소)

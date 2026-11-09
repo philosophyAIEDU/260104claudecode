@@ -42,6 +42,7 @@ function reviewStatsHtml(rs) {
   <li><b>${rs.total}건</b><span>공개된 수강 후기 (${rs.authors}명)</span></li>
   <li><b>${m('nocode')}건</b><span>코딩·개발 경험이 없었다고 언급</span></li>
   <li><b>${m('deploy')}건</b><span>배포까지 했다고 언급</span></li>
+  <li><b>${m('care')}건</b><span>한 명씩 챙겨 줬다고 언급</span></li>
   <li><b>${m('confidence')}건</b><span>자신감·“할 수 있다”를 언급</span></li>
 </ul>
 <p class="stat-note">작성자 동의를 받아 공개한 후기 원문에서 해당 표현이 나온 후기 수를 셌습니다 (${esc(rs.from.replace(/-/g, '.'))}~${esc(rs.to.replace(/-/g, '.'))} 작성).</p>`;
@@ -99,13 +100,13 @@ ${crumbs(crumb)}
       <p class="eyebrow">AI Education Instructor</p>
       <h1>대학 교수님을 위한 AI 교육 강사,<br>필로소피 AI 교육</h1>
       <div class="answer-box"><p>${esc(SITE.oneLiner)}</p></div>
-      <p class="lead">교수님들이 실제로 겪는 고민 — 강의자료 제작, AI 시대의 과제·평가, 반복되는 연구·행정업무 — 에서 출발해, 비전공자도 따라 할 수 있는 단계별 실습으로 함께 해결합니다. 기술적으로 가능한 것과 교육적으로 바람직한 것을 구분하는 판단과 윤리도 함께 다룹니다.</p>
+      <p class="lead">${rs.total ? `수강생 ${rs.authors}명이 남긴 후기 ${rs.total}건에서 반복되는 이야기는 세 가지입니다 — 코딩을 몰라도 수업 안에서 내 웹앱을 만들어 배포까지 했다(코딩 경험 없었음 ${rs.mentions.find(m => m.key === 'nocode').count}건·배포 ${rs.mentions.find(m => m.key === 'deploy').count}건), 막히는 사람 없이 한 명씩 챙겨 준다(${rs.mentions.find(m => m.key === 'care').count}건), “나도 할 수 있겠다”는 자신감이 생겼다(${rs.mentions.find(m => m.key === 'confidence').count}건). ` : ''}교수님들의 실제 고민 — 강의자료 제작, AI 시대의 과제·평가, 반복되는 연구·행정업무 — 에도 같은 방식, 즉 비전공자도 따라 하는 단계별 실습으로 함께 해결합니다.</p>
       <ul class="chips" aria-label="전문 분야">
         <li>교수님 AI 실습</li><li>대학 교수법 혁신</li><li>연구·업무 자동화</li><li>AI 수업 앱 제작</li>
       </ul>
       <div class="btn-row">
         <a class="btn btn-cta" href="${SITE.inquiryUrl}" data-track="cta_inquiry_click" data-track-label="instructor_top">대학 AI 연수 문의</a>
-        <a class="btn btn-ghost" href="#history">강의 이력 보기</a>
+        ${rs.total ? `<a class="btn btn-ghost" href="#instructor-reviews">수강 후기 먼저 보기 ↓</a>` : ''}<a class="btn btn-ghost" href="#history">강의 이력 보기</a>
       </div>
     </div>
     <aside class="profile-card" aria-label="강사 프로필">
@@ -122,6 +123,7 @@ ${crumbs(crumb)}
     </aside>
   </div>
 </section>
+${reviewEvidenceSection(reviews, { id: 'instructor-reviews', title: '수강생 후기로 먼저 확인하세요', label: 'instructor' })}
 
 <section class="section section-alt" aria-labelledby="quick-h">
   <div class="wrap">
@@ -165,7 +167,6 @@ ${crumbs(crumb)}
     </div>
   </div>
 </section>
-${reviewEvidenceSection(reviews, { id: 'instructor-reviews', label: 'instructor' })}
 
 <section class="section" aria-labelledby="diff-h">
   <div class="wrap">
@@ -510,17 +511,40 @@ export function notFoundPage() {
 }
 
 // ───────── 메인 페이지(index.html)에 넣는 정적 후기 근거 ─────────
+// 후기에서 반복되는 이야기 3가지 — 수치는 원문에서 센 값, 인용은 원문 문장 그대로(없으면 생략)
+const THEMES = [
+    { key: 'nocode', title: '코딩을 몰라도, 수업 안에서 완성합니다', quotes: ['코딩 1도 모르는데, 1시간 반 만에 내 웹사이트가 세상에 나왔습니다.', '아니 저같은 초초초초보가 3시간 만에 챌린지 인증 웹을 만든다니요?'] },
+    { key: 'care', title: '막히는 한 사람까지 챙깁니다', quotes: ['누락되는 사람 없도록 하나하나 꼼꼼하게 불러주시고, 챙겨주십니다.', '끝까지 놓치지 않고 제 사이트를 완성할 수 있었습니다.'] },
+    { key: 'confidence', title: '“나도 할 수 있다”가 남습니다', quotes: ["강의덕분에 '할 수 있겠다'는 생각으로 바뀌었습니다!", '이제 필요한 페이지는 제가 직접 만들어볼 수 있을 것 같습니다!'] },
+];
+function themeCards(rs) {
+    const items = THEMES.map(t => {
+        const count = rs.mentions.find(m => m.key === t.key).count;
+        let hit = null;
+        for (const q of t.quotes) { const r = rs.reviews.find(x => x.originalText.includes(q)); if (r) { hit = { q, r }; break; } }
+        if (!count) return '';
+        return `<li class="theme-card"><b class="theme-count">${count}건</b><h3>${esc(t.title)}</h3>${hit ? `<blockquote cite="/reviews/${esc(hit.r.slug)}"><p>“${esc(hit.q)}”</p><footer><a href="/reviews/${esc(hit.r.slug)}">${esc(authorOf(hit.r))}</a></footer></blockquote>` : ''}</li>`;
+    }).join('');
+    return items ? `<ul class="theme-grid" aria-label="후기에서 반복되는 이야기">${items}</ul>` : '';
+}
 export function reviewEvidenceHome(list) {
     const rs = summarizeReviews(list);
     if (!rs.total) return '';
-    return `            <div class="home-reviews">
-                <div class="trust-reviews-head"><h3>수강생 후기 ${rs.total}건 — 원문 그대로</h3><a href="/reviews" data-track="reviews_click" data-track-label="home">후기 전체 보기 →</a></div>
-                ${reviewStatsHtml(rs)}
+    return `            <div class="section-head">
+                <span class="eyebrow">Student Reviews</span>
+                <h2 class="section-title" id="reviewsHomeTitle">수강생들이 직접 쓴 <em>수업 후기</em> ${rs.total}건</h2>
+                <p class="section-sub">수업을 들은 ${rs.authors}명이 네이버 카페에 남긴 후기 가운데 공개 동의를 받은 글입니다. 따옴표 안 문장은 후기 원문 그대로이고, 숫자는 원문에 그 이야기가 나온 후기 수입니다.</p>
+            </div>
+            ${themeCards(rs)}
+            <div class="home-reviews">
+                <div class="trust-reviews-head"><h3>후기 원문에서 옮긴 문장</h3><a href="/reviews" data-track="reviews_click" data-track-label="home">후기 ${rs.total}건 전체 보기 →</a></div>
                 ${quoteCards(list, 6)}
+                ${reviewStatsHtml(rs)}
             </div>`;
 }
 export function reviewHeroLine(list) {
     const rs = summarizeReviews(list);
     if (!rs.total) return '';
-    return `                        <div><dt>수강 후기</dt><dd>공개된 후기 ${rs.total}건 (${rs.authors}명) — 코딩 경험 없이 웹앱을 만들어 배포했다는 후기가 많습니다 <a href="/reviews">후기 보기</a></dd></div>`;
+    const m = (k) => rs.mentions.find(x => x.key === k).count;
+    return `                        <div><dt>수강 후기</dt><dd>${rs.total}건 (${rs.authors}명) — 코딩 경험 없었음 ${m('nocode')}건 · 배포까지 ${m('deploy')}건 · 한 명씩 챙겨 줌 ${m('care')}건 · “할 수 있다” ${m('confidence')}건 <a href="#reviews-home" data-track="reviews_click" data-track-label="hero_fact">후기 보기</a></dd></div>`;
 }
