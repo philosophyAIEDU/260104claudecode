@@ -53,15 +53,43 @@ export const SITE = {
  */
 export const HISTORY = [
     {
+        id: 'dongshin-2026-vibe', date: '2026-10', org: '동신대학교', title: '동신대학교 바이브 코딩 수업',
+        kind: '대학 수업 특강', subject: '바이브 코딩으로 나만의 웹사이트 만들고 배포하기', audience: '동신대학교 학생',
+        desc: '나주 동신대학교에서 학생들과 Antigravity를 활용해 각자 원하는 웹사이트를 만들고 배포하는 과정을 2시간 동안 실습했습니다.',
+        tags: ['바이브 코딩', '대학생', '웹사이트 배포'], programs: ['vibe-coding'], categories: ['vibe-coding'],
+        photos: [], links: [], sessions: 1, source: '운영자 네이버 카페 기록 (2026.10.16)',
+    },
+    {
+        id: 'permes-2026-codex', date: '2026-10-06', org: '퍼스널메이커스', title: '퍼스널메이커스 이너서클 AI 교육 (GPT·Codex)',
+        kind: '온라인 그룹 코칭', subject: 'GPT·Codex로 웹앱 만들기', audience: '퍼스널메이커스 이너서클 참여자 (1인 사업가·크리에이터 등)',
+        desc: 'Claude Code 수업에 이어 GPT·Codex로 웹앱을 만드는 온라인 그룹 실습을 진행했습니다. 초기 세팅부터 사이트 완성까지 참여자 한 명 한 명의 진행을 확인하며 도왔습니다.',
+        tags: ['GPT Codex', '온라인', '웹앱'], programs: ['vibe-coding'], categories: ['vibe-coding'],
+        photos: [], links: [], sessions: 1, source: '참여자 네이버 카페 후기',
+    },
+    {
+        id: 'permes-2026-claudecode', date: '2026-10-02', org: '퍼스널메이커스', title: '퍼스널메이커스 이너서클 AI 교육 (Claude Code)',
+        kind: '온라인 그룹 코칭', subject: 'Claude Code로 웹앱 만들기 · GitHub · Netlify · Firebase', audience: '퍼스널메이커스 이너서클 참여자 (1인 사업가·크리에이터 등)',
+        desc: 'Zoom으로 진행한 약 3시간의 그룹 실습입니다. Claude 프로젝트 세팅, GitHub 저장소, Netlify 배포, Firebase 구글 로그인 연동까지 참여자가 직접 손으로 해 보며 각자의 웹앱을 만들었습니다.',
+        tags: ['Claude Code', 'GitHub', 'Netlify', 'Firebase', '온라인'], programs: ['vibe-coding'], categories: ['vibe-coding'],
+        photos: [], links: [], sessions: 1, source: '참여자 네이버 카페 후기',
+    },
+    {
+        id: 'permes-2026-reading', date: '2026-09-17', org: '퍼스널메이커스', title: '퍼스널메이커스 독서챌린지 AI 특강',
+        kind: '온라인 특강', subject: 'AI로 나만의 사이트 만들기 (Claude Code 바이브 코딩)', audience: '퍼스널메이커스 독서챌린지 참여자',
+        desc: '독서챌린지 참여자를 대상으로 약 1시간 30분 동안 온라인 라이브로 진행한 바이브 코딩 특강입니다. Claude Code로 사이트를 만들고 GitHub 연결과 Netlify 배포까지 실습했습니다.',
+        tags: ['Claude Code', '바이브 코딩', '온라인 라이브'], programs: ['vibe-coding'], categories: ['vibe-coding'],
+        photos: [], links: [], sessions: 1, source: '참여자 네이버 카페 후기',
+    },
+    {
         id: 'gnu-2026-physics', date: '2026-07-27', org: '경상국립대학교', title: '경상국립대학교 물리 정교사(1급) 자격 연수',
-        kind: '대학·자격연수', subject: 'AI 리터러시 교육', audience: '물리 정교사(1급) 자격연수에 참여한 현직 교사',
+        kind: '대학·자격연수', subject: 'AI 리터러시 교육', audience: '물리 정교사(1급) 자격연수에 참여한 현직 물리 교사 21명',
         desc: '물리 정교사 1급 자격 연수 과정에서 현직 교사분들과 함께 AI를 수업과 연구에 활용하는 기준과 방법을 다뤘습니다.',
         tags: ['AI 리터러시', '현직 교사', '실습 중심'], programs: ['ai-literacy'], categories: ['teacher-training', 'ai-literacy'],
         photos: [
             { src: '/assets/web/edu-2607-gnu-1.jpg', alt: '경상국립대학교 사범대학 부설교육연수원 2026년 하계 물리 정교사(1급) 자격연수 안내 자료', cap: '자격연수 안내 자료' },
             { src: '/assets/web/edu-2607-gnu-2.jpg', alt: '선생님들의 고민을 정리한 슬라이드로 진행 중인 강의 장면', cap: '선생님들의 고민 나눔' },
         ],
-        links: [{ label: '연수 과정용으로 제작·공개한 웹앱 (26년 하계 물리 정교사(1급) 자격연수 과정)', url: 'https://philoksnu.netlify.app/' }],
+        links: [{ label: '선생님 21명이 만든 물리 학습 앱 아카이브', url: 'https://philoksnu.netlify.app/' }],
         sessions: 1,
     },
     {
@@ -217,11 +245,11 @@ export function buildFaq() {
         },
         {
             q: '필로소피 AI 교육은 어떤 기관에서 강의했나요?',
-            a: `${s.since}부터 ${s.orgList.join(', ')}에서 강의했습니다(공개 기록 기준 ${s.orgs}개 기관, ${s.sessions}회 강의). 기관별 주제와 대상은 교육 사례 페이지에 정리되어 있습니다.`,
+            a: `${s.since}부터 ${s.orgList.join(', ')}에서 강의했습니다(공개 기록 기준 ${s.orgs}개 기관·단체, ${s.sessions}회 강의). 기관별 주제와 대상은 교육 사례 페이지에, 참여자 후기는 후기 페이지에 정리되어 있습니다.`,
         },
         {
             q: '대학 교수님을 대상으로 강의한 경험이 있나요?',
-            a: '대학 교수님만을 대상으로 한 단독 강의는 아직 공개 기록에 없습니다. 경상국립대학교 부설 연수원의 교사 자격연수, 경희대학교 대학원 바이브 코딩 특강, 서울대학교 생산공학연구실 특강 등 대학 현장의 강의 경험을 바탕으로 교수님용 프로그램을 구성했습니다.',
+            a: '대학 교수님만을 대상으로 한 단독 강의는 아직 공개 기록에 없습니다. 경상국립대학교 부설 연수원의 교사 자격연수, 동신대학교 학생 대상 바이브 코딩 수업, 경희대학교 대학원 바이브 코딩 특강, 서울대학교 생산공학연구실 특강 등 대학 현장의 강의 경험을 바탕으로 교수님용 프로그램을 구성했습니다.',
         },
         {
             q: '코딩을 전혀 몰라도 AI 수업 앱 만들기에 참여할 수 있나요?',
@@ -248,7 +276,11 @@ export function buildFaq() {
  * reaction(참여자 반응)·result(확인된 결과)는 실제 후기·자료가 확보된 뒤 운영자가 채웁니다.
  */
 export const CASE_DETAILS = {
-    'gnu-2026-physics': { purpose: 'AI를 물리 수업과 연구에 활용하는 기준과 방법 세우기', practice: '선생님들의 고민을 모아 정리한 내용에서 출발한 실습 중심 강의', reaction: '', result: '' },
+    'gnu-2026-physics': { purpose: 'AI를 물리 수업과 연구에 활용하는 기준과 방법 세우기', practice: '2시간 30분 동안 AI 리터러시와 포스트 AI 시대, NotebookLM·Google AI Studio·Opal을 다룬 뒤, Antigravity로 바이브 코딩하여 물리 학습 앱을 만들고 배포', reaction: '수업을 마친 뒤 재미있었다는 답을 들었습니다 (운영자 기록).', result: '참여한 물리 교사 21명 모두 물리 학습 앱을 배포까지 완료했고, 21개 작품을 아카이브 사이트에 공개했습니다 (운영자 기록).' },
+    'dongshin-2026-vibe': { purpose: '학생들이 AI로 원하는 결과물을 직접 만들어 보는 경험', practice: 'Antigravity로 각자 원하는 웹사이트를 만들고 배포 (2시간, 학생 한 명 한 명 옆에서 지원)', reaction: '수업 뒤 집에서 이어서 해 볼 방법을 구체적으로 묻는 학생이 있었습니다 (운영자 기록).', result: '많은 학생이 웹사이트 배포에 성공했습니다 (운영자 기록, 인원 수 미기록).' },
+    'permes-2026-codex': { purpose: 'Claude Code에 이어 다른 AI 코딩 도구(GPT·Codex)로도 웹앱을 만드는 흐름 익히기', practice: 'Codex 초기 세팅, GPT로 디자인과 이미지 생성, 사이트에 AI 상담원 추가 등', reaction: '참여자들이 네이버 카페에 남긴 후기 가운데 공개 동의를 받은 글을 후기 페이지에 원문 그대로 옮겼습니다.', reviewsLink: 'vibe-coding', result: '' },
+    'permes-2026-claudecode': { purpose: '1인 사업·콘텐츠 운영에 쓸 웹앱을 직접 만들고 관리하는 방법 익히기', practice: 'Claude 프로젝트 세팅 → GitHub 저장소 → Netlify 배포 → Firebase 구글 로그인 연동을 각자 진행, 막힌 부분은 화면 공유로 함께 해결', reaction: '참여자들이 네이버 카페에 남긴 후기 가운데 공개 동의를 받은 글을 후기 페이지에 원문 그대로 옮겼습니다.', reviewsLink: 'vibe-coding', result: '' },
+    'permes-2026-reading': { purpose: 'AI를 처음 접하는 분도 첫 웹사이트를 만들어 공개해 보기', practice: 'Claude Code로 사이트 만들기, 제공한 프롬프트 활용, GitHub 연결과 Netlify 배포, 휴대폰으로 이어서 수정하기', reaction: '참여자들이 네이버 카페에 남긴 후기 가운데 공개 동의를 받은 글을 후기 페이지에 원문 그대로 옮겼습니다.', reviewsLink: 'vibe-coding', result: '' },
     'toegyewon-2026-claude': { purpose: 'Claude를 처음 접하는 선생님들이 수업과 업무에 활용할 수 있도록 입문하기', practice: '수업 자료 제작과 업무 활용 실습', reaction: '', result: '' },
     'jeonju-2026-literacy': { purpose: '행정 업무에 AI를 안전하게 활용하는 방법 익히기', practice: '', reaction: '', result: '' },
     'jeonju-2026-vibe': { purpose: '코딩 경험이 없어도 AI와 함께 직접 도구를 만들어 보기', practice: '컴퓨터실에서 바이브 코딩 첫 단계 실습', reaction: '', result: '' },

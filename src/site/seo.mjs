@@ -59,7 +59,7 @@ ${SITE.audiences.map(a => `- ${a}`).join('\n')}
 ## 전문 분야
 ${SITE.expertise.map(e => `- ${e.title}: ${e.desc}`).join('\n')}
 
-## 강의 이력 (공개 기록 기준 ${s.orgs}개 기관, ${s.sessions}회 강의, ${s.since}~; 대학 교수님만을 대상으로 한 단독 강의는 아직 기록에 없음)
+## 강의 이력 (공개 기록 기준 ${s.orgs}개 기관·단체, ${s.sessions}회 강의, ${s.since}~; 대학 교수님만을 대상으로 한 단독 강의는 아직 기록에 없음)
 ${HISTORY.map(h => `- ${h.date} ${h.title} — ${h.subject}${h.audience ? ` (대상: ${h.audience})` : ''}`).join('\n')}
 
 ## 교육 프로그램

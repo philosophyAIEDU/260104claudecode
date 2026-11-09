@@ -65,6 +65,7 @@
   .img-item input { font-size: 13.5px; padding: 6px 8px; }
   .img-btns { display: flex; gap: 4px; }
   .img-btns button { width: 34px; height: 34px; border: 1px solid var(--line-strong); background: #fff; border-radius: 8px; cursor: pointer; font-size: 15px; }
+  .bulk-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; }
   .list-filters { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
   .rv-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; }
   .rv-row h3 { font-size: 16px; margin: 0 0 4px; }
@@ -248,6 +249,11 @@
         <select id="lFeatured" aria-label="대표 후기"><option value="">대표 여부 전체</option><option value="1">대표 후기만</option></select>
       </div>
       <p class="hint" id="featuredCount"></p>
+      <div class="bulk-bar" id="bulkBar">
+        <label class="checks"><input type="checkbox" id="selectAll"> 보이는 후기 모두 선택</label>
+        <span id="selCount" class="small muted">0개 선택</span>
+        <button type="button" class="btn btn-primary" id="bulkPublishBtn" disabled style="min-height:38px;padding:6px 14px">선택한 후기 공개 동의 확인 후 게시</button>
+      </div>
       <div id="listBox"><p class="muted">불러오는 중…</p></div>
     </section>
 
@@ -740,7 +746,7 @@ function renderList() {
     box.innerHTML = rows.map(r => `
       <div class="rv-row">
         <div>
-          <h3>${esc(r.title || '(제목 없음)')}</h3>
+          <h3><label style="display:inline-flex;gap:8px;align-items:flex-start"><input type="checkbox" class="row-sel" data-id="${esc(r.id)}" ${selected.has(r.id) ? 'checked' : ''} aria-label="선택"> <span>${esc(r.title || '(제목 없음)')}</span></label></h3>
           <div class="meta">
             <span class="pill pill-${esc(r.status)}">${esc(RC.STATUSES[r.status] || r.status)}</span>
             <span class="pill pill-consent-${esc(r.consentStatus)}">${esc(RC.CONSENT[r.consentStatus] || '')}</span>
@@ -760,7 +766,48 @@ function renderList() {
         </div>
       </div>`).join('');
     box.querySelectorAll('button[data-act]').forEach(b => b.addEventListener('click', () => rowAction(b.dataset.act, b.dataset.id)));
+    box.querySelectorAll('.row-sel').forEach(c => c.addEventListener('change', () => { c.checked ? selected.add(c.dataset.id) : selected.delete(c.dataset.id); updateSel(); }));
+    visibleIds = rows.map(r => r.id);
+    updateSel();
 }
+
+// ───────── 여러 후기 한 번에: 공개 동의 확인 후 게시 ─────────
+const selected = new Set();
+let visibleIds = [];
+function updateSel() {
+    for (const id of [...selected]) if (!all.some(r => r.id === id)) selected.delete(id);
+    $('selCount').textContent = `${selected.size}개 선택`;
+    $('bulkPublishBtn').disabled = selected.size === 0;
+    $('selectAll').checked = visibleIds.length > 0 && visibleIds.every(id => selected.has(id));
+}
+$('selectAll').addEventListener('change', () => {
+    for (const id of visibleIds) $('selectAll').checked ? selected.add(id) : selected.delete(id);
+    renderList();
+});
+$('bulkPublishBtn').addEventListener('click', async () => {
+    const targets = all.filter(r => selected.has(r.id));
+    if (!targets.length) return;
+    const note = prompt(`선택한 후기 ${targets.length}건의 작성자 모두에게 홈페이지 게시 동의를 받으셨나요?\n\n동의를 받은 날짜와 방법을 적어 주세요 (예: 2026-11-10 카페 공지·쪽지로 게시 동의 확인).\n동의를 받지 않은 후기는 선택을 해제해 주세요.`, '');
+    if (note === null) return;
+    if (note.trim().length < 4) { alert('동의 확인 기록을 4자 이상 적어 주세요. 게시하지 않았습니다.'); return; }
+    let ok = 0; const fail = [];
+    for (const r of targets) {
+        const next = { ...stripId(r), consentStatus: 'confirmed', status: 'published', updatedAt: serverTimestamp() };
+        if (!r.publishedAt) next.publishedAt = serverTimestamp();
+        const chk = RC.publishCheck(next);
+        if (!chk.ok) { fail.push(`${r.title || r.id}: ${chk.errors.join(' ')}`); continue; }
+        try {
+            await setDoc(doc(db, 'reviews', r.id), next);
+            let priv = {};
+            try { const s2 = await getDoc(doc(db, 'review_private', r.id)); if (s2.exists()) priv = s2.data(); } catch { /* 무시 */ }
+            await setDoc(doc(db, 'review_private', r.id), { ...priv, consentNote: note.trim().slice(0, 300), updatedAt: serverTimestamp() });
+            ok++;
+        } catch (e) { fail.push(`${r.title || r.id}: ${e.message}`); }
+    }
+    selected.clear();
+    await loadAll();
+    alert(`${ok}건을 게시했습니다.` + (fail.length ? `\n\n게시하지 못한 후기 ${fail.length}건:\n- ` + fail.join('\n- ') : ''));
+});
 
 async function openReview(id) {
     if (dirty && !confirm('저장하지 않은 내용이 있습니다. 이 후기를 열까요?')) return;
@@ -823,10 +870,10 @@ function parseImportText(fmt) {
     msg.className = 'msg ' + (errors.length ? 'msg-warn' : 'msg-info');
     msg.innerHTML = `${importItems.length}건을 읽었습니다.` + (errors.length ? '<ul>' + errors.map(x => `<li>${esc(x)}</li>`).join('') + '</ul>' : '');
     msg.hidden = false;
-    $('importPreview').innerHTML = importItems.length ? `<div style="overflow:auto"><table class="imp"><thead><tr><th>가져오기</th><th>원문</th><th>작성자</th><th>작성일</th><th>프로그램</th><th>원본 URL</th><th>확인</th></tr></thead><tbody>${importItems.map((it, i) => `
+    $('importPreview').innerHTML = importItems.length ? `<div style="overflow:auto"><table class="imp"><thead><tr><th>가져오기</th><th>제목 · 원문</th><th>작성자</th><th>작성일</th><th>교육명·분류</th><th>원본 URL</th><th>확인</th></tr></thead><tbody>${importItems.map((it, i) => `
       <tr><td><input type="checkbox" data-i="${i}" ${it._include ? 'checked' : ''} aria-label="${i + 1}번 가져오기"></td>
-      <td class="t">${esc(it.originalText.slice(0, 160))}${it.originalText.length > 160 ? '…' : ''}</td>
-      <td>${esc(it.anonymous ? '익명' : it.authorDisplay)}</td><td>${esc(it.reviewDate)}</td><td>${esc(RC.programLabel(it.program))}</td>
+      <td class="t">${it.title ? `<b>${esc(it.title)}</b><br>` : ''}${esc(it.originalText.slice(0, 160))}${it.originalText.length > 160 ? '…' : ''}</td>
+      <td>${esc(it.anonymous ? '익명' : it.authorDisplay)}</td><td>${esc(it.reviewDate)}</td><td>${esc(it.institution || RC.programLabel(it.program))}${(it.categories || []).length ? '<br><small>' + esc(it.categories.map(RC.categoryLabel).join(', ')) + '</small>' : ''}</td>
       <td>${it.sourceUrl ? `<a href="${esc(it.sourceUrl)}" target="_blank" rel="noopener">링크</a>` : ''}</td>
       <td>${it._dup ? `<span class="pill pill-consent-pending">중복 의심: ${esc(it._dup.title)}</span>` : '<span class="ok-badge">새 후기</span>'}</td></tr>`).join('')}</tbody></table></div>` : '';
     $('importPreview').querySelectorAll('input[data-i]').forEach(c => c.addEventListener('change', () => { importItems[c.dataset.i]._include = c.checked; }));
@@ -838,7 +885,7 @@ $('importSaveBtn').addEventListener('click', async () => {
     const batchId = 'import-' + new Date().toISOString().slice(0, 10) + '-' + Math.random().toString(36).slice(2, 6);
     const btn = $('importSaveBtn'); btn.disabled = true;
     try {
-        for (let i = 0; i < chosen.length; i += 200) {
+        for (let i = 0; i < chosen.length; i += 200) { // 후기+비공개 문서 2건씩 → 한 묶음 최대 400건 (Firestore 한도 500)
             const b = writeBatch(db);
             for (const it of chosen.slice(i, i + 200)) {
                 const id = newDocId();
@@ -847,12 +894,20 @@ $('importSaveBtn').addEventListener('click', async () => {
                     slug: RC.makeSlug(it, id.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5)),
                     title: it.title || '(제목 미입력) ' + it.originalText.replace(/\s+/g, ' ').slice(0, 30),
                     authorDisplay: it.anonymous ? '' : it.authorDisplay, anonymous: it.anonymous, authorType: it.authorType,
-                    program: it.program, categories: [], institution: '', reviewDate: it.reviewDate,
-                    concernBefore: '', memorablePractice: '', changeAfter: '', adminSummary: '',
+                    program: it.program, categories: it.categories || [], institution: it.institution || '', reviewDate: it.reviewDate,
+                    concernBefore: it.concernBefore || '', memorablePractice: it.memorablePractice || '', changeAfter: it.changeAfter || '', adminSummary: it.adminSummary || '',
                     originalText: it.originalText, sourceUrl: it.sourceUrl, images: [],
                     consentStatus: 'pending', status: 'draft', featured: false, summaryOrigin: 'manual',
                     importBatch: batchId, createdAt: now, updatedAt: now,
                 });
+                // 카페 닉네임·운영 메모는 관리자만 보는 비공개 문서에 보관
+                if (it.cafeNickname || it.privateNote) {
+                    b.set(doc(db, 'review_private', id), {
+                        realName: '', contact: '', institution: '', institutionPublic: false, consentNote: '',
+                        memo: [it.cafeNickname && `카페 닉네임: ${it.cafeNickname}`, it.privateNote].filter(Boolean).join(' / ').slice(0, 500),
+                        aiDraft: null, updatedAt: now,
+                    });
+                }
             }
             await b.commit();
         }
