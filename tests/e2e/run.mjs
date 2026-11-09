@@ -106,7 +106,15 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
         await page.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
         assert(await page.title() === '필로소피 AI 교육 | 대학 교수님 AI 연수·생성형 AI 실습', await page.title());
         const h1 = (await page.locator('h1').innerText()).replace(/\s+/g, ' ');
-        assert(h1.includes('AI 시대, 교수님의 든든한 교육 파트너.'), h1);
+        assert(h1.includes('대학 교수님을 위한 AI 교육 강사, 필로소피 AI 교육'), h1);
+        // 첫 화면 = 강사 소개: 캐릭터 프로필·전문 분야·강의 이력·철학·슬로건·강사 소개 링크
+        assert((await page.locator('.hero-slogan').innerText()) === 'AI 시대, 교수님의 든든한 교육 파트너.');
+        assert(await page.locator('.hero-profile img[src="assets/mascot.jpg"]').count() === 1, '캐릭터 프로필');
+        const facts = await page.locator('.hero-profile-facts').innerText();
+        for (const f of ['전문 분야', '교육 대상', '강의 이력', '교육 철학', '6개 기관 8회']) assert(facts.includes(f), f);
+        assert(await page.locator('.hero a[href="/ai-instructor"]').count() >= 1, '강사 소개 링크');
+        const heroBox = await page.locator('#home .hero-content').boundingBox();
+        assert(heroBox.y < 200, '강사 소개가 첫 화면 최상단');
         const cta = page.locator('.hero-buttons a');
         assert(await cta.nth(0).innerText() === '대학 AI 연수 문의' && await cta.nth(0).getAttribute('href') === '/education-inquiry', '1차 CTA');
         assert((await cta.nth(1).innerText()).startsWith('교육 프로그램 살펴보기') && await cta.nth(1).getAttribute('href') === '/programs', '2차 CTA');
@@ -115,7 +123,7 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
         assert(await page.locator('.problem-card').count() === 4, '고민 카드 4개');
         assert(await page.locator('.prog-card').count() === 4, '프로그램 4개');
         const txt = await page.locator('body').innerText();
-        for (const s of ['AI로 성장하고, 그 성장을 나눕니다.', 'AI 시대, 교육자의 나침반', '교수님만을 대상으로 한 단독 강의는 아직 기록에 없으며', '필로소피 AI 툴', '바이브코딩 쇼케이스', '교육자 커뮤니티'])
+        for (const s of ['AI로 성장하고, 그 성장을 나눕니다.', 'AI 시대, 교육자의 나침반', '좋은 질문에서 시작되는, 새로운 배움', '교수님만을 대상으로 한 단독 강의는 아직 기록에 없으며', '필로소피 AI 툴', '바이브코딩 쇼케이스', '교육자 커뮤니티'])
             assert(txt.replace(/\s+/g, ' ').includes(s) || txt.includes(s.replace(/\s+/g, '')) || (await page.content()).includes(s), '없음: ' + s);
         assert(await page.locator('#tools, #showcase, #community, #contact, #problems, #programs-home, #credentials, #learn, #philosophy').count() === 9, '섹션');
         // 섹션 순서: 고민 → 프로그램 → 이력 → 도구 → 칼럼/유튜브 → 철학 → 커뮤니티 → 문의
