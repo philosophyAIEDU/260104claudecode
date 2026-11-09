@@ -100,7 +100,6 @@ ${crumbs(crumb)}
       <p class="eyebrow">AI Education Instructor</p>
       <h1>대학 교수님을 위한 AI 교육 강사,<br>필로소피 AI 교육</h1>
       <div class="answer-box"><p>${esc(SITE.oneLiner)}</p></div>
-      <p class="lead">${rs.total ? `수강생 ${rs.authors}명이 남긴 후기 ${rs.total}건에서 반복되는 이야기는 세 가지입니다 — 코딩을 몰라도 수업 안에서 내 웹앱을 만들어 배포까지 했다(코딩 경험 없었음 ${rs.mentions.find(m => m.key === 'nocode').count}건·배포 ${rs.mentions.find(m => m.key === 'deploy').count}건), 막히는 사람 없이 한 명씩 챙겨 준다(${rs.mentions.find(m => m.key === 'care').count}건), “나도 할 수 있겠다”는 자신감이 생겼다(${rs.mentions.find(m => m.key === 'confidence').count}건). ` : ''}교수님들의 실제 고민 — 강의자료 제작, AI 시대의 과제·평가, 반복되는 연구·행정업무 — 에도 같은 방식, 즉 비전공자도 따라 하는 단계별 실습으로 함께 해결합니다.</p>
       <ul class="chips" aria-label="전문 분야">
         <li>교수님 AI 실습</li><li>대학 교수법 혁신</li><li>연구·업무 자동화</li><li>AI 수업 앱 제작</li>
       </ul>
