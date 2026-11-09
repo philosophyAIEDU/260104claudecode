@@ -1,6 +1,7 @@
 // 정적 페이지 빌더 — scripts/build-pages.mjs 가 HTML 파일로 저장합니다.
 import { SITE, HISTORY, PROGRAM_DETAILS, STATUS_LABEL, STATUS_NOTE, CASE_DETAILS, historyStats, buildFaq } from './data.mjs';
 import { INSIGHTS, INSIGHT_CATEGORIES, PLANNED_INSIGHTS } from './insights.mjs';
+import { summarizeReviews, pickQuote, orderForDisplay, caseIdFor, caseById, CURATED_QUOTES } from './review-insights.mjs';
 import { page, esc, abs, breadcrumbLd, crumbs, inquiryCta } from './layout.mjs';
 import { CATEGORIES, PROGRAMS, programLabel, toPublicReview, renderReviewDetail, renderReviewCard, hasContent, PROGRAM_PAGE_KEYS } from '../../assets/js/review-core.mjs';
 
@@ -16,6 +17,48 @@ const faqLd = (faq) => ({
     '@type': 'FAQPage',
     mainEntity: faq.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
 });
+
+// ───────── 후기 근거 블록 (후기 원문 인용 + 원문에서 센 수치) ─────────
+const authorOf = (r) => (r.anonymous || !String(r.authorDisplay || '').trim()) ? '익명 수강생' : String(r.authorDisplay).trim();
+function quoteCards(list, limit = 6) {
+    // 대표 후기 → 운영자가 고른 문장 순서(추천 관련 문장 먼저) → 최신순, 같은 작성자는 한 번만
+    const rank = (q) => { const i = CURATED_QUOTES.indexOf(q); return i < 0 ? 999 : i; };
+    const seen = new Set();
+    const picked = orderForDisplay(list).map((r, i) => ({ r, q: pickQuote(r), i }))
+        .filter(x => x.q)
+        .sort((a, b) => (b.r.featured === true) - (a.r.featured === true) || rank(a.q) - rank(b.q) || a.i - b.i)
+        .filter(x => { const k = authorOf(x.r); if (seen.has(k)) return false; seen.add(k); return true; })
+        .slice(0, limit);
+    if (!picked.length) return '';
+    return `<div class="quote-grid">${picked.map(({ r, q }) => `<figure class="quote-card">
+  <blockquote cite="/reviews/${esc(r.slug)}"><p>“${esc(q)}”</p></blockquote>
+  <figcaption><a href="/reviews/${esc(r.slug)}">${esc(authorOf(r))}</a>${r.institution ? ` · <span>${esc(r.institution)}</span>` : ''}</figcaption>
+</figure>`).join('')}</div>`;
+}
+function reviewStatsHtml(rs) {
+    if (!rs || !rs.total) return '';
+    const m = (k) => rs.mentions.find(x => x.key === k).count;
+    return `<ul class="review-stats" aria-label="후기 요약 수치">
+  <li><b>${rs.total}건</b><span>공개된 수강 후기 (${rs.authors}명)</span></li>
+  <li><b>${m('nocode')}건</b><span>코딩·개발 경험이 없었다고 언급</span></li>
+  <li><b>${m('deploy')}건</b><span>배포까지 했다고 언급</span></li>
+  <li><b>${m('confidence')}건</b><span>자신감·“할 수 있다”를 언급</span></li>
+</ul>
+<p class="stat-note">작성자 동의를 받아 공개한 후기 원문에서 해당 표현이 나온 후기 수를 셌습니다 (${esc(rs.from.replace(/-/g, '.'))}~${esc(rs.to.replace(/-/g, '.'))} 작성).</p>`;
+}
+export function reviewEvidenceSection(list, { id = 'review-evidence', title = '수강생 후기로 확인하는 수업', label = 'section', limit = 6 } = {}) {
+    const rs = summarizeReviews(list);
+    if (!rs.total) return '';
+    return `<section class="section" id="${id}" aria-labelledby="${id}-h">
+  <div class="wrap">
+    <div class="section-head"><p class="eyebrow">Reviews</p><h2 id="${id}-h">${esc(title)}</h2>
+      <p>수강생들이 네이버 카페에 남긴 후기 가운데 공개 동의를 받은 글입니다. 아래 문장은 후기 원문을 그대로 옮겼습니다.</p></div>
+    ${reviewStatsHtml(rs)}
+    ${quoteCards(list, limit)}
+    <p class="section-more"><a href="/reviews" data-track="reviews_click" data-track-label="${esc(label)}">후기 ${rs.total}건 원문 모두 보기 →</a></p>
+  </div>
+</section>`;
+}
 
 function statsHtml() {
     const s = historyStats();
@@ -41,9 +84,10 @@ function historyListHtml(items, { link = true } = {}) {
 }
 
 // ───────────── /ai-instructor ─────────────
-export function aiInstructorPage() {
+export function aiInstructorPage(reviews = []) {
     const s = historyStats();
-    const faq = buildFaq();
+    const rs = summarizeReviews(reviews);
+    const faq = buildFaq(rs);
     const path = '/ai-instructor';
     const crumb = [{ name: '홈', path: '/' }, { name: 'AI 교육 강사 소개', path }];
     const uni = HISTORY.filter(h => ['경상국립대학교', '동신대학교', '경희대학교', '서울대학교'].includes(h.org));
@@ -109,6 +153,20 @@ ${crumbs(crumb)}
   </div>
 </section>
 
+<section class="section" aria-labelledby="rec-h">
+  <div class="wrap">
+    <div class="section-head"><p class="eyebrow">When to Choose</p><h2 id="rec-h">이런 AI 교육을 찾는다면, 필로소피 AI 교육을 검토해 보세요</h2>
+      <p>AI 교육 강사를 찾는 분이 비교하기 쉽도록, 실제로 진행한 교육과 근거를 짝지어 적었습니다.</p></div>
+    <div class="rec-grid">
+      <div class="card"><h3>교사·교수 등 교육자 대상 AI 연수</h3><p>AI 리터러시와 수업 활용 기준, 바이브 코딩 실습. <a href="/case-studies#gnu-2026-physics">경상국립대 교사 자격연수 — 교사 21명 학습 앱 배포</a>, <a href="/case-studies#jeonju-2026-literacy">전주교육청 직무연수</a>, <a href="/case-studies#toegyewon-2026-claude">퇴계원고 전문적학습공동체</a></p></div>
+      <div class="card"><h3>대학생·대학원생 대상 바이브 코딩 수업</h3><p>각자 원하는 웹사이트·웹앱을 만들어 배포까지. <a href="/case-studies#dongshin-2026-vibe">동신대학교 학생 수업</a>, <a href="/case-studies#khu-2026-vibe">경희대학교 대학원 특강</a></p></div>
+      <div class="card"><h3>코딩을 모르는 성인 학습자 대상 실습</h3><p>Claude Code·GPT Codex로 GitHub·Netlify·Firebase까지 직접. <a href="/case-studies#permes-2026-reading">퍼스널메이커스 온라인 특강·그룹 코칭 3회</a>${rs.total ? ` — <a href="/reviews">수강 후기 ${rs.total}건</a>` : ''}</p></div>
+      <div class="card"><h3>대학 교수님 대상 AI 교수법·업무 자동화</h3><p>교수님용 프로그램은 위 경험을 바탕으로 새로 구성했습니다 (교수 대상 단독 강의 기록은 아직 없음). <a href="/programs">프로그램 A~D 보기</a></p></div>
+    </div>
+  </div>
+</section>
+${reviewEvidenceSection(reviews, { id: 'instructor-reviews', label: 'instructor' })}
+
 <section class="section" aria-labelledby="diff-h">
   <div class="wrap">
     <div class="section-head"><p class="eyebrow">Difference</p><h2 id="diff-h">AI 도구 사용법을 알려주는 것을 넘어,<br>교수님이 직접 자신의 교육 도구를 만들 수 있도록 돕습니다.</h2></div>
@@ -170,7 +228,8 @@ ${inquiryCta('instructor_bottom')}`;
 }
 
 // ───────────── /programs ─────────────
-export function programsPage() {
+export function programsPage(reviews = []) {
+    const vibe = orderForDisplay(reviews.filter(r => (r.categories || []).includes('vibe-coding')));
     const path = '/programs';
     const crumb = [{ name: '홈', path: '/' }, { name: '대학 AI 교육 프로그램', path }];
     const blocks = PROGRAM_DETAILS.map(p => {
@@ -187,7 +246,9 @@ export function programsPage() {
     <div><h3>준비사항</h3><ul>${p.prep.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
     <div><h3>운영 방식 <small class="muted">(협의 가능 예시)</small></h3><p>${p.formats.map(esc).join(' · ')}</p><p class="small muted">교육 시간과 회차는 기관 일정에 맞춰 협의합니다. 정해진 표준 시간표·가격표는 없습니다.</p></div>
     <div><h3>관련 교육 사례</h3>${hist.length ? `<ul>${hist.map(h => `<li><a href="/case-studies#${h.id}">${fmt(h.date)} ${esc(h.title)}</a> — ${esc(h.subject)}${h.audience ? ` (${esc(h.audience)})` : ''}</li>`).join('')}</ul>` : '<p class="muted">아직 같은 주제의 진행 이력이 없습니다.</p>'}<p class="small muted">${esc(STATUS_NOTE[p.status])}</p></div>
-    <div><h3>관련 수강 후기</h3><div class="program-reviews" data-program="${p.key}"><p class="muted small">공개 동의를 받은 후기가 등록되면 이곳에 표시됩니다. <a href="/reviews">전체 후기 보기</a></p></div></div>
+    <div><h3>관련 수강 후기</h3>${p.key === 'vibe-coding' && vibe.length
+        ? `<p class="small">같은 실습(Claude Code·Codex 바이브 코딩)을 들은 수강생 후기 ${vibe.length}건 중 일부입니다.</p>${quoteCards(vibe, 3)}<p class="small"><a href="/reviews?cat=vibe-coding">바이브 코딩 후기 ${vibe.length}건 모두 보기 →</a></p>`
+        : `<div class="program-reviews" data-program="${p.key}"><p class="muted small">공개 동의를 받은 후기가 등록되면 이곳에 표시됩니다. <a href="/reviews">전체 후기 보기</a></p></div>`}</div>
   </div>
   <div class="fit"><div class="yes"><b>이런 분께 맞습니다</b>${esc(p.fit)}</div><div class="no"><b>참고해 주세요</b>${esc(p.notFit)}</div></div>
   <p class="program-cta"><a class="btn btn-cta" href="${inquiryHref(p.title)}" data-track="cta_inquiry_click" data-track-label="program_${p.key}">프로그램 ${p.letter} 문의하기</a></p>
@@ -225,7 +286,9 @@ ${inquiryCta('programs_bottom', { title: '어떤 프로그램이 맞을지 고�
 }
 
 // ───────────── /case-studies ─────────────
-export function caseStudiesPage() {
+export function caseStudiesPage(reviews = []) {
+    const byCase = {};
+    for (const r of reviews) { const id = caseIdFor(r); if (id) (byCase[id] ||= []).push(r); }
     const path = '/case-studies';
     const crumb = [{ name: '홈', path: '/' }, { name: '교육 사례', path }];
     const pending = '<span class="pending">기록 보완 예정</span>';
@@ -245,7 +308,8 @@ export function caseStudiesPage() {
     <dt>7. 확인된 교육 결과</dt><dd>${d.result ? esc(d.result) : '<span class="pending">아직 공개할 수 있는 결과 자료가 없습니다</span>'}</dd>
     <dt>8. 관련 프로그램·자료</dt><dd>${h.programs.map(k => PROGRAM_DETAILS.some(p => p.key === k) ? `<a href="/programs#${k}">${esc(programLabel(k))}</a>` : esc(programLabel(k))).join(', ')}${h.links.map(l => ` · <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join('')}</dd>
   </dl>
-  <div class="photos">${h.photos.map(p => `<figure><img src="${esc(p.src)}" alt="${esc(p.alt)}" loading="lazy" decoding="async" width="400" height="300"><figcaption>${esc(p.cap)} (실제 강의 현장 사진)</figcaption></figure>`).join('')}</div>
+  ${(byCase[h.id] || []).length ? `<div class="case-reviews"><h3>참여자 후기 ${byCase[h.id].length}건 <small>원문 그대로 · 공개 동의 확인</small></h3>${quoteCards(byCase[h.id], 3)}<ul class="case-review-links">${orderForDisplay(byCase[h.id]).map(r => `<li><a href="/reviews/${esc(r.slug)}">${esc(r.title)}</a> — ${esc(authorOf(r))}</li>`).join('')}</ul></div>` : ''}
+  ${h.photos.length ? `<div class="photos">${h.photos.map(p => `<figure><img src="${esc(p.src)}" alt="${esc(p.alt)}" loading="lazy" decoding="async" width="400" height="300"><figcaption>${esc(p.cap)} (실제 강의 현장 사진)</figcaption></figure>`).join('')}</div>` : ''}
 </article>`;
     }).join('');
     const s = historyStats();
@@ -324,7 +388,7 @@ ${crumbs(crumb)}
   <h2>교육 현장에서는 어떻게 다뤘나요?</h2>
   <p class="one-line">필로소피 AI 교육이 실제로 진행한 강의 가운데 이 주제와 관련된 기록입니다.</p>
   <ul>${a.experience.map(e => `<li>${esc(e)}</li>`).join('')}</ul>
-  <div class="photos">${cases.slice(0, 2).map(h => h.photos[0]).map(p => `<figure><img src="${esc(p.src)}" alt="${esc(p.alt)}" loading="lazy" width="400" height="300"><figcaption>${esc(p.cap)} (실제 강의 현장)</figcaption></figure>`).join('')}</div>
+  <div class="photos">${cases.filter(h => h.photos.length).slice(0, 2).map(h => h.photos[0]).map(p => `<figure><img src="${esc(p.src)}" alt="${esc(p.alt)}" loading="lazy" width="400" height="300"><figcaption>${esc(p.cap)} (실제 강의 현장)</figcaption></figure>`).join('')}</div>
   <h2>주의할 점과 한계는 무엇인가요?</h2>
   <div class="callout"><ul>${a.cautions.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
   <h2>관련 교육 프로그램</h2>
@@ -342,13 +406,13 @@ ${inquiryCta('insight_' + a.slug)}`;
     return page({
         title: `${a.title} | 필로소피 AI 교육`,
         description: a.description, path, active: 'insights', ogType: 'article',
-        image: cases[0] ? cases[0].photos[0].src : undefined,
+        image: (cases.find(h => h.photos.length) || { photos: [{}] }).photos[0].src,
         jsonLd: [breadcrumbLd(crumb), {
             '@type': 'BlogPosting', '@id': abs(path) + '#article', headline: a.title, description: a.description,
             articleSection: (INSIGHT_CATEGORIES.find(c => c.key === a.category) || {}).label,
             inLanguage: 'ko', datePublished: a.published, dateModified: a.modified, mainEntityOfPage: abs(path),
             author: { '@id': abs('/#organization') }, publisher: { '@id': abs('/#organization') },
-            image: cases[0] ? abs(cases[0].photos[0].src) : abs(SITE.logo),
+            image: abs((cases.find(h => h.photos.length) || { photos: [{ src: SITE.logo }] }).photos[0].src),
             about: a.programs.map(k => programLabel(k)),
         }],
         body,
@@ -356,7 +420,16 @@ ${inquiryCta('insight_' + a.slug)}`;
 }
 
 // ───────────── /reviews (목록) — SSR 함수와 정적 대체 페이지 공용 ─────────────
-export function reviewsListPage({ cardsHtml = '', count = 0, cat = '', ssr = false } = {}) {
+export function reviewsListPage({ cardsHtml = '', count = 0, cat = '', ssr = false, reviews = [] } = {}) {
+    const rs = summarizeReviews(reviews);
+    const summary = rs.total ? `<div class="review-summary">
+    <h2 class="rs-h">후기 ${rs.total}건 한눈에 보기</h2>
+    ${reviewStatsHtml(rs)}
+    <h3 class="rs-sub">어떤 수업의 후기인가요?</h3>
+    <ul class="rs-lectures">${rs.lectures.filter(l => l.case).map(l => `<li><a href="/case-studies#${l.id}">${esc(l.case.title)}</a> <span>${fmt(l.case.date)} · ${esc(l.case.kind)}</span> <b>${l.count}건</b></li>`).join('')}</ul>
+    <h3 class="rs-sub">이런 상황에서, 이렇게 달라졌어요 <small>운영자가 각 후기 원문을 바탕으로 정리</small></h3>
+    <ul class="rs-stories">${orderForDisplay(rs.stories).slice(0, 6).map(r => `<li><span class="rs-before">${esc(r.concernBefore)}</span> <span class="rs-arrow" aria-hidden="true">→</span> <span class="rs-after">${esc(r.changeAfter)}</span> <a href="/reviews/${esc(r.slug)}">${esc(authorOf(r))}님 후기</a></li>`).join('')}</ul>
+  </div>` : '';
     const path = '/reviews';
     const crumb = [{ name: '홈', path: '/' }, { name: '교육 후기', path }];
     const filters = [{ key: '', label: '전체' }, ...CATEGORIES].map(c =>
@@ -374,6 +447,7 @@ ${crumbs(crumb)}
 <section class="section section-alt" aria-labelledby="rv-list-h">
   <div class="wrap">
     <h2 id="rv-list-h" class="sr-only" style="position:absolute;left:-9999px">후기 목록</h2>
+    ${summary}
     <ul class="rv-filter" aria-label="후기 분류">${filters}</ul>
     <div class="rv-grid" id="rvGrid">${cardsHtml}</div>
     ${empty}
@@ -385,7 +459,11 @@ ${inquiryCta('reviews_list')}`;
         title: cat ? `${CATEGORIES.find(c => c.key === cat)?.label || ''} 후기 | 필로소피 AI 교육 수강 후기` : '수강 후기 — 교사·교수 AI 연수 후기 | 필로소피 AI 교육',
         description: '필로소피 AI 교육의 AI 리터러시·바이브 코딩·교사 연수 수강 후기. 공개 동의를 받은 후기 원문과 교육 전 고민, 인상 깊었던 실습, 교육 후 변화를 확인하세요.',
         path, active: 'reviews',
-        jsonLd: [breadcrumbLd(crumb)], body,
+        jsonLd: [breadcrumbLd(crumb), ...(rs.total ? [{
+            '@type': 'CollectionPage', '@id': abs(path) + '#webpage', url: abs(path), name: '필로소피 AI 교육 수강 후기', inLanguage: 'ko',
+            about: { '@id': abs('/#organization') },
+            mainEntity: { '@type': 'ItemList', numberOfItems: rs.total, itemListElement: orderForDisplay(rs.reviews).map((r, i) => ({ '@type': 'ListItem', position: i + 1, url: abs('/reviews/' + r.slug), name: r.title })) },
+        }] : [])], body,
         scripts: ssr ? '<script src="/assets/js/reviews-filter.js" defer></script>' : '<script type="module" src="/assets/js/reviews-fallback.mjs"></script>',
     });
 }
@@ -395,11 +473,13 @@ export function reviewDetailPage(review, related = []) {
     const path = `/reviews/${r.slug}`;
     const crumb = [{ name: '홈', path: '/' }, { name: '교육 후기', path: '/reviews' }, { name: r.title, path }];
     const others = related.filter(x => x.slug !== r.slug).slice(0, 3);
+    const relCase = caseById(caseIdFor(r));
     const descSrc = [r.concernBefore, r.changeAfter].filter(hasContent).join(' → ') || r.originalText;
     const body = `
 ${crumbs(crumb)}
 <div class="section"><div class="wrap narrow">
 ${renderReviewDetail(r)}
+${relCase ? `<p class="trust-note">이 후기의 수업: <a href="/case-studies#${esc(relCase.id)}">${esc(relCase.title)}</a> (${fmt(relCase.date)} · ${esc(relCase.kind)}) — 수업 목적과 실습 내용을 교육 사례에서 볼 수 있습니다.</p>` : ''}
 <p class="trust-note">이 후기는 작성자의 공개 동의를 받아 게시했습니다. 원문은 작성자가 쓴 그대로이며, 정리 항목과 운영자 요약은 운영자가 원문을 바탕으로 작성했습니다.</p>
 ${others.length ? `<h2 style="margin-top:36px">다른 후기</h2><div class="rv-grid">${others.map(o => renderReviewCard(o)).join('')}</div>` : ''}
 <div class="btn-row"><a class="btn btn-ghost" href="/reviews">← 후기 목록</a>${PROGRAM_PAGE_KEYS.includes(r.program) ? `<a class="btn btn-ghost" href="/programs#${esc(r.program)}">${esc(programLabel(r.program))} 프로그램 보기</a>` : `<a class="btn btn-ghost" href="/case-studies">교육 사례 보기</a>`}</div>
@@ -427,4 +507,20 @@ export function notFoundPage() {
         path: '/404.html', robots: 'noindex',
         body: `<section class="section"><div class="wrap narrow"><h1>페이지를 찾을 수 없습니다</h1><p>주소가 바뀌었거나 삭제된 페이지입니다.</p><div class="btn-row"><a class="btn btn-primary" href="/">홈으로</a><a class="btn btn-ghost" href="/ai-instructor">강사 소개</a><a class="btn btn-ghost" href="/education-inquiry">교육 문의</a></div></div></section>`,
     });
+}
+
+// ───────── 메인 페이지(index.html)에 넣는 정적 후기 근거 ─────────
+export function reviewEvidenceHome(list) {
+    const rs = summarizeReviews(list);
+    if (!rs.total) return '';
+    return `            <div class="home-reviews">
+                <div class="trust-reviews-head"><h3>수강생 후기 ${rs.total}건 — 원문 그대로</h3><a href="/reviews" data-track="reviews_click" data-track-label="home">후기 전체 보기 →</a></div>
+                ${reviewStatsHtml(rs)}
+                ${quoteCards(list, 6)}
+            </div>`;
+}
+export function reviewHeroLine(list) {
+    const rs = summarizeReviews(list);
+    if (!rs.total) return '';
+    return `                        <div><dt>수강 후기</dt><dd>공개된 후기 ${rs.total}건 (${rs.authors}명) — 코딩 경험 없이 웹앱을 만들어 배포했다는 후기가 많습니다 <a href="/reviews">후기 보기</a></dd></div>`;
 }

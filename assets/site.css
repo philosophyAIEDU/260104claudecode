@@ -232,3 +232,39 @@ p { margin: 0 0 1em; }
   .program-compare > a span:first-child { font-weight: 700; color: var(--ink); }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+/* ===== 후기 근거 블록 (2026-11-10) ===== */
+.review-stats { list-style: none; padding: 0; margin: 0 0 6px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.review-stats li { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+.review-stats b { display: block; font-size: 24px; color: var(--navy); }
+.review-stats span { font-size: 13px; color: var(--muted); }
+.quote-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin: 18px 0 0; }
+.quote-card { margin: 0; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--gold-brand); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.quote-card blockquote { margin: 0; }
+.quote-card blockquote p { margin: 0; font-size: 15.5px; line-height: 1.75; color: var(--ink); font-weight: 600; }
+.quote-card figcaption { font-size: 13px; color: var(--muted); margin-top: auto; }
+.quote-card figcaption a { color: var(--navy); font-weight: 700; }
+.rec-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.rec-grid .card p { font-size: 15px; }
+.case-reviews { margin: 4px 0 18px; padding: 16px 18px; background: var(--bg); border-radius: 14px; }
+.case-reviews h3 { font-size: 16px; }
+.case-reviews h3 small { font-weight: 500; color: var(--muted); font-size: 12.5px; margin-left: 6px; }
+.case-review-links { margin: 14px 0 0; padding-left: 18px; font-size: 14px; }
+.review-summary { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 26px; }
+.review-summary .rs-h { font-size: 20px; }
+.rs-sub { font-size: 16px; margin: 22px 0 10px; }
+.rs-sub small { font-weight: 500; color: var(--muted); font-size: 12.5px; margin-left: 6px; }
+.rs-lectures, .rs-stories { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14.5px; }
+.rs-lectures li { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.rs-lectures span { color: var(--muted); font-size: 13px; }
+.rs-lectures b { margin-left: auto; color: var(--navy); }
+.rs-stories li { background: var(--bg); border-radius: 12px; padding: 10px 14px; line-height: 1.7; }
+.rs-before { color: var(--muted); }
+.rs-arrow { color: var(--gold-brand); font-weight: 800; margin: 0 4px; }
+.rs-after { color: var(--ink); font-weight: 600; }
+.rs-stories a { font-size: 13px; margin-left: 6px; }
+@media (max-width: 860px) {
+  .review-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rec-grid { grid-template-columns: 1fr; }
+  .rs-lectures b { margin-left: 0; }
+}

@@ -179,3 +179,19 @@ button.hamburger { border: 0; background: transparent; }
 .pastel-home .hero { padding-top: 120px; }
 .pastel-home .hero h1 em { display: block; }
 @media (max-width: 760px) { .pastel-home .hero { padding-top: 104px; } }
+
+/* 메인: 정적 후기 근거 (assets/site.css 의 같은 이름 스타일과 맞춤) */
+.home-reviews { margin-top: 34px; }
+.home-reviews .trust-reviews-head h3 { font-size: 19px; color: var(--navy); }
+.review-stats { list-style: none; padding: 0; margin: 0 0 6px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.review-stats li { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+.review-stats b { display: block; font-size: 24px; color: var(--navy); }
+.review-stats span { font-size: 13px; color: var(--text-soft); }
+.stat-note { font-size: 12.5px; color: var(--text-soft); }
+.quote-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 18px 0 0; }
+.quote-card { margin: 0; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--gold-brand); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.quote-card blockquote { margin: 0; }
+.quote-card blockquote p { margin: 0; font-size: 15px; line-height: 1.75; color: var(--navy); font-weight: 600; }
+.quote-card figcaption { font-size: 13px; color: var(--text-soft); margin-top: auto; }
+.quote-card figcaption a { color: var(--navy); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 860px) { .review-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .quote-grid { grid-template-columns: 1fr; } }

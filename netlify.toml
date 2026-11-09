@@ -67,6 +67,11 @@
   status = 200
   force = true
 [[redirects]]
+  from = "/llms.txt"
+  to = "/.netlify/functions/llms"
+  status = 200
+  force = true
+[[redirects]]
   from = "/sitemap.xml"
   to = "/.netlify/functions/sitemap"
   status = 200
