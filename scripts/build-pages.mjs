@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { notFoundPage, aiInstructorPage, programsPage, caseStudiesPage, insightsIndexPage, insightPage, reviewsListPage } from '../src/site/pages.mjs';
 import { INSIGHTS } from '../src/site/insights.mjs';
 import { buildLlmsTxt, buildSitemapXml } from '../src/site/seo.mjs';
-import { reviewEvidenceHome, reviewHeroLine } from '../src/site/pages.mjs';
+import { reviewEvidenceHome, reviewHeroLine, homeLd, homeFaq } from '../src/site/pages.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -60,3 +60,5 @@ function fillBlock(file, name, html) {
 }
 fillBlock('index.html', 'reviews-home', reviewEvidenceHome(reviews));
 fillBlock('index.html', 'reviews-hero', reviewHeroLine(reviews));
+fillBlock('index.html', 'home-ld', homeLd(reviews));
+fillBlock('index.html', 'home-faq', homeFaq(reviews));
