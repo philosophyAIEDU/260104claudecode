@@ -1391,6 +1391,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
 
         // ===== AI 툴 동적 로드 =====
         const TOOL_CATEGORIES = [
+            { id: '교수님·연구', icon: 'fas fa-chalkboard-user' },
             { id: '언어·독서', icon: 'fas fa-book-open' },
             { id: '수학·물리', icon: 'fas fa-square-root-variable' },
             { id: '과학·자연', icon: 'fas fa-flask' },
@@ -1401,6 +1402,7 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
         const ETC_CATEGORY = { id: '기타', icon: 'fas fa-shapes' };
 
         const DEFAULT_TOOLS = [
+            { name: '교수님들을 위한 Local AI 앱', category: '교수님·연구', tagline: '교수님들을 위해 만든 Local AI 앱', description: '교수님들을 위해 만든 Local AI 앱입니다. 강의와 연구에서 Local AI를 어떻게 쓸 수 있는지 직접 열어 살펴보세요.', tags: ['Local AI', '교수님', '강의·연구'], url: 'https://philolocalai.netlify.app/', icon: 'fas fa-laptop-code', order: 0 },
             { name: '영어 사전', category: '언어·독서', tagline: '맥락으로 익히는 똑똑한 영어 사전', description: '단어의 뜻만이 아니라 예문과 쓰임, 뉘앙스까지 함께 보여 줍니다. 영어 수업과 어휘 학습, 독해 지도에 바로 활용할 수 있습니다.', tags: ['영어 어휘', '예문·뉘앙스', '독해 지도'], url: 'https://philoenglishdictionary.netlify.app', icon: 'fas fa-book-open', order: 1 },
             { name: 'AI 독서 코치', category: '언어·독서', tagline: '책 읽기를 도와주는 AI 코치', description: '책을 읽는 과정에서 질문과 안내를 통해 이해를 돕는 코치입니다. 독서 수업과 자기주도 독서 활동에 활용할 수 있습니다.', tags: ['독서', '읽기 지도', '자기주도 학습'], url: 'https://philoreading.netlify.app/', icon: 'fas fa-book-reader', order: 2 },
             { name: '문장나무', category: '언어·독서', tagline: '문장 구조를 나무처럼 분석하는 학습 앱', description: '문장을 성분별로 나누어 나무 구조로 시각화하며 익힙니다. 국어·영어 문법 수업에서 문장 구조 이해를 돕는 학습 도구입니다.', tags: ['문장 분석', '문법', '언어 학습'], url: 'https://philolang.netlify.app/', icon: 'fas fa-tree', order: 3 },
