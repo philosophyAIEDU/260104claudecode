@@ -30,7 +30,7 @@ export function organizationLd() {
         slogan: SITE.slogan,
         email: SITE.email,
         areaServed: { '@type': 'Country', name: '대한민국' },
-        knowsAbout: [...SITE.expertise.map(e => e.title), '생성형 AI 교육', 'AI 리터러시 교사 연수', '바이브 코딩 교육', 'GPT Codex', 'GitHub·Netlify 웹앱 배포'],
+        knowsAbout: [...SITE.expertise.map(e => e.title), '대학 교수 AI 연수', '교수님 지식 자산화(Claude)', '생성형 AI 교육', 'AI 리터러시 교사 연수', '바이브 코딩 교육', 'GPT Codex', 'GitHub·Netlify 웹앱 배포'],
         contactPoint: { '@type': 'ContactPoint', contactType: '교육·강의 문의', email: SITE.email, url: abs('/education-inquiry'), availableLanguage: 'ko' },
         sameAs: SITE.channels.map(c => c.url),
     };
