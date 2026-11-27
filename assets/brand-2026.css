@@ -237,3 +237,29 @@ button.hamburger { border: 0; background: transparent; }
 .home-faq summary::after { content: '+'; float: right; color: var(--gold-brand, #C6A15B); font-size: 20px; line-height: 1; }
 .home-faq details[open] summary::after { content: '−'; }
 .home-faq details p { margin: 0; padding: 0 20px 18px; line-height: 1.75; color: #3d4a57; }
+
+/* ===== 대학 교수님 대상 강의 강조 ===== */
+.prof-highlight { background: #162C43; color: #F8F5EE; border-radius: 22px; padding: 24px 26px; margin: 0 0 26px; border: 2px solid #C6A15B; }
+.prof-highlight .prof-eyebrow { margin: 0 0 6px; font-size: 12.5px; font-weight: 800; letter-spacing: .08em; color: #C6A15B; }
+.prof-highlight .prof-title { margin: 0 0 6px; font-size: 22px; line-height: 1.35; color: #fff; }
+.prof-highlight .prof-title b { color: #E9C77F; }
+.prof-highlight .prof-title span { font-size: .8em; font-weight: 600; color: #d9dee4; }
+.prof-highlight .prof-sub { margin: 0 0 14px; font-size: 14.5px; color: #d9dee4; }
+.prof-highlight .prof-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.prof-highlight .prof-list li { background: rgba(255,255,255,.07); border: 1px solid rgba(198,161,91,.45); border-radius: 14px; padding: 12px 14px; }
+.prof-highlight .prof-list time { display: block; font-size: 13px; font-weight: 800; color: #E9C77F; }
+.prof-highlight .prof-list a { color: #fff; text-decoration: none; display: grid; gap: 2px; }
+.prof-highlight .prof-list a:hover b { text-decoration: underline; }
+.prof-highlight .prof-list b { font-size: 15.5px; }
+.prof-highlight .prof-list span { font-size: 12.5px; color: #cfd6de; line-height: 1.5; }
+@media (max-width: 760px) { .prof-highlight { padding: 20px 18px; } .prof-highlight .prof-list { grid-template-columns: 1fr; } .prof-highlight .prof-title { font-size: 19px; } }
+.history-item.is-prof { border: 2px solid #C6A15B; background: #fffaf0; }
+.kind-prof { background: #162C43 !important; color: #E9C77F !important; }
+.prof-line { margin: 10px 0 0; font-size: 15px; }
+.prof-line a { color: #162C43; text-decoration: none; border-bottom: 2px solid #C6A15B; }
+.hero-profile-facts .fact-prof { background: #162C43; border-radius: 12px; padding: 8px 10px; margin: 2px -10px; }
+.hero-profile-facts .fact-prof dt { color: #E9C77F !important; }
+.hero-profile-facts .fact-prof dd, .hero-profile-facts .fact-prof dd b { color: #fff !important; }
+.hero-profile-facts .fact-prof a { color: #E9C77F !important; }
+.trust-history li.is-prof { grid-column: 1 / -1; }
+.trust-history li.is-prof a { border: 2px solid #C6A15B; background: #fffaf0; }

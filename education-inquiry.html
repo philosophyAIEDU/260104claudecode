@@ -489,6 +489,13 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
     .lb-next { right: 6px; }
 }
 
+/* 대학 교수님 대상 강의 강조 */
+.cred-prof .num { color: #A8843F; }
+.cred-prof .label { font-weight: 700; color: #162C43; }
+.cred-prof .label small { font-weight: 500; color: var(--text-soft); }
+.tl-prof .tl-card { border: 2px solid #C6A15B; background: #fffaf0; }
+.tl-prof .tl-kind { background: #162C43; color: #E9C77F; }
+.tl-prof .tl-date { color: #A8843F; }
     </style>
     <link rel="stylesheet" href="assets/pastel-theme.css">
     <link rel="stylesheet" href="assets/brand-2026.css">
@@ -720,21 +727,21 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
     <section class="cred-strip">
         <div class="container">
             <div class="cred-grid">
+                <div class="cred-item cred-prof">
+                    <div class="num">6<small>회</small></div>
+                    <div class="label">대학 교수님·교직원 대상 강의<br><small>계명대 3회 · HTHT 대학 컨소시엄 3회(회당 약 250명)</small></div>
+                </div>
                 <div class="cred-item">
-                    <div class="num">12<small>회</small></div>
+                    <div class="num">18<small>회</small></div>
                     <div class="label">진행한 교육·연수</div>
                 </div>
                 <div class="cred-item">
-                    <div class="num">8<small>곳</small></div>
+                    <div class="num">10<small>곳</small></div>
                     <div class="label">강의한 기관·단체</div>
                 </div>
                 <div class="cred-item">
                     <div class="num">4<small>곳</small></div>
                     <div class="label">봉사단 노트북 기부처</div>
-                </div>
-                <div class="cred-item">
-                    <div class="num">2025.04<small>~</small></div>
-                    <div class="label">교육 활동 기간</div>
                 </div>
             </div>
         </div>
@@ -785,11 +792,20 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
             <div class="section-head reveal">
                 <span class="eyebrow">Teaching History</span>
                 <h2 class="section-title">지금까지의 <em>교육 이력</em></h2>
-                <p class="section-sub">2025년 4월부터 공공기관·대학·교육청·학교에서 진행한 교육입니다.
-                    사진을 클릭하시면 크게 보실 수 있습니다.</p>
+                <p class="section-sub">2025년 4월부터 대학 교수님·교직원 직무연수, 공공기관·대학·교육청·학교에서 진행한 교육입니다.
+                    <b>금색으로 표시한 항목</b>이 대학 교수님 대상 강의입니다. 사진을 클릭하시면 크게 보실 수 있습니다.</p>
             </div>
 
             <div class="timeline">
+                <article class="tl-item tl-prof reveal">
+                    <div class="tl-date">2026.10~11<span>계명대학교</span></div>
+                    <div class="tl-card">
+                        <div class="tl-org"><h3>계명대학교</h3><span class="tl-kind">교수님·교직원 AI 교육 과정 3회</span></div>
+                        <div class="tl-subject">클로드(Claude)로 교수님의 지식을 자산화하는 AI 교육</div>
+                        <p class="tl-desc">계명대학교 교수님과 교직원분들을 대상으로, 클로드를 활용해 교수님이 가진 강의·연구 지식을 다시 쓸 수 있는 자산으로 정리하는 과정을 2026년 10~11월에 3회 진행했습니다. 2026년 12월에 1회를 더 진행할 예정입니다.</p>
+                        <div class="tl-tags"><span>교수님·교직원</span><span>Claude</span><span>지식 자산화</span></div>
+                    </div>
+                </article>
                 <article class="tl-item reveal">
                     <div class="tl-date">2026.10<span>동신대학교</span></div>
                     <div class="tl-card">
@@ -807,6 +823,15 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                         <p class="tl-desc">2026.09.17 독서챌린지 AI 특강, 10.02 Claude Code 그룹 코칭, 10.06 GPT·Codex 그룹 코칭을 온라인으로 진행했습니다.
                             GitHub·Netlify 배포와 Firebase 로그인 연동까지 참여자가 직접 해 보는 실습입니다. <a href="/reviews">참여자 후기 보기</a></p>
                         <div class="tl-tags"><span>Claude Code</span><span>Codex</span><span>온라인</span></div>
+                    </div>
+                </article>
+                <article class="tl-item tl-prof reveal">
+                    <div class="tl-date">2026.08<span>HTHT 대학 컨소시엄</span></div>
+                    <div class="tl-card">
+                        <div class="tl-org"><h3>HTHT 대학 컨소시엄 (한국대학경쟁력연구원)</h3><span class="tl-kind">교수님·교직원 직무연수</span></div>
+                        <div class="tl-subject">Antigravity를 활용한 나만의 앱 만들기</div>
+                        <p class="tl-desc">2026 하계 교직원 역량 강화 직무연수에서 대학 교수님과 교직원 약 250명을 대상으로 Antigravity로 각자 필요한 앱을 직접 만드는 수업을 진행했습니다. <a href="https://philo2026htht.netlify.app/" target="_blank" rel="noopener">연수 성과 사이트 보기</a></p>
+                        <div class="tl-tags"><span>교수님·교직원</span><span>약 250명</span><span>Antigravity</span></div>
                     </div>
                 </article>
                 <article class="tl-item reveal">
@@ -885,6 +910,15 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                     </div>
                 </article>
 
+                <article class="tl-item tl-prof reveal">
+                    <div class="tl-date">2026.05<span>HTHT 대학 컨소시엄</span></div>
+                    <div class="tl-card">
+                        <div class="tl-org"><h3>HTHT 대학 컨소시엄 (한국대학경쟁력연구원)</h3><span class="tl-kind">교수님·교직원 직무연수</span></div>
+                        <div class="tl-subject">AI 리터러시 수업</div>
+                        <p class="tl-desc">2026 교직원 역량 강화 직무연수에서 대학 교수님과 교직원 약 250명을 대상으로 AI 리터러시 수업을 진행했습니다.</p>
+                        <div class="tl-tags"><span>교수님·교직원</span><span>약 250명</span><span>AI 리터러시</span></div>
+                    </div>
+                </article>
                 <article class="tl-item reveal">
                     <div class="tl-date">2026.04.10<span>전주교육청</span></div>
                     <div class="tl-card">
@@ -932,6 +966,15 @@ footer { background: var(--parchment-deep); border-top: 1px solid var(--parchmen
                     </div>
                 </article>
 
+                <article class="tl-item tl-prof reveal">
+                    <div class="tl-date">2025.08<span>HTHT 대학 컨소시엄</span></div>
+                    <div class="tl-card">
+                        <div class="tl-org"><h3>HTHT 대학 컨소시엄 (한국대학경쟁력연구원)</h3><span class="tl-kind">교수님·교직원 직무연수</span></div>
+                        <div class="tl-subject">AI 리터러시 수업</div>
+                        <p class="tl-desc">2025 하계 교직원 역량 강화 직무연수에서 대학 교수님과 교직원 약 250명을 대상으로 AI 리터러시 수업을 진행했습니다.</p>
+                        <div class="tl-tags"><span>교수님·교직원</span><span>약 250명</span><span>AI 리터러시</span></div>
+                    </div>
+                </article>
                 <article class="tl-item reveal">
                     <div class="tl-date">2025.07.07<span>서울대학교</span></div>
                     <div class="tl-card">

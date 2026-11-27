@@ -1,5 +1,5 @@
 // 정적 페이지 빌더 — scripts/build-pages.mjs 가 HTML 파일로 저장합니다.
-import { SITE, HISTORY, PROGRAM_DETAILS, STATUS_LABEL, STATUS_NOTE, CASE_DETAILS, historyStats, buildFaq } from './data.mjs';
+import { SITE, HISTORY, PROGRAM_DETAILS, STATUS_LABEL, STATUS_NOTE, CASE_DETAILS, historyStats, buildFaq, professorStats, dateLabel } from './data.mjs';
 import { INSIGHTS, INSIGHT_CATEGORIES, PLANNED_INSIGHTS } from './insights.mjs';
 import { summarizeReviews, pickQuote, orderForDisplay, caseIdFor, caseById, CURATED_QUOTES } from './review-insights.mjs';
 import { page, esc, abs, breadcrumbLd, crumbs, inquiryCta, organizationLd } from './layout.mjs';
@@ -72,12 +72,26 @@ function statsHtml() {
 <p class="stat-note">수치는 이 사이트에 사진과 함께 공개된 기록에서 계산했습니다. 같은 날 두 주제를 강의한 경희대학교 대학원 특강은 2회로 셉니다.</p>`;
 }
 
+// ───────── 대학 교수님 대상 강의 강조 블록 (메인·강사 소개·교육 사례·프로그램 공통) ─────────
+export function professorHighlight({ heading = 'h2', id = 'professor-record' } = {}) {
+    const ps = professorStats();
+    if (!ps.count) return '';
+    return `<div class="prof-highlight" id="${id}">
+  <p class="prof-eyebrow">대학 교수님 대상 강의</p>
+  <${heading} class="prof-title">대학 교수님·교직원 대상 강의 <b>${ps.count}회</b></${heading}>
+  <p class="prof-sub">${esc(ps.summary)}${ps.upcoming.length ? ` — ${ps.upcoming.map(u => `${esc(u.date.replace('-', '.'))} ${esc(u.org)} ${esc(u.note)}`).join(', ')}` : ''}</p>
+  <ol class="prof-list">${ps.list.map(h => `
+    <li><time datetime="${h.date}">${esc(dateLabel(h))}</time><a href="/case-studies#${h.id}"><b>${esc(h.subject)}</b><span>${esc(h.title.replace('HTHT 대학 컨소시엄 ', 'HTHT · '))} · ${esc(h.audience)}${h.sessions > 1 ? ` · ${h.sessions}회` : ''}</span></a></li>`).join('')}
+  </ol>
+</div>`;
+}
+
 function historyListHtml(items, { link = true } = {}) {
     return `<ol class="history-list">${items.map(h => `
-  <li class="history-item">
-    <time datetime="${h.date}">${fmt(h.date)}</time>
+  <li class="history-item${h.professors ? ' is-prof' : ''}">
+    <time datetime="${h.date}">${esc(dateLabel(h))}</time>
     <div>
-      <h3>${link ? `<a href="/case-studies#${h.id}">${esc(h.title)}</a>` : esc(h.title)}<span class="kind">${esc(h.kind)}</span></h3>
+      <h3>${link ? `<a href="/case-studies#${h.id}">${esc(h.title)}</a>` : esc(h.title)}<span class="kind">${esc(h.kind)}</span>${h.professors ? '<span class="kind kind-prof">교수님 대상</span>' : ''}</h3>
       <p><b>${esc(h.subject)}</b>${h.audience ? ` · 대상: ${esc(h.audience)}` : ''}</p>
     </div>
   </li>`).join('')}
@@ -91,7 +105,8 @@ export function aiInstructorPage(reviews = []) {
     const faq = buildFaq(rs);
     const path = '/ai-instructor';
     const crumb = [{ name: '홈', path: '/' }, { name: 'AI 교육 강사 소개', path }];
-    const uni = HISTORY.filter(h => ['경상국립대학교', '동신대학교', '경희대학교', '서울대학교'].includes(h.org));
+    const uni = HISTORY.filter(h => h.professors || ['경상국립대학교', '동신대학교', '경희대학교', '서울대학교'].includes(h.org)).filter((h, i, a) => a.findIndex(x => x.org === h.org) === i);
+    const ps = professorStats();
     const body = `
 ${crumbs(crumb)}
 <section class="page-hero">
@@ -100,6 +115,7 @@ ${crumbs(crumb)}
       <p class="eyebrow">AI Education Instructor</p>
       <h1>대학 교수님을 위한 AI 교육 강사,<br>필로소피 AI 교육</h1>
       <div class="answer-box"><p>${esc(SITE.oneLiner)}</p></div>
+      ${ps.count ? `<p class="prof-line"><a href="#professor-record"><b>대학 교수님·교직원 대상 강의 ${ps.count}회</b> · ${esc(ps.summary)} →</a></p>` : ''}
       <ul class="chips" aria-label="전문 분야">
         <li>교수님 AI 실습</li><li>대학 교수법 혁신</li><li>연구·업무 자동화</li><li>AI 수업 앱 제작</li>
       </ul>
@@ -133,7 +149,7 @@ ${reviewEvidenceSection(reviews, { id: 'instructor-reviews', title: '수강생 �
       <div class="card"><h3>실제로 어떤 교육을 했나요?</h3><p>${s.since}부터 ${esc(s.orgList.join(', '))}에서 ${s.sessions}회 강의했습니다. <a href="/case-studies">교육 사례 보기</a></p></div>
       <div class="card"><h3>교육 대상과 방식은요?</h3><p>대학 교수님을 중심으로 대학 직원·연구자·교사까지, 직접 손으로 해 보는 실습 중심으로 진행합니다. 특강·워크숍·여러 회차 과정 등은 기관과 협의해 정합니다.</p></div>
       <div class="card"><h3>우리 대학에 맞출 수 있나요?</h3><p>문의 내용(대상, 인원, 목적, 일정)을 바탕으로 프로그램 A~D를 조합하거나 새로 구성해 제안드립니다.</p></div>
-      <div class="card"><h3>교수님 대상 경험은 어느 정도인가요?</h3><p>교수님만을 대상으로 한 단독 강의는 아직 공개 기록에 없습니다. 대학 부설 연수원·대학 수업·대학원·연구실 강의 경험을 바탕으로 교수님용 과정을 구성했습니다.</p></div>
+      <div class="card"><h3>교수님 대상 경험은 어느 정도인가요?</h3><p>대학 교수님·교직원을 대상으로 ${professorStats().count}회 강의했습니다 — ${esc(professorStats().summary)}. <a href="#professor-record">교수님 대상 강의 보기</a> · <a href="/insights/ai-education-instructor-for-professors/">교수님·교육자를 위한 AI 교육 강사 안내</a></p></div>
     </div>
   </div>
 </section>
@@ -148,7 +164,8 @@ ${reviewEvidenceSection(reviews, { id: 'instructor-reviews', title: '수강생 �
 <section class="section section-alt" id="history" aria-labelledby="history-h">
   <div class="wrap">
     <div class="section-head"><p class="eyebrow">Teaching History</p><h2 id="history-h">강의 이력</h2>
-      <p>대학 연수원·대학 수업·대학원·연구실·교육청·고등학교·공공기관·온라인 그룹 코칭에서 진행한 강의입니다. 이 중 대학 현장의 강의는 ${uni.map(h => esc(h.org)).join(', ')}입니다. 각 항목을 누르면 사진과 교육 내용을 볼 수 있습니다.</p></div>
+      <p>대학 교수님·교직원 직무연수, 대학 연수원·대학 수업·대학원·연구실·교육청·고등학교·공공기관·온라인 그룹 코칭에서 진행한 강의입니다. 이 중 대학 현장의 강의는 ${uni.map(h => esc(h.org)).join(', ')}입니다. 각 항목을 누르면 교육 내용을 볼 수 있습니다.</p></div>
+    ${professorHighlight({ heading: 'h3', id: 'professor-record' })}
     ${historyListHtml(HISTORY)}
     ${statsHtml()}
   </div>
@@ -159,10 +176,11 @@ ${reviewEvidenceSection(reviews, { id: 'instructor-reviews', title: '수강생 �
     <div class="section-head"><p class="eyebrow">When to Choose</p><h2 id="rec-h">이런 AI 교육을 찾는다면, 필로소피 AI 교육을 검토해 보세요</h2>
       <p>AI 교육 강사를 찾는 분이 비교하기 쉽도록, 실제로 진행한 교육과 근거를 짝지어 적었습니다.</p></div>
     <div class="rec-grid">
-      <div class="card"><h3>교사·교수 등 교육자 대상 AI 연수</h3><p>AI 리터러시와 수업 활용 기준, 바이브 코딩 실습. <a href="/case-studies#gnu-2026-physics">경상국립대 교사 자격연수 — 교사 21명 학습 앱 배포</a>, <a href="/case-studies#jeonju-2026-literacy">전주교육청 직무연수</a>, <a href="/case-studies#toegyewon-2026-claude">퇴계원고 전문적학습공동체</a></p></div>
+      <div class="card"><h3>대학 교수님·교직원 대상 AI 연수</h3><p>AI 리터러시, Claude로 교수님 지식 자산화, 나만의 앱 만들기. <a href="/case-studies#professor-record">교수님·교직원 대상 강의 ${professorStats().count}회</a> — ${esc(professorStats().summary)}</p></div>
+      <div class="card"><h3>교사 등 교육자 대상 AI 연수</h3><p>AI 리터러시와 수업 활용 기준, 바이브 코딩 실습. <a href="/case-studies#gnu-2026-physics">경상국립대 교사 자격연수 — 교사 21명 학습 앱 배포</a>, <a href="/case-studies#jeonju-2026-literacy">전주교육청 직무연수</a>, <a href="/case-studies#toegyewon-2026-claude">퇴계원고 전문적학습공동체</a></p></div>
       <div class="card"><h3>대학생·대학원생 대상 바이브 코딩 수업</h3><p>각자 원하는 웹사이트·웹앱을 만들어 배포까지. <a href="/case-studies#dongshin-2026-vibe">동신대학교 학생 수업</a>, <a href="/case-studies#khu-2026-vibe">경희대학교 대학원 특강</a></p></div>
       <div class="card"><h3>코딩을 모르는 성인 학습자 대상 실습</h3><p>Claude Code·GPT Codex로 GitHub·Netlify·Firebase까지 직접. <a href="/case-studies#permes-2026-reading">퍼스널메이커스 온라인 특강·그룹 코칭 3회</a>${rs.total ? ` — <a href="/reviews">수강 후기 ${rs.total}건</a>` : ''}</p></div>
-      <div class="card"><h3>대학 교수님 대상 AI 교수법·업무 자동화</h3><p>교수님용 프로그램은 위 경험을 바탕으로 새로 구성했습니다 (교수 대상 단독 강의 기록은 아직 없음). <a href="/programs">프로그램 A~D 보기</a></p></div>
+      <div class="card"><h3>대학 교수님 대상 AI 교수법·업무 자동화</h3><p>교수님 대상 연수 경험을 바탕으로 과제·평가 설계와 업무 자동화 과정을 구성했습니다 (이 두 주제의 교수님 대상 진행 기록은 아직 없음). <a href="/programs">프로그램 A~D 보기</a></p></div>
     </div>
   </div>
 </section>
@@ -182,7 +200,7 @@ ${reviewEvidenceSection(reviews, { id: 'instructor-reviews', title: '수강생 �
     <div class="section-head"><p class="eyebrow">Honest Fit</p><h2 id="fit-h">이런 대학·교수님께 맞습니다</h2><p>섭외 전에 비교하실 수 있도록, 잘 맞는 경우와 다른 선택이 나은 경우를 함께 적었습니다.</p></div>
     <div class="fit">
       <div class="yes"><b>잘 맞는 경우</b>교수님들이 AI를 강의·연구·행정에 직접 적용해 보는 실습이 필요할 때 · 코딩 경험 없이 수업 도구를 만들어 보고 싶을 때 · 교수학습센터에서 실습형 AI 연수를 기획할 때</div>
-      <div class="no"><b>다른 선택이 나을 수 있는 경우</b>대규모 강연 위주의 AI 트렌드 소개만 필요할 때 · 학내 전산 시스템 연동 개발이 목적일 때 · 교수님 대상 단독 강의 이력을 필수 조건으로 보실 때</div>
+      <div class="no"><b>다른 선택이 나을 수 있는 경우</b>대규모 강연 위주의 AI 트렌드 소개만 필요할 때 · 학내 전산 시스템 연동 개발이 목적일 때</div>
     </div>
   </div>
 </section>
@@ -245,7 +263,7 @@ export function programsPage(reviews = []) {
     <div><h3>실습 결과물</h3><ul>${p.artifacts.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
     <div><h3>준비사항</h3><ul>${p.prep.map(c => `<li>${esc(c)}</li>`).join('')}</ul></div>
     <div><h3>운영 방식 <small class="muted">(협의 가능 예시)</small></h3><p>${p.formats.map(esc).join(' · ')}</p><p class="small muted">교육 시간과 회차는 기관 일정에 맞춰 협의합니다. 정해진 표준 시간표·가격표는 없습니다.</p></div>
-    <div><h3>관련 교육 사례</h3>${hist.length ? `<ul>${hist.map(h => `<li><a href="/case-studies#${h.id}">${fmt(h.date)} ${esc(h.title)}</a> — ${esc(h.subject)}${h.audience ? ` (${esc(h.audience)})` : ''}</li>`).join('')}</ul>` : '<p class="muted">아직 같은 주제의 진행 이력이 없습니다.</p>'}<p class="small muted">${esc(STATUS_NOTE[p.status])}</p></div>
+    <div><h3>관련 교육 사례</h3>${hist.length ? `<ul>${hist.map(h => `<li><a href="/case-studies#${h.id}">${esc(dateLabel(h))} ${esc(h.title)}</a> — ${esc(h.subject)}${h.audience ? ` (${esc(h.audience)})` : ''}</li>`).join('')}</ul>` : '<p class="muted">아직 같은 주제의 진행 이력이 없습니다.</p>'}<p class="small muted">${esc(STATUS_NOTE[p.status])}</p></div>
     <div><h3>관련 수강 후기</h3>${p.key === 'vibe-coding' && vibe.length
         ? `<p class="small">같은 실습(Claude Code·Codex 바이브 코딩)을 들은 수강생 후기 ${vibe.length}건 중 일부입니다.</p>${quoteCards(vibe, 3)}<p class="small"><a href="/reviews?cat=vibe-coding">바이브 코딩 후기 ${vibe.length}건 모두 보기 →</a></p>`
         : `<div class="program-reviews" data-program="${p.key}"><p class="muted small">공개 동의를 받은 후기가 등록되면 이곳에 표시됩니다. <a href="/reviews">전체 후기 보기</a></p></div>`}</div>
@@ -265,7 +283,8 @@ ${crumbs(crumb)}
       <div role="row" class="pc-head"><span role="columnheader">프로그램</span><span role="columnheader">이런 고민에</span><span role="columnheader">실습 결과물</span></div>
       ${PROGRAM_DETAILS.map(p => `<a role="row" href="#${p.key}"><span role="cell"><b>${p.letter}</b> ${esc(p.title)}</span><span role="cell">${esc(p.problem)}</span><span role="cell">${esc(p.artifacts[0].replace(/\s*\(.*\)$/, ''))}</span></a>`).join('')}
     </div>
-    <p class="trust-note">각 프로그램에 <b>같은 주제 진행 이력 있음(다른 대상)</b> / <b>일부 주제 진행 이력 · 교수님용 새 구성</b> / <b>신규 제안 프로그램</b>을 구분해 표시했습니다. 교수님만을 대상으로 한 단독 강의 이력은 아직 공개 기록에 없으며, 교육 내용은 기관과 협의해 조정하는 제안 구성입니다.</p>
+    <p class="trust-note">각 프로그램에 <b>교수님 대상 진행 이력 있음</b> / <b>일부 주제 진행 이력 · 교수님용 새 구성</b> / <b>신규 제안 프로그램</b>을 구분해 표시했습니다. A(AI 리터러시)와 C(나만의 앱 만들기)는 HTHT 대학 컨소시엄 교직원 직무연수(회당 약 250명)에서, Claude 활용 지식 자산화는 계명대학교 교수님·교직원 과정에서 진행했습니다. 교육 내용은 기관과 협의해 조정합니다.</p>
+    ${professorHighlight({ heading: 'h2', id: 'professor-record' })}
   </div>
 </section>
 <section class="section section-alt"><div class="wrap">${blocks}</div></section>
@@ -297,7 +316,7 @@ export function caseStudiesPage(reviews = []) {
         return `
 <article class="case" id="${h.id}" aria-labelledby="${h.id}-h">
   <h2 id="${h.id}-h">${esc(h.title)}</h2>
-  <div class="case-meta"><time datetime="${h.date}">${fmt(h.date)}</time><span>${esc(h.kind)}</span><span>${esc(h.subject)}</span></div>
+  <div class="case-meta"><time datetime="${h.date}">${esc(dateLabel(h))}</time><span>${esc(h.kind)}</span><span>${esc(h.subject)}</span></div>
   <dl>
     <dt>1. 어떤 기관의 교육이었나요?</dt><dd>${esc(h.org)} — ${esc(h.title)}</dd>
     <dt>2. 누가 참여했나요?</dt><dd>${h.audience ? esc(h.audience) : pending}</dd>
@@ -320,7 +339,8 @@ ${crumbs(crumb)}
     <p class="eyebrow">Case Studies</p>
     <h1>AI 교육 강의 사례와 기관 연수</h1>
     <div class="answer-box"><p>필로소피 AI 교육은 ${s.since}부터 ${esc(s.orgList.join(', '))} 등 ${s.orgs}개 기관·단체에서 ${s.sessions}회 강의했습니다. 모든 사례를 같은 형식(기관·대상·목적·내용·실습·반응·결과·자료)으로 정리하고, 관련된 <a href="/programs">대학 AI 교육 프로그램</a>과 연결했습니다.</p></div>
-    <p class="trust-note">대학 현장의 강의는 경상국립대학교(부설 연수원 교사 자격연수), 경희대학교 대학원, 서울대학교 생산공학연구실입니다. 교수님만을 대상으로 한 단독 강의는 아직 기록에 없습니다. 확인되지 않은 학습 성과는 적지 않으며, 기록이 없는 항목은 <b>기록 보완 예정</b>으로 표시합니다.</p>
+    ${professorHighlight({ heading: 'h2', id: 'professor-record' })}
+    <p class="trust-note">대학 현장의 강의는 HTHT 대학 컨소시엄 교수님·교직원 직무연수(3회), 계명대학교 교수님·교직원 과정(3회), 경상국립대학교(부설 연수원 교사 자격연수), 동신대학교, 경희대학교 대학원, 서울대학교 생산공학연구실입니다. 확인되지 않은 학습 성과는 적지 않으며, 기록이 없는 항목은 <b>기록 보완 예정</b>으로 표시합니다.</p>
   </div>
 </section>
 <section class="section section-alt"><div class="wrap">${cases}</div></section>
@@ -395,7 +415,7 @@ ${crumbs(crumb)}
   <ul class="related">${a.programs.map(k => `<li><a href="/programs#${k}">${esc(programLabel(k))} →</a></li>`).join('')}</ul>
   <h2>관련 강의 사례 · 후기 · 영상</h2>
   <ul class="related">
-    ${cases.map(h => `<li><a href="/case-studies#${h.id}">${fmt(h.date)} ${esc(h.title)} — ${esc(h.subject)}</a></li>`).join('')}
+    ${cases.map(h => `<li><a href="/case-studies#${h.id}">${esc(dateLabel(h))} ${esc(h.title)} — ${esc(h.subject)}</a></li>`).join('')}
     <li><a href="/reviews">수강자 후기 보기</a></li>
     <li><a href="${esc(SITE.channels[0].url)}" target="_blank" rel="noopener">유튜브 · 필로소피 AI 교육 실습 영상 ↗</a></li>
   </ul>
@@ -577,4 +597,17 @@ export function homeFaq(list) {
             <div class="home-faq">${items.map(f => `
                 <details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('')}
             </div>`;
+}
+
+// ───────── 메인(index.html) 강의 이력 블록 — 숫자는 HISTORY 에서 계산 ─────────
+export function historyHeroLines() {
+    const s = historyStats(), ps = professorStats();
+    return `${ps.count ? `                        <div class="fact-prof"><dt>교수님 대상</dt><dd><b>대학 교수님·교직원 대상 강의 ${ps.count}회</b> — ${esc(ps.summary)} <a href="/case-studies#professor-record">보기</a></dd></div>\n` : ''}                        <div><dt>강의 이력</dt><dd>${s.since}부터 ${s.orgs}개 기관·단체 ${s.sessions}회 — 계명대·HTHT 대학 컨소시엄·경상국립대·동신대·경희대 대학원·서울대 연구실·전주교육청 등 <a href="/case-studies">사례 보기</a></dd></div>`;
+}
+export function historySubHome() {
+    const s = historyStats(), ps = professorStats();
+    return `                <p class="section-sub">${s.since.replace('.', '년 ').replace(/^(\d+년 )0?(\d+)$/, '$1$2월')}부터 대학 교수님·교직원 직무연수, 대학 부설 연수원, 대학 수업, 대학원, 연구실, 교육청, 고등학교, 공공기관, 온라인 그룹 코칭에서 강의했습니다 (${s.orgs}개 기관·단체, ${s.sessions}회).${ps.count ? ` 그중 대학 교수님·교직원 대상 강의가 ${ps.count}회입니다.` : ''}</p>`;
+}
+export function professorHome() {
+    return professorHighlight({ heading: 'h3', id: 'professor-record' });
 }

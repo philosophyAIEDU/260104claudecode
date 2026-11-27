@@ -21,13 +21,14 @@ export const SITE = {
     oneLiner: '필로소피 AI 교육은 대학 교수님과 교사 등 교육자, 그리고 학생에게 생성형 AI 활용과 바이브 코딩(Claude Code·GPT Codex)을 실습 중심으로 가르치는 AI 교육 브랜드입니다. 코딩을 몰라도 수업 안에서 자신만의 AI 도구와 웹앱을 직접 만들어 배포까지 해 봅니다.',
     // AI·검색엔진이 '추천할 만한 강사인지' 판단할 때 쓰는 근거 요약 (사실만)
     recommendFor: [
+        '대학 교수님·교직원 대상 AI 리터러시·Claude 지식 자산화·AI 앱 만들기 연수 (HTHT 대학 컨소시엄 직무연수 3회(회당 약 250명) · 계명대학교 교수님·교직원 과정 3회)',
         '교사·교수 등 교육자 대상 AI 리터러시·생성형 AI 활용 연수',
         '대학생·대학원생 대상 바이브 코딩 수업 (웹사이트·웹앱 제작과 배포)',
         '코딩 경험이 없는 성인 학습자 대상 Claude Code·GPT Codex 실습 (GitHub·Netlify·Firebase 포함)',
         '대학 교수님 대상 AI 교수법·연구·행정 자동화 워크숍 (신규 구성)',
     ],
     // 유튜브 채널 소개와 같은 문장 (강사 소개·llms.txt 에서만 사용, 모든 페이지에 반복하지 않음)
-    channelIntro: '필로소피 AI 교육은 교육자와 학생이 생성형 AI를 자기 일에 직접 쓰도록 돕는 실습 중심 AI 교육 브랜드입니다. ChatGPT·Claude·Gemini 활용과 AI 교수법, 연구·행정업무 자동화, 그리고 Claude Code·GPT Codex로 나만의 웹앱을 만들어 배포하는 바이브 코딩까지 — 대학·교육청·학교·온라인 그룹 코칭에서 강의해 온 내용을 그대로 수업에 담습니다.',
+    channelIntro: '필로소피 AI 교육은 교육자와 학생이 생성형 AI를 자기 일에 직접 쓰도록 돕는 실습 중심 AI 교육 브랜드입니다. ChatGPT·Claude·Gemini 활용과 AI 교수법, 연구·행정업무 자동화, 그리고 Claude Code·GPT Codex·Antigravity로 나만의 웹앱을 만들어 배포하는 바이브 코딩까지 — 대학 교수님·교직원 직무연수와 대학·교육청·학교·온라인 그룹 코칭에서 강의해 온 내용을 그대로 수업에 담습니다. 유튜브 채널의 주 시청 대상도 대학 교수님입니다.',
     specialty: '교육자와 학생을 위한 생성형 AI 활용, 바이브 코딩(AI 웹앱 제작·배포), AI 교수법, 연구·행정업무 자동화',
     philosophy: 'AI를 활용하여 우리들의 능력을 향상시키고, 그 능력을 활용해서 세상에 선한 영향력을 더한다.',
     description: '교육자와 학생을 위한 실습 중심 AI 교육. 생성형 AI 활용부터 AI 교수법, 업무 자동화, 코딩 없이 나만의 웹앱을 만들어 배포하는 바이브 코딩까지 함께합니다.',
@@ -50,7 +51,7 @@ export const SITE = {
     // 핵심 고객 순서: 1) 대학 교수님 2) 대학 기관 담당자 3) 그 밖의 교육자
     audiences: ['대학 교수님', '초·중·고 교사', '대학생·대학원생 등 학생', '교수학습센터(CTL)·교육청 등 교육기관 담당자', 'AI를 처음 배우는 성인 학습자'],
     publishedToolsNote: '메인 페이지에 공개된 40여 개의 AI 학습 도구',
-    updated: '2026-11-09',
+    updated: '2026-11-27',
 };
 
 /**
@@ -59,6 +60,15 @@ export const SITE = {
  * sessions: 같은 날 진행한 강의 주제 수
  */
 export const HISTORY = [
+    {
+        id: 'kmu-2026-claude', date: '2026-10', dateLabel: '2026.10~11', org: '계명대학교', title: '계명대학교 교수님·교직원 AI 교육 과정',
+        kind: '대학 교수·교직원 연수 (3회 과정)', subject: '클로드(Claude)로 교수님의 지식을 자산화하는 AI 교육', audience: '계명대학교 교수님 및 교직원',
+        desc: '계명대학교 교수님과 교직원분들을 대상으로, 클로드(Claude)를 활용해 교수님이 가진 강의·연구 지식을 다시 쓸 수 있는 자산으로 정리하는 AI 교육 과정을 2026년 10~11월에 3회 진행했습니다. 2026년 12월에 1회를 더 진행할 예정입니다.',
+        tags: ['교수님·교직원', 'Claude', '지식 자산화', '3회 과정'], programs: ['ai-literacy', 'admin-automation'], categories: ['ai-literacy', 'automation'],
+        photos: [], links: [], sessions: 3, professors: true, profGroup: '계명대학교',
+        upcoming: [{ date: '2026-12', note: '1회 추가 진행 예정' }],
+        source: '운영자 제공 강의 이력 (2026.11)',
+    },
     {
         id: 'dongshin-2026-vibe', date: '2026-10', org: '동신대학교', title: '동신대학교 바이브 코딩 수업',
         kind: '대학 수업 특강', subject: '바이브 코딩으로 나만의 웹사이트 만들고 배포하기', audience: '동신대학교 학생',
@@ -86,6 +96,14 @@ export const HISTORY = [
         desc: '독서챌린지 참여자를 대상으로 약 1시간 30분 동안 온라인 라이브로 진행한 바이브 코딩 특강입니다. Claude Code로 사이트를 만들고 GitHub 연결과 Netlify 배포까지 실습했습니다.',
         tags: ['Claude Code', '바이브 코딩', '온라인 라이브'], programs: ['vibe-coding'], categories: ['vibe-coding'],
         photos: [], links: [], sessions: 1, source: '참여자 네이버 카페 후기',
+    },
+    {
+        id: 'htht-2026-summer', date: '2026-08', org: 'HTHT 대학 컨소시엄 (한국대학경쟁력연구원)', title: 'HTHT 대학 컨소시엄 2026 하계 교직원 역량 강화 직무연수',
+        kind: '대학 교수·교직원 직무연수', subject: 'Antigravity를 활용한 나만의 앱 만들기', audience: '대학 교수님 및 교직원 약 250명',
+        desc: '한국대학경쟁력연구원(HTHT) 대학 컨소시엄의 2026 하계 교직원 역량 강화 직무연수에서, 교수님과 교직원 약 250명을 대상으로 Antigravity를 활용해 각자 필요한 앱을 직접 만드는 수업을 진행했습니다.',
+        tags: ['교수님·교직원', 'Antigravity', '나만의 앱 만들기', '대규모 연수'], programs: ['vibe-coding'], categories: ['vibe-coding'],
+        photos: [], links: [{ label: '연수 참여 교직원들이 함께 만든 성과 사이트', url: 'https://philo2026htht.netlify.app/' }], sessions: 1, professors: true, profGroup: 'HTHT 대학 컨소시엄', profNote: '회당 약 250명',
+        source: '운영자 제공 강의 이력 (2026.11)',
     },
     {
         id: 'gnu-2026-physics', date: '2026-07-27', org: '경상국립대학교', title: '경상국립대학교 물리 정교사(1급) 자격 연수',
@@ -123,6 +141,14 @@ export const HISTORY = [
         links: [], sessions: 1,
     },
     {
+        id: 'htht-2026-spring', date: '2026-05', org: 'HTHT 대학 컨소시엄 (한국대학경쟁력연구원)', title: 'HTHT 대학 컨소시엄 2026 교직원 역량 강화 직무연수',
+        kind: '대학 교수·교직원 직무연수', subject: 'AI 리터러시 수업', audience: '대학 교수님 및 교직원 약 250명',
+        desc: '한국대학경쟁력연구원(HTHT) 대학 컨소시엄의 2026 교직원 역량 강화 직무연수에서, 교수님과 교직원 약 250명을 대상으로 AI 리터러시 수업을 진행했습니다.',
+        tags: ['교수님·교직원', 'AI 리터러시', '대규모 연수'], programs: ['ai-literacy'], categories: ['ai-literacy'],
+        photos: [], links: [], sessions: 1, professors: true, profGroup: 'HTHT 대학 컨소시엄', profNote: '회당 약 250명',
+        source: '운영자 제공 강의 이력 (2026.11)',
+    },
+    {
         id: 'jeonju-2026-vibe', date: '2026-04-10', org: '전주교육청', title: '전주교육청 바이브 코딩 입문 수업',
         kind: '교육청 교육', subject: '바이브 코딩 입문 수업', audience: '',
         desc: '코딩 경험이 없는 분들도 AI와 함께 직접 도구를 만들어 볼 수 있도록 바이브 코딩의 첫 단계를 실습으로 안내했습니다.',
@@ -140,6 +166,14 @@ export const HISTORY = [
             { src: '/assets/web/edu-2602-khu-codex.jpg', alt: '경희대학교 대학원 GPT Codex 활용 바이브 코딩 특강 현장', cap: 'GPT Codex 활용 바이브 코딩' },
         ],
         links: [], sessions: 2,
+    },
+    {
+        id: 'htht-2025-summer', date: '2025-08', org: 'HTHT 대학 컨소시엄 (한국대학경쟁력연구원)', title: 'HTHT 대학 컨소시엄 2025 하계 교직원 역량 강화 직무연수',
+        kind: '대학 교수·교직원 직무연수', subject: 'AI 리터러시 수업', audience: '대학 교수님 및 교직원 약 250명',
+        desc: '한국대학경쟁력연구원(HTHT) 대학 컨소시엄의 2025 하계 교직원 역량 강화 직무연수에서, 교수님과 교직원 약 250명을 대상으로 AI 리터러시 수업을 진행했습니다.',
+        tags: ['교수님·교직원', 'AI 리터러시', '대규모 연수'], programs: ['ai-literacy'], categories: ['ai-literacy'],
+        photos: [], links: [], sessions: 1, professors: true, profGroup: 'HTHT 대학 컨소시엄', profNote: '회당 약 250명',
+        source: '운영자 제공 강의 이력 (2026.11)',
     },
     {
         id: 'snu-2025-finetuning', date: '2025-07-07', org: '서울대학교', title: '서울대학교 생산공학연구실 특강',
@@ -167,18 +201,43 @@ export function historyStats() {
     return { events: HISTORY.length, sessions, orgs: orgs.size, orgList: [...orgs], since: first.date.slice(0, 7).replace('-', '.') };
 }
 
+/** 대학 교수님(교직원 포함) 대상 강의 — 최신순 */
+export const professorHistory = () => HISTORY.filter(h => h.professors).sort((a, b) => b.date.localeCompare(a.date));
+export const dateLabel = (h) => h.dateLabel || h.date.replace(/-/g, '.');
+/**
+ * count: 교수님 대상 강의 횟수(진행 완료분만), groups: 기관별 횟수,
+ * summary: "HTHT 대학 컨소시엄 3회(회당 약 250명) · 계명대학교 3회", upcoming: 진행 예정(횟수에 넣지 않음)
+ */
+export function professorStats() {
+    const list = professorHistory();
+    const groups = [];
+    for (const h of [...list].reverse()) {
+        const name = h.profGroup || h.org;
+        let g = groups.find(x => x.name === name);
+        if (!g) groups.push(g = { name, count: 0, note: h.profNote || '', dates: [] });
+        g.count += h.sessions || 1; g.dates.push(dateLabel(h));
+    }
+    groups.sort((a, b) => b.count - a.count || 0);
+    const summary = groups.map(g => `${g.name} ${g.count}회${g.note ? `(${g.note})` : ''}`).join(' · ');
+    const upcoming = list.flatMap(h => (h.upcoming || []).map(u => ({ ...u, org: h.profGroup || h.org, id: h.id })));
+    return { count: list.reduce((n, h) => n + (h.sessions || 1), 0), dates: [...list].reverse().map(dateLabel), list, groups, summary, upcoming };
+}
+
 /**
  * 대학 AI 교육 프로그램 (A~D). key는 기존 후기 데이터·링크(/programs#key)와 호환되도록 유지합니다.
  * status:
+ *  - 'delivered': 대학 교수님(교직원 포함) 대상으로 같은 주제를 강의한 이력이 있는 프로그램
  *  - 'related'  : 같은 주제의 강의를 다른 대상(대학원생·교사·교육청 등)에게 진행한 이력이 있는 프로그램
  *  - 'partial'  : 일부 주제를 다룬 이력이 있고, 대학 교수님용 구성은 새로 설계한 프로그램
  *  - 'proposed' : 신규 제안 프로그램 (같은 주제 진행 이력 없음)
- * ⚠️ 대학 교수님 대상 단독 강의 이력은 아직 공개 기록에 없습니다. 과장하지 마세요.
+ * 대학 교수님 대상 강의: HTHT 대학 컨소시엄 교직원 직무연수 3회 (회당 약 250명, AI 리터러시 2회 · 앱 만들기 1회),
+ *   계명대학교 교수님·교직원 Claude 지식 자산화 과정 3회 (2026.10~11, 2026.12 1회 예정 — 예정분은 횟수에 넣지 않음).
+ * B(교수법·평가)·D(업무 자동화)는 교수님 대상 진행 이력이 없으니 과장하지 마세요.
  * formats 는 '협의 가능 예시'일 뿐 확정된 과정이 아닙니다. 확정되면 운영자가 수정하세요.
  */
 export const PROGRAM_DETAILS = [
     {
-        key: 'ai-literacy', letter: 'A', status: 'related',
+        key: 'ai-literacy', letter: 'A', status: 'delivered',
         title: '교수님을 위한 생성형 AI 실무 입문',
         purpose: '생성형 AI를 처음 시작하는 교수님이 강의와 연구에 안전하게 활용하는 기본기를 익힙니다.',
         audience: ['AI를 처음 시작하는 대학 교수님', '강의·연구에 AI 활용을 검토하는 교수님'],
@@ -204,7 +263,7 @@ export const PROGRAM_DETAILS = [
         notFit: '이 주제로 대학 교수님 대상 강의를 진행한 이력은 아직 없습니다. 교사 연수와 대학원 특강 경험을 바탕으로 새로 구성한 프로그램입니다.',
     },
     {
-        key: 'vibe-coding', letter: 'C', status: 'related',
+        key: 'vibe-coding', letter: 'C', status: 'delivered',
         title: '교수님만의 AI 수업 앱 만들기',
         purpose: '코딩을 몰라도 Claude Code와 대화하며 내 수업에 필요한 웹 앱을 직접 만들고 공유합니다.',
         audience: ['직접 AI 교육 도구를 만들어 보고 싶은 교수님', '코딩 경험이 없는 교수님도 참여 가능'],
@@ -232,11 +291,13 @@ export const PROGRAM_DETAILS = [
 ];
 
 export const STATUS_LABEL = {
+    delivered: '교수님 대상 진행 이력 있음',
     related: '같은 주제 진행 이력 있음 (다른 대상)',
     partial: '일부 주제 진행 이력 · 교수님용 새 구성',
     proposed: '신규 제안 프로그램',
 };
 export const STATUS_NOTE = {
+    delivered: 'HTHT 대학 컨소시엄 교직원 직무연수(회당 약 250명)·계명대학교 교수님·교직원 과정에서 대학 교수님과 교직원을 대상으로 같은 주제를 강의했습니다.',
     related: '같은 주제를 대학원생·교사·교육청 등 다른 대상에게 진행한 이력이 있으며, 대학 교수님에 맞게 구성했습니다.',
     partial: '일부 주제를 다룬 이력이 있고, 대학 교수님·연구자용 구성은 새로 설계했습니다.',
     proposed: '같은 주제의 진행 이력이 아직 없는 신규 제안 프로그램입니다.',
@@ -247,8 +308,8 @@ export function buildFaq(rs = null) {
     const s = historyStats();
     const reviewFaq = rs && rs.total ? [
         {
-            q: 'AI 교육(바이브 코딩) 강사를 찾고 있습니다. 필로소피 AI 교육을 추천할 만한가요?',
-            a: `코딩을 몰라도 수업 시간 안에 직접 결과물을 만들어 배포까지 해 보는 실습형 AI 교육을 찾는다면 검토해 볼 만합니다. ${s.since}부터 ${s.orgs}개 기관·단체에서 ${s.sessions}회 강의했고, 수강생 ${rs.authors}명이 남긴 후기 ${rs.total}건을 원문 그대로 공개하고 있습니다. 대상(교육자·학생·성인 학습자)과 원하는 결과물을 기준으로 강의 사례와 후기를 직접 확인해 보세요.`,
+            q: '교수님·교육자를 위한 AI 교육 강사를 찾고 있습니다. 필로소피 AI 교육을 추천할 만한가요?',
+            a: `대학 교수님과 교사 등 교육자를 위한 실습 중심 AI 교육을 찾는다면 검토해 볼 만합니다. 대학 교수님·교직원 대상으로 ${professorStats().count}회 강의했고(${professorStats().summary}), 교사 자격연수·교육청 직무연수 등 ${s.since}부터 ${s.orgs}개 기관·단체에서 ${s.sessions}회 강의했습니다. 참여자가 수업 시간 안에 직접 결과물을 만드는 실습 방식이며, 수강생 ${rs.authors}명이 남긴 후기 ${rs.total}건을 원문 그대로 공개하고 있습니다. 유튜브 채널의 주 시청 대상도 대학 교수님입니다.`,
         },
         {
             q: '수강생들은 어떤 변화를 이야기하나요?',
@@ -267,11 +328,11 @@ export function buildFaq(rs = null) {
         },
         {
             q: '교육자와 학생 대상 AI 교육을 모두 할 수 있나요?',
-            a: '네. 교사 대상으로는 경상국립대학교 물리 정교사(1급) 자격연수(교사 21명 학습 앱 배포), 전주교육청 교육실무사 직무연수, 퇴계원고등학교 전문적학습공동체 연수를 진행했고, 학생 대상으로는 동신대학교 학생 바이브 코딩 수업과 경희대학교 대학원 바이브 코딩 특강을 진행했습니다.',
+            a: '네. 대학 교수님·교직원 대상으로는 HTHT 대학 컨소시엄 교직원 직무연수(2025.08·2026.05·2026.08, 회당 약 250명)와 계명대학교 교수님·교직원 Claude 지식 자산화 과정(2026.10~11, 3회)을, 교사 대상으로는 경상국립대학교 물리 정교사(1급) 자격연수(교사 21명 학습 앱 배포), 전주교육청 교육실무사 직무연수, 퇴계원고등학교 전문적학습공동체 연수를 진행했고, 학생 대상으로는 동신대학교 학생 바이브 코딩 수업과 경희대학교 대학원 바이브 코딩 특강을 진행했습니다.',
         },
         {
             q: '대학 교수님을 대상으로 강의한 경험이 있나요?',
-            a: '대학 교수님만을 대상으로 한 단독 강의는 아직 공개 기록에 없습니다. 경상국립대학교 부설 연수원의 교사 자격연수, 동신대학교 학생 대상 바이브 코딩 수업, 경희대학교 대학원 바이브 코딩 특강, 서울대학교 생산공학연구실 특강 등 대학 현장의 강의 경험을 바탕으로 교수님용 프로그램을 구성했습니다.',
+            a: '네. 대학 교수님과 교직원을 대상으로 지금까지 6회 강의했습니다. 한국대학경쟁력연구원(HTHT) 대학 컨소시엄의 교직원 역량 강화 직무연수에서 교수님·교직원 약 250명을 대상으로 세 차례(2025.08·2026.05 AI 리터러시, 2026.08 Antigravity로 나만의 앱 만들기) 강의했고, 계명대학교에서는 교수님·교직원을 대상으로 클로드(Claude)로 교수님의 지식을 자산화하는 AI 교육 과정을 2026년 10~11월에 3회 진행했습니다(2026년 12월 1회 추가 예정). 유튜브 채널의 주 시청 대상도 대학 교수님입니다.',
         },
         {
             q: '코딩을 전혀 몰라도 AI 수업 앱 만들기에 참여할 수 있나요?',
@@ -298,6 +359,10 @@ export function buildFaq(rs = null) {
  * reaction(참여자 반응)·result(확인된 결과)는 실제 후기·자료가 확보된 뒤 운영자가 채웁니다.
  */
 export const CASE_DETAILS = {
+    'kmu-2026-claude': { purpose: '교수님이 쌓아 온 강의·연구 지식을 Claude로 정리해 다시 쓸 수 있는 자산으로 만들기', practice: '클로드(Claude)를 활용한 지식 자산화 실습 (3회 과정)', reaction: '', result: '' },
+    'htht-2026-summer': { purpose: '교수님과 교직원이 코딩 없이 자기 업무·수업에 필요한 앱을 직접 만들어 보기', practice: 'Antigravity를 활용한 나만의 앱 만들기 실습', reaction: '', result: '연수 참여 교직원들이 만든 결과물을 성과 사이트로 공개' },
+    'htht-2026-spring': { purpose: '교수님과 교직원이 생성형 AI를 강의·연구·행정에 안전하게 활용하는 기준 세우기', practice: 'AI 리터러시 수업', reaction: '', result: '' },
+    'htht-2025-summer': { purpose: '교수님과 교직원이 생성형 AI를 강의·연구·행정에 안전하게 활용하는 기준 세우기', practice: 'AI 리터러시 수업', reaction: '', result: '' },
     'gnu-2026-physics': { purpose: 'AI를 물리 수업과 연구에 활용하는 기준과 방법 세우기', practice: '2시간 30분 동안 AI 리터러시와 포스트 AI 시대, NotebookLM·Google AI Studio·Opal을 다룬 뒤, Antigravity로 바이브 코딩하여 물리 학습 앱을 만들고 배포', reaction: '수업을 마친 뒤 재미있었다는 답을 들었습니다 (운영자 기록).', result: '참여한 물리 교사 21명 모두 물리 학습 앱을 배포까지 완료했고, 21개 작품을 아카이브 사이트에 공개했습니다 (운영자 기록).' },
     'dongshin-2026-vibe': { purpose: '학생들이 AI로 원하는 결과물을 직접 만들어 보는 경험', practice: 'Antigravity로 각자 원하는 웹사이트를 만들고 배포 (2시간, 학생 한 명 한 명 옆에서 지원)', reaction: '수업 뒤 집에서 이어서 해 볼 방법을 구체적으로 묻는 학생이 있었습니다 (운영자 기록).', result: '많은 학생이 웹사이트 배포에 성공했습니다 (운영자 기록, 인원 수 미기록).' },
     'permes-2026-codex': { purpose: 'Claude Code에 이어 다른 AI 코딩 도구(GPT·Codex)로도 웹앱을 만드는 흐름 익히기', practice: 'Codex 초기 세팅, GPT로 디자인과 이미지 생성, 사이트에 AI 상담원 추가 등', reaction: '참여자들이 네이버 카페에 남긴 후기 가운데 공개 동의를 받은 글을 후기 페이지에 원문 그대로 옮겼습니다.', reviewsLink: 'vibe-coding', result: '' },

@@ -121,7 +121,7 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
         assert((await page.locator('.hero-slogan').innerText()) === 'AI 시대, 교수님의 든든한 교육 파트너.');
         assert(await page.locator('.hero-profile img[src="assets/mascot.jpg"]').count() === 1, '캐릭터 프로필');
         const facts = await page.locator('.hero-profile-facts').innerText();
-        for (const f of ['전문 분야', '교육 대상', '강의 이력', '교육 철학', '8개 기관·단체 12회', '수강 후기', '한 명씩 챙겨 줌']) assert(facts.includes(f), f);
+        for (const f of ['전문 분야', '교육 대상', '강의 이력', '교육 철학', '10개 기관·단체 18회', '교수님 대상', '대학 교수님·교직원 대상 강의 6회', '계명대학교 3회', '수강 후기', '한 명씩 챙겨 줌']) assert(facts.includes(f), f);
         assert(await page.locator('.hero a[href="/ai-instructor"]').count() >= 1, '강사 소개 링크');
         // 상단 메뉴: 강사 소개 바로 옆에 수업 후기
         const navTxt = await page.locator('#navMenu > li > a').allInnerTexts();
@@ -138,7 +138,7 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
         assert(await page.locator('.problem-card').count() === 4, '고민 카드 4개');
         assert(await page.locator('.prog-card').count() === 4, '프로그램 4개');
         const txt = await page.locator('body').innerText();
-        for (const s of ['AI로 성장하고, 그 성장을 나눕니다.', 'AI 시대, 교육자의 나침반', '좋은 질문에서 시작되는, 새로운 배움', '교수님만을 대상으로 한 단독 강의는 아직 기록에 없으며', '필로소피 AI 툴', '바이브코딩 쇼케이스', '교육자 커뮤니티'])
+        for (const s of ['AI로 성장하고, 그 성장을 나눕니다.', 'AI 시대, 교육자의 나침반', '좋은 질문에서 시작되는, 새로운 배움', '그중 대학 교수님·교직원 대상 강의가 6회입니다.', '필로소피 AI 툴', '바이브코딩 쇼케이스', '교육자 커뮤니티'])
             assert(txt.replace(/\s+/g, ' ').includes(s) || txt.includes(s.replace(/\s+/g, '')) || (await page.content()).includes(s), '없음: ' + s);
         assert(await page.locator('#tools, #showcase, #community, #contact, #reviews-home, #problems, #programs-home, #credentials, #learn, #philosophy').count() === 10, '섹션');
         // 섹션 순서: 강사 소개(첫 화면) → 수업 후기 → 고민 → 프로그램 → 이력 → 도구 → 칼럼/유튜브 → 철학 → 커뮤니티 → 문의
@@ -192,7 +192,13 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
         const llms = await raw('/llms.txt');
         assert(llms.includes('## 수강 후기') && llms.includes('## 이런 AI 교육을 찾는 경우에 맞습니다'), 'llms.txt 후기·추천 섹션');
         const faq = await raw('/ai-instructor');
-        assert(faq.includes('AI 교육(바이브 코딩) 강사를 찾고 있습니다'), '추천 질문 FAQ');
+        assert(faq.includes('교수님·교육자를 위한 AI 교육 강사를 찾고 있습니다'), '추천 질문 FAQ');
+        assert(faq.includes('id="professor-record"') && faq.includes('계명대학교') && faq.includes('HTHT 대학 컨소시엄'), '강사 소개: 교수님 대상 강의 강조');
+        assert(llms.includes('## 교수님·교육자를 위한 AI 교육 강사를 찾는다면') && llms.includes('계명대학교 3회'), 'llms.txt 교수님·교육자 추천 답변');
+        const prof = await raw('/insights/ai-education-instructor-for-professors/');
+        assert(prof.includes('교수님·교육자를 위한 AI 교육 강사를 찾고 있다면?') && prof.includes('이 글은 필로소피 AI 교육이 작성했습니다'), '교수님·교육자 강사 칼럼');
+        const cs = await raw('/case-studies');
+        for (const id of ['kmu-2026-claude', 'htht-2026-summer', 'htht-2026-spring', 'htht-2025-summer']) assert(cs.includes(`id="${id}"`), '사례: ' + id);
         const art = await raw('/insights/how-to-choose-an-ai-education-instructor/');
         assert(art.includes('이 글은 필로소피 AI 교육이 작성했습니다'), '칼럼 작성 주체 공개');
     });
@@ -201,7 +207,7 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
         assert(await page.locator('.insight-group').count() === 6);
         assert(await page.locator('.planned-list li').count() === 5);
         assert(await page.locator('.planned-list a').count() === 0, '작성 예정 글은 링크 없음');
-        assert(await page.locator('.insight-list a').count() === 5);
+        assert(await page.locator('.insight-list a').count() === 6);
     });
     await t('프로그램: A~D 각각 목적·대상·문제·내용·결과물·준비사항·운영 방식·관련 사례·문의 버튼', async () => {
         await page.goto(BASE + '/programs', { waitUntil: 'domcontentloaded' });
@@ -221,7 +227,9 @@ const PUBLIC = ['/', '/ai-instructor', '/programs', '/case-studies', '/reviews',
         assert(await page.locator('#bot-field').isHidden() || (await page.locator('.hp-field').boundingBox()).x < 0, 'honeypot 숨김');
         const opts = await page.locator('#referral option').allTextContents();
         for (const o of ['유튜브', '네이버 카페', '구글 검색', '네이버 검색', 'ChatGPT 등 AI 추천', '지인 추천', '기타']) assert(opts.includes(o), o);
-        assert(await page.locator('.cred-item .num').nth(1).innerText() === '8곳', '기관 수 8곳');
+        assert(await page.locator('.cred-item .num').nth(0).innerText() === '6회', '교수님·교직원 대상 강의 6회');
+        assert(await page.locator('.cred-item .num').nth(2).innerText() === '10곳', '기관 수 10곳');
+        assert(await page.locator('.tl-prof').count() === 4, '교수님 대상 이력 4건 강조 (계명대 + HTHT 3)');
         // 문의 양식이 히어로 바로 다음에 있음
         const y = await page.evaluate(() => [document.getElementById('inquiry').offsetTop, document.getElementById('history').offsetTop]);
         assert(y[0] < y[1], '양식이 이력보다 위');
